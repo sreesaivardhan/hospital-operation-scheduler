@@ -1,0 +1,3319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System - Complete Professional Dashboard</title>
+    <style>
+        /* Modern Executive UI/UX Styling */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-bg: #2c3e50;
+            --light-bg: #ecf0f1;
+            --card-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --glass-effect: rgba(255, 255, 255, 0.25);
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--primary-gradient);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        /* Auth Container */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: var(--card-shadow);
+            transform: translateY(0);
+            transition: var(--transition);
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.5);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h1 {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .dashboard-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--glass-effect);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 2rem 0;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .nav-brand {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .nav-brand h2 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-right: 3px solid #fff;
+        }
+
+        .nav-link i {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .content-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .content-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(31, 38, 135, 0.4);
+        }
+
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            background: var(--primary-gradient);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Form Styling */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #e74c3c;
+            background: #ffeaea;
+        }
+
+        .form-input.success {
+            border-color: #27ae60;
+            background: #eaffea;
+        }
+
+        .validation-message {
+            font-size: 14px;
+            margin-top: 5px;
+            padding: 5px 0;
+        }
+
+        .error-text {
+            color: #dc3545;
+        }
+
+        .success-text {
+            color: #28a745;
+        }
+
+        .password-strength {
+            margin-top: 5px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: #e1e8ed;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+
+        .strength-weak {
+            background: #dc3545;
+            width: 25%;
+        }
+
+        .strength-fair {
+            background: #ffc107;
+            width: 50%;
+        }
+
+        .strength-good {
+            background: #17a2b8;
+            width: 75%;
+        }
+
+        .strength-strong {
+            background: #28a745;
+            width: 100%;
+        }
+
+        /* Button Styling */
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transition);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-gradient);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-gradient);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--card-shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .close:hover {
+            color: var(--text-primary);
+            transform: scale(1.1);
+        }
+
+        /* Table Styling */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table th {
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border-left: 5px solid transparent;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(31, 38, 135, 0.3);
+            border-left-color: #667eea;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .item-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Messages */
+        .message {
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            display: none;
+            animation: slideInDown 0.3s ease;
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+            color: #c0392b;
+        }
+
+        .message.success {
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid #27ae60;
+            color: #1e8449;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Schedule Grid */
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .schedule-day {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .schedule-day:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .schedule-day.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .schedule-builder {
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .schedule-day-builder {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .schedule-day-builder label {
+            min-width: 100px;
+            margin-bottom: 0;
+        }
+
+        .time-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-inputs input {
+            width: 120px;
+            padding: 8px 12px;
+        }
+
+        /* Search and Filter Bar */
+        .search-filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            background: white;
+        }
+
+        /* Session Info */
+        .session-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* User Info */
+        .user-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Admin Features */
+        .admin-features, .user-features {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .admin-features h3, .user-features h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #bbdefb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .feature-list li:hover {
+            background: #f5f5f5;
+            padding-left: 10px;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Activity Log */
+        .activity-log {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #f1f2f6;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .log-entry {
+            padding: 10px;
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .log-time {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .log-action {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .log-details {
+            font-size: 14px;
+            color: #495057;
+            margin-top: 5px;
+        }
+
+        /* Badge */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-admin {
+            background: #dc3545;
+            color: white;
+        }
+
+        .badge-user {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-verified {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .badge-unverified {
+            background: #6c757d;
+            color: white;
+        }
+
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .dashboard-nav {
+                transform: translateX(-100%);
+                transition: var(--transition);
+            }
+            
+            .dashboard-nav.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .search-filter-bar {
+                flex-direction: column;
+            }
+
+            .search-input {
+                min-width: 100%;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .auth-link {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .auth-link:hover {
+            color: #5a6cd8;
+            text-decoration: underline;
+        }
+
+        .toggle-auth {
+            text-align: center;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication Container -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>🏥 MediCore</h1>
+                <p id="authTitle">Welcome to Professional Healthcare Management</p>
+            </div>
+
+            <!-- Messages -->
+            <div id="authErrorMessage" class="message error"></div>
+            <div id="authSuccessMessage" class="message success"></div>
+
+            <!-- Auth Form -->
+            <form id="authForm">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email" class="form-input" autocomplete="off" required placeholder="Enter your professional email">
+                    <div class="validation-message" id="emailValidation"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-input" autocomplete="new-password" required placeholder="Enter secure password">
+                    <div class="validation-message" id="passwordValidation"></div>
+                    <div class="password-strength" id="passwordStrength" style="display: none;">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <small id="strengthText">Password strength</small>
+                    </div>
+                </div>
+
+                <!-- Forgot Password Link -->
+                <div class="forgot-password" id="forgotPasswordContainer" style="display: block;">
+                    <a href="#" class="auth-link" id="forgotPasswordLink">Forgot Password?</a>
+                </div>
+
+                <!-- Registration Fields -->
+                <div id="registerFields" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="form-input" autocomplete="new-password" placeholder="Confirm your password">
+                        <div class="validation-message" id="confirmPasswordValidation"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="fullName">Full Name</label>
+                        <input type="text" id="fullName" class="form-input" placeholder="Dr. John Smith">
+                        <div class="validation-message" id="fullNameValidation"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-input" placeholder="+1 (555) 123-4567">
+                        <div class="validation-message" id="phoneValidation"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="department">Department</label>
+                        <select id="department" class="form-input">
+                            <option value="">Select Department</option>
+                            <option value="emergency">Emergency Medicine</option>
+                            <option value="cardiology">Cardiology</option>
+                            <option value="neurology">Neurology</option>
+                            <option value="pediatrics">Pediatrics</option>
+                            <option value="orthopedics">Orthopedics</option>
+                            <option value="administration">Administration</option>
+                        </select>
+                        <div class="validation-message" id="departmentValidation"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="role">Role</label>
+                        <select id="role" class="form-input">
+                            <option value="user">Healthcare Professional</option>
+                            <option value="admin">Department Admin</option>
+                            <option value="superadmin">System Administrator</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="authButton" style="width: 100%; margin-top: 1rem;">
+                    <span id="authButtonText">Sign In Securely</span>
+                    <span id="authSpinner" class="spinner" style="display: none;"></span>
+                </button>
+            </form>
+
+            <div class="toggle-auth">
+                <a href="#" id="toggleLink" class="auth-link">
+                    Need an account? Register here
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container" id="dashboardContainer">
+        <!-- Navigation Sidebar -->
+        <nav class="dashboard-nav" id="dashboardNav">
+            <div class="nav-brand">
+                <h2>🏥 MediCore</h2>
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Healthcare Management</p>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showSection('overview')">
+                        <i>📊</i> Dashboard Overview
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('doctors')">
+                        <i>👨‍⚕️</i> Doctor Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('users')">
+                        <i>👥</i> User Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('analytics')">
+                        <i>📈</i> Analytics Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('operations')">
+                        <i>⚙️</i> Operations Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('scheduling')">
+                        <i>📅</i> Scheduling System
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('profile')">
+                        <i>👤</i> Profile Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('assignments')">
+                        <i>📋</i> View Assignments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('availability')">
+                        <i>🕒</i> Update Availability
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('logs')">
+                        <i>📝</i> Audit Logs
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                    <a href="#" class="nav-link" onclick="logout()" style="color: #ff6b6b;">
+                        <i>🚪</i> Secure Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <h1 id="pageTitle">Dashboard Overview</h1>
+                <div class="breadcrumb">
+                    <span id="breadcrumbPath">Home › Dashboard</span>
+                    <div style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
+                        <span id="userWelcome">Welcome, Professional</span>
+                        <span id="sessionStatus" style="padding: 0.5rem 1rem; background: rgba(39, 174, 96, 0.1); color: #27ae60; border-radius: 20px; font-size: 0.9rem;">● Active Session</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Overview Section -->
+            <div id="section-overview" class="content-section active">
+                <!-- Session Info -->
+                <div id="sessionInfo" class="session-info" style="display: none;">
+                    <strong>Session Active:</strong> <span id="sessionTime">-</span><br>
+                    <strong>Last Activity:</strong> <span id="lastActivity">-</span>
+                </div>
+
+                <!-- Statistics Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👨‍⚕️</div>
+                        <div class="stat-number" id="totalDoctors">0</div>
+                        <div class="stat-label">Total Doctors</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div class="stat-label">Healthcare Staff</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-number" id="totalAppointments">127</div>
+                        <div class="stat-label">Active Appointments</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-number" id="monthlyRevenue">$45.2K</div>
+                        <div class="stat-label">Monthly Revenue</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="section-card">
+                    <h2 class="section-title">Quick Actions</h2>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="showSection('doctors')">
+                            <i>👨‍⚕️</i> Manage Doctors
+                        </button>
+                        <button class="btn btn-success" onclick="showSection('scheduling')">
+                            <i>📅</i> Schedule Management
+                        </button>
+                        <button class="btn btn-warning" onclick="showSection('analytics')">
+                            <i>📈</i> View Analytics
+                        </button>
+                        <button class="btn btn-danger" onclick="openModal('emergencyModal')">
+                            <i>🚨</i> Emergency Protocol
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Info Card -->
+                <div class="section-card">
+                    <h2 class="section-title">User Information</h2>
+                    <div class="user-info">
+                        <p><strong>Name:</strong> <span id="userName">-</span></p>
+                        <p><strong>Email:</strong> <span id="userEmail">-</span></p>
+                        <p><strong>Role:</strong> <span id="userRole">-</span></p>
+                        <p><strong>Department:</strong> <span id="userDepartment">-</span></p>
+                        <p><strong>Status:</strong> <span id="userStatus">-</span></p>
+                        <p><strong>Session:</strong> <span id="sessionStatusInfo">Active</span></p>
+                    </div>
+                    <button class="btn btn-success" onclick="editProfile()">Edit Profile</button>
+                    <button class="btn btn-danger" onclick="logout()">Logout</button>
+                </div>
+
+                <!-- Admin Panel -->
+                <div id="adminPanel" class="section-card" style="display: none;">
+                    <h2 class="section-title">Admin Panel</h2>
+                    <button class="btn btn-primary" onclick="viewAllUsers()">View All Users</button>
+                    <button class="btn btn-success" onclick="exportUsers()">Export Users</button>
+                    <div id="userStats" style="margin-top: 1rem;">
+                        <p><strong>Total Users:</strong> <span id="totalUsersAdmin">0</span></p>
+                        <p><strong>Verified Users:</strong> <span id="verifiedUsers">0</span></p>
+                        <p><strong>Admin Users:</strong> <span id="adminUsers">0</span></p>
+                    </div>
+                </div>
+
+                <!-- Session Management -->
+                <div class="section-card">
+                    <h2 class="section-title">Session Management</h2>
+                    <div class="session-info">
+                        <p><strong>Login Time:</strong> <span id="loginTime">-</span></p>
+                        <p><strong>Session Duration:</strong> <span id="sessionDuration">-</span></p>
+                        <p><strong>Auto-logout:</strong> <span id="autoLogoutTime">30 minutes</span></p>
+                    </div>
+                    <button class="btn btn-primary" onclick="extendSession()">Extend Session</button>
+                    <button class="btn btn-danger" onclick="endSession()">End Session</button>
+                </div>
+
+                <!-- Authentication Flows -->
+                <div class="section-card">
+                    <h2 class="section-title">Authentication Flows</h2>
+                    <button class="btn btn-primary" onclick="changePassword()">Change Password</button>
+                    <button class="btn btn-warning" onclick="resetPassword()">Reset Password</button>
+                    <button class="btn btn-success" onclick="resendVerification()">Resend Verification</button>
+                    <button class="btn btn-primary" onclick="viewLoginHistory()">Login History</button>
+                </div>
+
+                <!-- Feature Lists Based on Role -->
+                <div id="adminFeatures" class="admin-features" style="display: none;">
+                    <h3>🔧 Admin Features</h3>
+                    <ul class="feature-list">
+                        <li onclick="manageUsers()">👥 Manage Users</li>
+                        <li onclick="viewAnalytics()">📊 View Analytics</li>
+                        <li onclick="systemSettings()">⚙️ System Settings</li>
+                        <li onclick="manageOperations()">📋 Manage Operations</li>
+                        <li onclick="scheduleManagement()">📅 Schedule Management</li>
+                        <li onclick="auditLogs()">📝 Audit Logs</li>
+                    </ul>
+                </div>
+                
+                <div id="userFeatures" class="user-features">
+                    <h3>👤 User Features</h3>
+                    <ul class="feature-list">
+                        <li onclick="viewSchedule()">📅 View Schedule</li>
+                        <li onclick="profileSettings()">👤 Profile Settings</li>
+                        <li onclick="contactSupport()">📞 Contact Support</li>
+                        <li onclick="viewAssignments()">📋 View Assignments</li>
+                        <li onclick="updateAvailability()">🕒 Update Availability</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Doctor Management Section -->
+            <div id="section-doctors" class="content-section">
+                <div class="section-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 class="section-title">Doctor Management</h2>
+                        <div>
+                            <button class="btn btn-primary" onclick="openDoctorModal()">
+                                <i>➕</i> Add New Doctor
+                            </button>
+                            <button class="btn btn-success" onclick="exportDoctors()">
+                                <i>📊</i> Export Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div class="search-filter-bar">
+                        <input type="text" id="doctorSearch" class="search-input" placeholder="Search doctors..." onkeyup="searchDoctors()">
+                        <select id="specializationFilter" class="filter-select" onchange="filterDoctors()">
+                            <option value="">All Specializations</option>
+                            <option value="cardiology">Cardiology</option>
+                            <option value="neurology">Neurology</option>
+                            <option value="pediatrics">Pediatrics</option>
+                            <option value="orthopedics">Orthopedics</option>
+                            <option value="emergency">Emergency Medicine</option>
+                        </select>
+                        <select id="statusFilter" class="filter-select" onchange="filterDoctors()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <!-- Doctors Grid -->
+                    <div id="doctorsContainer" class="cards-grid">
+                        <!-- Doctors will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management Section -->
+            <div id="section-users" class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">Healthcare Staff Management</h2>
+                    <div id="usersContainer">
+                        <!-- Users will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="section-analytics" class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">Analytics Dashboard</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-number">94%</div>
+                            <div class="stat-label">Patient Satisfaction</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-number">12.5</div>
+                            <div class="stat-label">Avg. Wait Time (min)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏥</div>
+                            <div class="stat-number">87%</div>
+                            <div class="stat-label">Bed Occupancy</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💊</div>
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">Prescriptions Today</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operations Management Section -->
+            <div id="section-operations" class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">Operations Management</h2>
+                    <div class="form-grid">
+                        <div class="stat-card">
+                            <h3>Equipment Status</h3>
+                            <p>All critical equipment operational</p>
+                            <button class="btn btn-primary btn-sm">View Details</button>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Supply Inventory</h3>
+                            <p>Stock levels: Normal</p>
+                            <button class="btn btn-warning btn-sm">Manage Inventory</button>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Staff Scheduling</h3>
+                            <p>All shifts covered</p>
+                            <button class="btn btn-success btn-sm">View Schedule</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scheduling Section -->
+            <div id="section-scheduling" class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">Scheduling System</h2>
+                    <div class="schedule-grid">
+                        <div class="schedule-day active">
+                            <h4>Mon</h4>
+                            <p>8 appointments</p>
+                        </div>
+                        <div class="schedule-day">
+                            <h4>Tue</h4>
+                            <p>12 appointments</p>
+                        </div>
+                        <div class="schedule-day">
+                            <h4>Wed</h4>
+                            <p>10 appointments</p>
+                        </div>
+                        <div class="schedule-day">
+                            <h4>Thu</h4>
+                            <p>15 appointments</p>
+                        </div>
+                        <div class="schedule-day">
+                            <h4>Fri</h4>
+                            <p>9 appointments</p>
+                        </div>
+                        <div class="schedule-day">
+                            <h4>Sat</h4>
+                            <p>6 appointments</p>
+                        </div>
+                        <div class="schedule-day">
+                            <h4>Sun</h4>
+                            <p>3 appointments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="section-profile" class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">Profile Settings</h2>
+                    <form id="profileForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="editFullName">Full Name</label>
+                                <input type="text" id="editFullName" class="form-input" required>
+                                <div class="validation-message" id="editFullNameValidation"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="editEmail">Email</label>
+                                <input type="email" id="editEmail" class="form-input" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="editPhone">Phone Number</label>
+                                <input type="tel" id="editPhone" class="form-input">
+                                <div class="validation-message" id="editPhoneValidation"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="editDepartment">Department</label>
+                                <select id="editDepartment" class="form-input">
+                                    <option value="emergency">Emergency Medicine</option>
+                                    <option value="cardiology">Cardiology</option>
+                                    <option value="neurology">Neurology</option>
+                                    <option value="pediatrics">Pediatrics</option>
+                                    <option value="orthopedics">Orthopedics</option>
+                                    <option value="administration">Administration</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="bio">Bio</label>
+                            <textarea id="bio" class="form-input" rows="4" placeholder="Tell us about yourself"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Assignments Section -->
+            <div id="section-assignments" class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">Current Assignments</h2>
+                    <div id="assignmentsList" class="cards-grid">
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div>
+                                    <div class="item-title">Emergency Department Coverage</div>
+                                    <div class="item-subtitle">Monday - Wednesday, 8:00 AM - 4:00 PM</div>
+                                </div>
+                                <span class="badge badge-active">Active</span>
+                            </div>
+                        </div>
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div>
+                                    <div class="item-title">Patient Consultation - Cardiology</div>
+                                    <div class="item-subtitle">Thursday - Friday, 10:00 AM - 6:00 PM</div>
+                                </div>
+                                <span class="badge" style="background: rgba(255, 193, 7, 0.1); color: #b45309;">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Availability Section -->
+            <div id="section-availability" class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">Update Availability</h2>
+                    <form id="availabilityForm">
+                        <div class="schedule-builder">
+                            <div class="schedule-day-builder">
+                                <input type="checkbox" id="monday" value="monday">
+                                <label for="monday">Monday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="mondayStart" class="form-input" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="mondayEnd" class="form-input" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day-builder">
+                                <input type="checkbox" id="tuesday" value="tuesday">
+                                <label for="tuesday">Tuesday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="tuesdayStart" class="form-input" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="tuesdayEnd" class="form-input" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day-builder">
+                                <input type="checkbox" id="wednesday" value="wednesday">
+                                <label for="wednesday">Wednesday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="wednesdayStart" class="form-input" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="wednesdayEnd" class="form-input" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day-builder">
+                                <input type="checkbox" id="thursday" value="thursday">
+                                <label for="thursday">Thursday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="thursdayStart" class="form-input" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="thursdayEnd" class="form-input" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day-builder">
+                                <input type="checkbox" id="friday" value="friday">
+                                <label for="friday">Friday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="fridayStart" class="form-input" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="fridayEnd" class="form-input" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day-builder">
+                                <input type="checkbox" id="saturday" value="saturday">
+                                <label for="saturday">Saturday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="saturdayStart" class="form-input" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="saturdayEnd" class="form-input" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day-builder">
+                                <input type="checkbox" id="sunday" value="sunday">
+                                <label for="sunday">Sunday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="sundayStart" class="form-input" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="sundayEnd" class="form-input" value="17:00">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 2rem;">Update Availability</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Audit Logs Section -->
+            <div id="section-logs" class="content-section">
+                <div class="section-card">
+                    <h2 class="section-title">System Audit Logs</h2>
+                    <div class="activity-log" id="activityLog">
+                        <!-- Audit logs will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Management Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">User Management</h2>
+                <button class="close" onclick="closeModal('userModal')">&times;</button>
+            </div>
+            <div style="padding: 1rem;">
+                <div id="usersTableContainer">
+                    <table class="data-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Modal -->
+    <div id="doctorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="doctorModalTitle">Add New Doctor</h2>
+                <button class="close" onclick="closeDoctorModal()">&times;</button>
+            </div>
+
+            <form id="doctorForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="doctorName">Full Name *</label>
+                        <input type="text" id="doctorName" class="form-input" required>
+                        <div class="validation-message" id="doctorNameValidation"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="doctorEmail">Email Address *</label>
+                        <input type="email" id="doctorEmail" class="form-input" required>
+                        <div class="validation-message" id="doctorEmailValidation"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="doctorPhone">Phone Number *</label>
+                        <input type="tel" id="doctorPhone" class="form-input" required>
+                        <div class="validation-message" id="doctorPhoneValidation"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="doctorSpecialization">Specialization *</label>
+                        <select id="doctorSpecialization" class="form-input" required>
+                            <option value="">Select Specialization</option>
+                            <option value="cardiology">Cardiology</option>
+                            <option value="neurology">Neurology</option>
+                            <option value="pediatrics">Pediatrics</option>
+                            <option value="orthopedics">Orthopedics</option>
+                            <option value="emergency">Emergency Medicine</option>
+                            <option value="oncology">Oncology</option>
+                        </select>
+                        <div class="validation-message" id="doctorSpecializationValidation"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="doctorLicense">Medical License</label>
+                        <input type="text" id="doctorLicense" class="form-input">
+                        <div class="validation-message" id="doctorLicenseValidation"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="doctorExperience">Years of Experience</label>
+                        <input type="number" id="doctorExperience" class="form-input" min="0" max="50">
+                        <div class="validation-message" id="doctorExperienceValidation"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="doctorFee">Consultation Fee ($)</label>
+                        <input type="number" id="doctorFee" class="form-input" min="0" step="0.01">
+                        <div class="validation-message" id="doctorFeeValidation"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="doctorStatus">Status</label>
+                        <select id="doctorStatus" class="form-input">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="doctorBio">Biography</label>
+                    <textarea id="doctorBio" class="form-input" rows="3" placeholder="Brief description about the doctor's background and expertise..."></textarea>
+                    <div class="validation-message" id="doctorBioValidation"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Weekly Schedule</label>
+                    <div class="schedule-builder">
+                        <div class="schedule-day-builder">
+                            <input type="checkbox" id="mondayDoc" value="monday">
+                            <label for="mondayDoc">Monday</label>
+                            <div class="time-inputs">
+                                <input type="time" id="mondayStartDoc" class="form-input" value="09:00">
+                                <span>to</span>
+                                <input type="time" id="mondayEndDoc" class="form-input" value="17:00">
+                            </div>
+                        </div>
+                        <div class="schedule-day-builder">
+                            <input type="checkbox" id="tuesdayDoc" value="tuesday">
+                            <label for="tuesdayDoc">Tuesday</label>
+                            <div class="time-inputs">
+                                <input type="time" id="tuesdayStartDoc" class="form-input" value="09:00">
+                                <span>to</span>
+                                <input type="time" id="tuesdayEndDoc" class="form-input" value="17:00">
+                            </div>
+                        </div>
+                        <div class="schedule-day-builder">
+                            <input type="checkbox" id="wednesdayDoc" value="wednesday">
+                            <label for="wednesdayDoc">Wednesday</label>
+                            <div class="time-inputs">
+                                <input type="time" id="wednesdayStartDoc" class="form-input" value="09:00">
+                                <span>to</span>
+                                <input type="time" id="wednesdayEndDoc" class="form-input" value="17:00">
+                            </div>
+                        </div>
+                        <div class="schedule-day-builder">
+                            <input type="checkbox" id="thursdayDoc" value="thursday">
+                            <label for="thursdayDoc">Thursday</label>
+                            <div class="time-inputs">
+                                <input type="time" id="thursdayStartDoc" class="form-input" value="09:00">
+                                <span>to</span>
+                                <input type="time" id="thursdayEndDoc" class="form-input" value="17:00">
+                            </div>
+                        </div>
+                        <div class="schedule-day-builder">
+                            <input type="checkbox" id="fridayDoc" value="friday">
+                            <label for="fridayDoc">Friday</label>
+                            <div class="time-inputs">
+                                <input type="time" id="fridayStartDoc" class="form-input" value="09:00">
+                                <span>to</span>
+                                <input type="time" id="fridayEndDoc" class="form-input" value="17:00">
+                            </div>
+                        </div>
+                        <div class="schedule-day-builder">
+                            <input type="checkbox" id="saturdayDoc" value="saturday">
+                            <label for="saturdayDoc">Saturday</label>
+                            <div class="time-inputs">
+                                <input type="time" id="saturdayStartDoc" class="form-input" value="09:00">
+                                <span>to</span>
+                                <input type="time" id="saturdayEndDoc" class="form-input" value="17:00">
+                            </div>
+                        </div>
+                        <div class="schedule-day-builder">
+                            <input type="checkbox" id="sundayDoc" value="sunday">
+                            <label for="sundayDoc">Sunday</label>
+                            <div class="time-inputs">
+                                <input type="time" id="sundayStartDoc" class="form-input" value="09:00">
+                                <span>to</span>
+                                <input type="time" id="sundayEndDoc" class="form-input" value="17:00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button type="submit" class="btn btn-success">
+                        <span id="doctorSubmitText">Save Doctor</span>
+                        <span id="doctorSubmitSpinner" class="spinner" style="display: none;"></span>
+                    </button>
+                    <button type="button" class="btn" onclick="closeDoctorModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Edit Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Profile</h2>
+                <button class="close" onclick="closeModal('profileModal')">&times;</button>
+            </div>
+            <div style="padding: 1rem;">
+                <form id="profileEditForm">
+                    <div class="form-group">
+                        <label class="form-label" for="profileEditFullName">Full Name</label>
+                        <input type="text" id="profileEditFullName" class="form-input" required>
+                        <div class="validation-message" id="profileEditFullNameValidation"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="profileEditPhone">Phone Number</label>
+                        <input type="tel" id="profileEditPhone" class="form-input">
+                        <div class="validation-message" id="profileEditPhoneValidation"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="profileEditDepartment">Department</label>
+                        <select id="profileEditDepartment" class="form-input">
+                            <option value="">Select Department</option>
+                            <option value="emergency">Emergency</option>
+                            <option value="cardiology">Cardiology</option>
+                            <option value="neurology">Neurology</option>
+                            <option value="pediatrics">Pediatrics</option>
+                            <option value="orthopedics">Orthopedics</option>
+                            <option value="administration">Administration</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="profileEditBio">Bio</label>
+                        <textarea id="profileEditBio" class="form-input" rows="4" placeholder="Tell us about yourself"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <script src="firebase-config.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = window.firebaseConfig;
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Global Variables
+        let currentUser = null;
+        let isLoginMode = true;
+        let sessionStartTime = null;
+        let sessionTimer = null;
+        let allDoctors = [];
+        let isEditingDoctor = false;
+        let editingDoctorId = null;
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auth state listener with FIXED user profile handling
+            auth.onAuthStateChanged(async (user) => {
+                if (user && user.emailVerified) {
+                    try {
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        
+                        if (!userDoc.exists) {
+                            console.error('❌ User profile missing in Firestore for UID:', user.uid);
+                            showAuthMessage('error', 'User profile not found. Please contact support or re-register.');
+                            await auth.signOut();
+                            return;
+                        }
+                        
+                        const userData = userDoc.data();
+                        console.log('✅ User profile loaded:', userData);
+                        
+                        currentUser = user;
+                        showDashboard(userData);
+                        await loadInitialData();
+                        startSessionManagement();
+                        
+                    } catch (error) {
+                        console.error('Error loading user profile:', error);
+                        showAuthMessage('error', 'Error loading profile: ' + error.message);
+                    }
+                } else if (user && !user.emailVerified) {
+                    showAuthMessage('error', 'Please verify your email before accessing the dashboard.');
+                    showAuth();
+                } else {
+                    showAuth();
+                }
+            });
+
+            // Event listeners
+            document.getElementById('authForm').addEventListener('submit', handleAuth);
+            document.getElementById('toggleLink').addEventListener('click', toggleAuthMode);
+            document.getElementById('forgotPasswordLink').addEventListener('click', handleForgotPassword);
+            document.getElementById('doctorForm').addEventListener('submit', handleDoctorSubmit);
+            document.getElementById('profileForm').addEventListener('submit', handleProfileUpdate);
+            document.getElementById('profileEditForm').addEventListener('submit', handleProfileEditUpdate);
+            document.getElementById('availabilityForm').addEventListener('submit', handleAvailabilityUpdate);
+
+            // Setup form validation
+            setupFormValidation();
+        });
+
+        // Authentication Functions
+        async function handleAuth(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showAuthMessage('error', 'Please fill in all required fields');
+                return;
+            }
+
+            if (!validateForm()) {
+                showAuthMessage('error', 'Please fix the validation errors above.');
+                return;
+            }
+
+            setAuthLoading(true);
+
+            try {
+                if (isLoginMode) {
+                    // LOGIN ATTEMPT
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    if (!userCredential.user.emailVerified) {
+                        showAuthMessage('error', 'Please verify your email before logging in. Check your inbox for verification link.');
+                        await auth.signOut();
+                        return;
+                    }
+                    
+                    // Update login timestamp
+                    await updateLoginHistory(userCredential.user.uid);
+                    
+                    showAuthMessage('success', 'Login successful!');
+                    sessionStartTime = new Date();
+                } else {
+                    // REGISTRATION ATTEMPT
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    const fullName = document.getElementById('fullName').value.trim();
+                    const phone = document.getElementById('phone').value.trim();
+                    const department = document.getElementById('department').value;
+                    const role = document.getElementById('role').value;
+                    
+                    if (!fullName || !department) {
+                        showAuthMessage('error', 'Please fill in all required fields');
+                        return;
+                    }
+                    
+                    if (password !== confirmPassword) {
+                        showAuthMessage('error', 'Passwords do not match');
+                        return;
+                    }
+                    
+                    if (password.length < 6) {
+                        showAuthMessage('error', 'Password must be at least 6 characters long');
+                        return;
+                    }
+                    
+                    // Create Firebase Auth user first
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+                    
+                    try {
+                        // CRITICAL: Create Firestore profile document
+                        await db.collection('users').doc(user.uid).set({
+                            email: email,
+                            fullName: fullName,
+                            phone: phone || '',
+                            department: department,
+                            role: role,
+                            bio: '',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            emailVerified: false,
+                            lastLogin: null,
+                            loginHistory: []
+                        });
+                        
+                        console.log('✅ User profile created successfully in Firestore');
+                        
+                        // Send email verification
+                        await user.sendEmailVerification();
+                        
+                        showAuthMessage('success', 'Registration successful! Please check your email for verification link.');
+                        toggleAuthMode(); // Switch to login mode
+                        
+                    } catch (firestoreError) {
+                        console.error('❌ Error creating user profile:', firestoreError);
+                        
+                        // Clean up: Delete the auth user if Firestore creation failed
+                        await user.delete();
+                        
+                        showAuthMessage('error', 'Registration failed. Please try again.');
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+                let errorMessage = 'An error occurred. Please try again.';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'This email is already registered. Please use the login form instead or try a different email.';
+                        // Automatically switch to login mode
+                        if (!isLoginMode) {
+                            setTimeout(() => {
+                                toggleAuthMode();
+                                showAuthMessage('success', 'Switched to login mode. Please enter your password to sign in.');
+                            }, 2000);
+                        }
+                        break;
+                    case 'auth/invalid-login-credentials':
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak. Please choose a stronger password (minimum 6 characters).';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address format. Please enter a valid email.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed attempts. Please wait a few minutes before trying again.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Please check your internet connection and try again.';
+                        break;
+                }
+                
+                showAuthMessage('error', errorMessage);
+            } finally {
+                setAuthLoading(false);
+            }
+        }
+
+        // Forgot password handler
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            
+            if (!email) {
+                showAuthMessage('error', 'Please enter your email address first');
+                document.getElementById('email').focus();
+                return;
+            }
+            
+            try {
+                await auth.sendPasswordResetEmail(email);
+                showAuthMessage('success', 'Password reset email sent! Check your inbox and spam folder.');
+            } catch (error) {
+                console.error('Error sending password reset email:', error);
+                
+                let errorMessage = 'Error sending password reset email';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email address';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address format';
+                        break;
+                }
+                
+                showAuthMessage('error', errorMessage);
+            }
+        }
+
+        // Form validation setup
+        function setupFormValidation() {
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const fullName = document.getElementById('fullName');
+            const phone = document.getElementById('phone');
+            const department = document.getElementById('department');
+
+            // Email validation
+            email.addEventListener('input', validateEmail);
+            email.addEventListener('blur', validateEmail);
+
+            // Password validation with strength meter
+            password.addEventListener('input', function() {
+                validatePassword();
+                if (!isLoginMode) {
+                    checkPasswordStrength(this.value);
+                }
+                if (confirmPassword && confirmPassword.value) {
+                    validateConfirmPassword();
+                }
+            });
+
+            if (confirmPassword) {
+                confirmPassword.addEventListener('input', validateConfirmPassword);
+            }
+
+            if (fullName) {
+                fullName.addEventListener('input', validateFullName);
+            }
+
+            if (phone) {
+                phone.addEventListener('input', validatePhone);
+            }
+
+            if (department) {
+                department.addEventListener('change', validateDepartment);
+            }
+        }
+
+        function validateEmail() {
+            const email = document.getElementById('email');
+            const validation = document.getElementById('emailValidation');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!email.value) {
+                setValidationError(email, validation, 'Email is required');
+                return false;
+            } else if (!emailRegex.test(email.value)) {
+                setValidationError(email, validation, 'Please enter a valid email');
+                return false;
+            } else {
+                setValidationSuccess(email, validation, 'Valid email');
+                return true;
+            }
+        }
+
+        function validatePassword() {
+            const password = document.getElementById('password');
+            const validation = document.getElementById('passwordValidation');
+
+            if (!password.value) {
+                setValidationError(password, validation, 'Password is required');
+                return false;
+            } else if (password.value.length < 6) {
+                setValidationError(password, validation, 'Password must be at least 6 characters');
+                return false;
+            } else {
+                setValidationSuccess(password, validation, 'Valid password');
+                return true;
+            }
+        }
+
+        function validateConfirmPassword() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const validation = document.getElementById('confirmPasswordValidation');
+
+            if (!confirmPassword.value) {
+                setValidationError(confirmPassword, validation, 'Please confirm your password');
+                return false;
+            } else if (password.value !== confirmPassword.value) {
+                setValidationError(confirmPassword, validation, 'Passwords do not match');
+                return false;
+            } else {
+                setValidationSuccess(confirmPassword, validation, 'Passwords match');
+                return true;
+            }
+        }
+
+        function validateFullName() {
+            const fullName = document.getElementById('fullName');
+            const validation = document.getElementById('fullNameValidation');
+
+            if (!fullName.value.trim()) {
+                setValidationError(fullName, validation, 'Full name is required');
+                return false;
+            } else if (fullName.value.trim().length < 2) {
+                setValidationError(fullName, validation, 'Name must be at least 2 characters');
+                return false;
+            } else {
+                setValidationSuccess(fullName, validation, 'Valid name');
+                return true;
+            }
+        }
+
+        function validatePhone() {
+            const phone = document.getElementById('phone');
+            const validation = document.getElementById('phoneValidation');
+            const phoneRegex = /^[\d\-\+\(\)\s]+$/;
+
+            if (phone.value && !phoneRegex.test(phone.value)) {
+                setValidationError(phone, validation, 'Please enter a valid phone number');
+                return false;
+            } else if (phone.value && phone.value.length < 10) {
+                setValidationError(phone, validation, 'Phone number must be at least 10 digits');
+                return false;
+            } else {
+                setValidationSuccess(phone, validation, 'Valid phone number');
+                return true;
+            }
+        }
+
+        function validateDepartment() {
+            const department = document.getElementById('department');
+            const validation = document.getElementById('departmentValidation');
+
+            if (!department.value) {
+                setValidationError(department, validation, 'Please select a department');
+                return false;
+            } else {
+                setValidationSuccess(department, validation, 'Department selected');
+                return true;
+            }
+        }
+
+        function checkPasswordStrength(password) {
+            const strengthMeter = document.getElementById('passwordStrength');
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+
+            if (!isLoginMode) {
+                strengthMeter.style.display = 'block';
+            } else {
+                strengthMeter.style.display = 'none';
+                return;
+            }
+
+            let strength = 0;
+            let feedback = [];
+
+            // Length check
+            if (password.length >= 8) strength += 1;
+            else feedback.push('at least 8 characters');
+
+            // Uppercase check
+            if (/[A-Z]/.test(password)) strength += 1;
+            else feedback.push('uppercase letter');
+
+            // Lowercase check
+            if (/[a-z]/.test(password)) strength += 1;
+            else feedback.push('lowercase letter');
+
+            // Number check
+            if (/[0-9]/.test(password)) strength += 1;
+            else feedback.push('number');
+
+            // Special character check
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            else feedback.push('special character');
+
+            // Update visual indicator
+            strengthFill.className = 'strength-fill';
+            switch(strength) {
+                case 0:
+                case 1:
+                    strengthFill.classList.add('strength-weak');
+                    strengthText.textContent = `Weak - Add ${feedback.join(', ')}`;
+                    break;
+                case 2:
+                    strengthFill.classList.add('strength-fair');
+                    strengthText.textContent = `Fair - Add ${feedback.join(', ')}`;
+                    break;
+                case 3:
+                case 4:
+                    strengthFill.classList.add('strength-good');
+                    strengthText.textContent = `Good - Add ${feedback.join(', ')}`;
+                    break;
+                case 5:
+                    strengthFill.classList.add('strength-strong');
+                    strengthText.textContent = 'Strong password!';
+                    break;
+            }
+        }
+
+        function setValidationError(input, validation, message) {
+            input.classList.remove('success');
+            input.classList.add('error');
+            validation.innerHTML = `<span class="error-text">${message}</span>`;
+        }
+
+        function setValidationSuccess(input, validation, message) {
+            input.classList.remove('error');
+            input.classList.add('success');
+            validation.innerHTML = `<span class="success-text">${message}</span>`;
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            // Always validate email and password
+            if (!validateEmail()) isValid = false;
+            if (!validatePassword()) isValid = false;
+
+            // Additional validation for registration
+            if (!isLoginMode) {
+                if (!validateConfirmPassword()) isValid = false;
+                if (!validateFullName()) isValid = false;
+                if (!validatePhone()) isValid = false;
+                if (!validateDepartment()) isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Toggle login/register
+        function toggleAuthMode(e) {
+            if (e) e.preventDefault();
+            
+            isLoginMode = !isLoginMode;
+            const registerFields = document.getElementById('registerFields');
+            const authTitle = document.getElementById('authTitle');
+            const authButtonText = document.getElementById('authButtonText');
+            const toggleLink = document.getElementById('toggleLink');
+            const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
+            const passwordStrength = document.getElementById('passwordStrength');
+            
+            if (isLoginMode) {
+                authTitle.textContent = 'Welcome Back to MediCore';
+                authButtonText.textContent = 'Sign In Securely';
+                toggleLink.textContent = 'Need an account? Register here';
+                registerFields.style.display = 'none';
+                forgotPasswordContainer.style.display = 'block';
+                passwordStrength.style.display = 'none';
+            } else {
+                authTitle.textContent = 'Join MediCore Platform';
+                authButtonText.textContent = 'Create Account';
+                toggleLink.textContent = 'Already have an account? Sign in';
+                registerFields.style.display = 'block';
+                forgotPasswordContainer.style.display = 'none';
+            }
+            
+            hideAuthMessages();
+            clearValidationMessages();
+            document.getElementById('authForm').reset();
+        }
+
+        function clearValidationMessages() {
+            const validationElements = document.querySelectorAll('.validation-message');
+            validationElements.forEach(el => el.innerHTML = '');
+            
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.classList.remove('error', 'success');
+            });
+        }
+
+        // Show/hide sections
+        function showAuth() {
+            document.getElementById('authContainer').style.display = 'flex';
+            document.getElementById('dashboardContainer').style.display = 'none';
+            hideAuthMessages();
+        }
+
+        function showDashboard(userData) {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('dashboardContainer').style.display = 'block';
+            
+            // Update user info in header
+            document.getElementById('userWelcome').textContent = `Welcome, ${userData.fullName || 'Professional'}`;
+            
+            // Update user info in dashboard
+            document.getElementById('userName').textContent = userData.fullName || 'N/A';
+            document.getElementById('userEmail').textContent = userData.email || currentUser.email;
+            document.getElementById('userRole').textContent = userData.role || 'user';
+            document.getElementById('userDepartment').textContent = userData.department || 'N/A';
+            document.getElementById('userStatus').textContent = currentUser.emailVerified ? 'Verified' : 'Unverified';
+            
+            // Show role-specific features
+            if (userData.role === 'admin' || userData.role === 'superadmin') {
+                document.getElementById('adminFeatures').style.display = 'block';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadUserStats();
+            } else {
+                document.getElementById('adminFeatures').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'none';
+            }
+            
+            // Load profile data into forms
+            document.getElementById('editFullName').value = userData.fullName || '';
+            document.getElementById('editEmail').value = userData.email || currentUser.email;
+            document.getElementById('editPhone').value = userData.phone || '';
+            document.getElementById('editDepartment').value = userData.department || '';
+            document.getElementById('bio').value = userData.bio || '';
+
+            // Load profile edit modal data
+            document.getElementById('profileEditFullName').value = userData.fullName || '';
+            document.getElementById('profileEditPhone').value = userData.phone || '';
+            document.getElementById('profileEditDepartment').value = userData.department || '';
+            document.getElementById('profileEditBio').value = userData.bio || '';
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Show selected section
+            const targetSection = document.getElementById(`section-${sectionName}`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Update navigation
+            const links = document.querySelectorAll('.nav-link');
+            links.forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update page title and breadcrumb
+            const titles = {
+                'overview': 'Dashboard Overview',
+                'doctors': 'Doctor Management',
+                'users': 'User Management',
+                'analytics': 'Analytics Dashboard',
+                'operations': 'Operations Management',
+                'scheduling': 'Scheduling System',
+                'profile': 'Profile Settings',
+                'assignments': 'View Assignments',
+                'availability': 'Update Availability',
+                'logs': 'Audit Logs'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[sectionName] || 'Dashboard';
+            document.getElementById('breadcrumbPath').textContent = `Home › ${titles[sectionName] || 'Dashboard'}`;
+            
+            // Load section-specific data
+            switch(sectionName) {
+                case 'doctors':
+                    loadDoctors();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'logs':
+                    loadActivityLog();
+                    break;
+            }
+        }
+
+        // Session Management
+        function startSessionManagement() {
+            sessionStartTime = new Date();
+            updateSessionStatus();
+            
+            sessionTimer = setInterval(updateSessionStatus, 60000); // Update every minute
+            
+            // Auto-logout after 30 minutes of inactivity
+            let inactivityTimer;
+            const resetInactivityTimer = () => {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = setTimeout(() => {
+                    showMessage('error', 'Session expired due to inactivity');
+                    logout();
+                }, 30 * 60 * 1000);
+            };
+            
+            document.addEventListener('click', resetInactivityTimer);
+            document.addEventListener('keypress', resetInactivityTimer);
+            resetInactivityTimer();
+        }
+
+        function updateSessionStatus() {
+            if (!sessionStartTime) return;
+            
+            const now = new Date();
+            const duration = Math.floor((now - sessionStartTime) / 1000);
+            const hours = Math.floor(duration / 3600);
+            const minutes = Math.floor((duration % 3600) / 60);
+            
+            let statusText = '● Active Session';
+            if (hours > 0) {
+                statusText += ` (${hours}h ${minutes}m)`;
+            } else if (minutes > 0) {
+                statusText += ` (${minutes}m)`;
+            }
+            
+            document.getElementById('sessionStatus').textContent = statusText;
+            document.getElementById('loginTime').textContent = sessionStartTime.toLocaleTimeString();
+            document.getElementById('sessionDuration').textContent = `${hours}h ${minutes}m`;
+        }
+
+        function extendSession() {
+            showMessage('success', 'Session extended successfully!');
+        }
+
+        function endSession() {
+            logout();
+        }
+
+        // Data Loading Functions
+        async function loadInitialData() {
+            try {
+                // Load statistics
+                const [doctorsSnapshot, usersSnapshot] = await Promise.all([
+                    db.collection('doctors').get(),
+                    db.collection('users').get()
+                ]);
+                
+                document.getElementById('totalDoctors').textContent = doctorsSnapshot.size;
+                document.getElementById('totalUsers').textContent = usersSnapshot.size;
+                
+                // Load doctors for management
+                allDoctors = [];
+                doctorsSnapshot.forEach(doc => {
+                    allDoctors.push({ id: doc.id, ...doc.data() });
+                });
+                
+            } catch (error) {
+                console.error('Error loading initial data:', error);
+            }
+        }
+
+        async function loadUserStats() {
+            try {
+                const usersSnapshot = await db.collection('users').get();
+                let totalUsers = 0;
+                let verifiedUsers = 0;
+                let adminUsers = 0;
+                
+                usersSnapshot.forEach(doc => {
+                    const userData = doc.data();
+                    totalUsers++;
+                    if (userData.emailVerified) verifiedUsers++;
+                    if (userData.role === 'admin' || userData.role === 'superadmin') adminUsers++;
+                });
+                
+                document.getElementById('totalUsersAdmin').textContent = totalUsers;
+                document.getElementById('verifiedUsers').textContent = verifiedUsers;
+                document.getElementById('adminUsers').textContent = adminUsers;
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+            }
+        }
+
+        async function loadDoctors() {
+            try {
+                const snapshot = await db.collection('doctors').orderBy('createdAt', 'desc').get();
+                allDoctors = [];
+                
+                snapshot.forEach(doc => {
+                    allDoctors.push({ id: doc.id, ...doc.data() });
+                });
+                
+                displayDoctors(allDoctors);
+                document.getElementById('totalDoctors').textContent = allDoctors.length;
+                
+            } catch (error) {
+                console.error('Error loading doctors:', error);
+                showMessage('error', 'Error loading doctors data');
+            }
+        }
+
+        function displayDoctors(doctors) {
+            const container = document.getElementById('doctorsContainer');
+            
+            if (doctors.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        <h3>No doctors found</h3>
+                        <p>Click "Add New Doctor" to get started</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = doctors.map(doctor => createDoctorCardHTML(doctor)).join('');
+        }
+
+        function createDoctorCardHTML(doctor) {
+            return `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-title">${doctor.name}</div>
+                            <div class="item-subtitle">${capitalizeFirst(doctor.specialization)} • ${doctor.experience || 0} years</div>
+                            <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                                📧 ${doctor.email}<br>
+                                📞 ${doctor.phone}
+                                ${doctor.licenseNumber ? `<br>🏥 License: ${doctor.licenseNumber}` : ''}
+                                ${doctor.consultationFee ? `<br>💰 Fee: $${doctor.consultationFee}` : ''}
+                            </div>
+                            ${doctor.bio ? `<div style="margin-top: 0.5rem; font-style: italic; color: var(--text-secondary);">${doctor.bio}</div>` : ''}
+                            ${doctor.schedule && Object.keys(doctor.schedule).length > 0 ? 
+                                `<div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                                    🕒 Available: ${formatSchedule(doctor.schedule)}
+                                </div>` : ''
+                            }
+                        </div>
+                        <div>
+                            <div style="margin-bottom: 10px;">
+                                <span class="badge badge-${doctor.status === 'active' ? 'active' : 'inactive'}">
+                                    ${doctor.status === 'active' ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-warning btn-sm" onclick="editDoctor('${doctor.id}')">Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteDoctor('${doctor.id}', '${doctor.name}')">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatSchedule(schedule) {
+            const availableDays = Object.keys(schedule).filter(day => schedule[day].available);
+            return availableDays.length > 0 ? 
+                availableDays.slice(0, 3).map(day => capitalizeFirst(day)).join(', ') + 
+                (availableDays.length > 3 ? '...' : '') : 'No schedule set';
+        }
+
+        async function loadUsers() {
+            try {
+                const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
+                const users = [];
+                
+                snapshot.forEach(doc => {
+                    users.push({ id: doc.id, ...doc.data() });
+                });
+                
+                const tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td>${user.fullName || 'N/A'}</td>
+                                    <td>${user.email}</td>
+                                    <td>${capitalizeFirst(user.department || 'N/A')}</td>
+                                    <td>
+                                        <span class="badge badge-${user.role === 'admin' || user.role === 'superadmin' ? 'admin' : 'user'}">
+                                            ${capitalizeFirst(user.role || 'user')}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-${user.emailVerified ? 'verified' : 'unverified'}">
+                                            ${user.emailVerified ? 'Verified' : 'Unverified'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm">Edit</button>
+                                        <button class="btn btn-danger btn-sm">Remove</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                
+                document.getElementById('usersContainer').innerHTML = tableHTML;
+                
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        async function loadActivityLog() {
+            try {
+                const snapshot = await db.collection('adminLogs')
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .get();
+                
+                const logContainer = document.getElementById('activityLog');
+                
+                if (snapshot.empty) {
+                    logContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No audit logs found</p>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach(doc => {
+                    const log = doc.data();
+                    const timestamp = log.timestamp ? log.timestamp.toDate().toLocaleString() : 'Unknown time';
+                    
+                    html += `
+                        <div class="log-entry">
+                            <div class="log-time">${timestamp}</div>
+                            <div class="log-action">${log.action}</div>
+                            <div class="log-details">${log.details}</div>
+                        </div>
+                    `;
+                });
+                
+                logContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading activity log:', error);
+            }
+        }
+
+        // Doctor Management Functions
+        function openDoctorModal() {
+            isEditingDoctor = false;
+            editingDoctorId = null;
+            document.getElementById('doctorModalTitle').textContent = 'Add New Doctor';
+            document.getElementById('doctorForm').reset();
+            clearValidationMessages();
+            document.getElementById('doctorModal').style.display = 'block';
+        }
+
+        function closeDoctorModal() {
+            document.getElementById('doctorModal').style.display = 'none';
+            clearValidationMessages();
+        }
+
+        async function handleDoctorSubmit(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('doctorSubmitText');
+            const spinner = document.getElementById('doctorSubmitSpinner');
+            
+            submitBtn.style.display = 'none';
+            spinner.style.display = 'inline-block';
+            
+            try {
+                const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                const schedule = {};
+                
+                days.forEach(day => {
+                    const checkbox = document.getElementById(day + 'Doc');
+                    const startTime = document.getElementById(day + 'StartDoc');
+                    const endTime = document.getElementById(day + 'EndDoc');
+                    
+                    schedule[day] = {
+                        available: checkbox ? checkbox.checked : false,
+                        startTime: startTime ? startTime.value : '09:00',
+                        endTime: endTime ? endTime.value : '17:00'
+                    };
+                });
+
+                const doctorData = {
+                    name: document.getElementById('doctorName').value.trim(),
+                    email: document.getElementById('doctorEmail').value.trim().toLowerCase(),
+                    phone: document.getElementById('doctorPhone').value.trim(),
+                    specialization: document.getElementById('doctorSpecialization').value,
+                    licenseNumber: document.getElementById('doctorLicense').value.trim(),
+                    experience: parseInt(document.getElementById('doctorExperience').value) || 0,
+                    consultationFee: parseFloat(document.getElementById('doctorFee').value) || 0,
+                    status: document.getElementById('doctorStatus').value,
+                    bio: document.getElementById('doctorBio').value.trim(),
+                    schedule: schedule
+                };
+                
+                if (isEditingDoctor && editingDoctorId) {
+                    await db.collection('doctors').doc(editingDoctorId).update({
+                        ...doctorData,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    await logAdminAction('Doctor Updated', `Updated doctor: ${doctorData.name}`);
+                    showMessage('success', 'Doctor updated successfully!');
+                } else {
+                    await db.collection('doctors').add({
+                        ...doctorData,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    await logAdminAction('Doctor Added', `Added new doctor: ${doctorData.name}`);
+                    showMessage('success', 'Doctor added successfully!');
+                }
+                
+                closeDoctorModal();
+                await loadDoctors();
+                await loadInitialData();
+                
+            } catch (error) {
+                console.error('Error saving doctor:', error);
+                showMessage('error', 'Error saving doctor. Please try again.');
+            } finally {
+                submitBtn.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        }
+
+        async function editDoctor(doctorId) {
+            try {
+                const doctorDoc = await db.collection('doctors').doc(doctorId).get();
+                if (!doctorDoc.exists) {
+                    showMessage('error', 'Doctor not found');
+                    return;
+                }
+                
+                const doctor = doctorDoc.data();
+                isEditingDoctor = true;
+                editingDoctorId = doctorId;
+                
+                // Populate form
+                document.getElementById('doctorModalTitle').textContent = 'Edit Doctor';
+                document.getElementById('doctorName').value = doctor.name || '';
+                document.getElementById('doctorEmail').value = doctor.email || '';
+                document.getElementById('doctorPhone').value = doctor.phone || '';
+                document.getElementById('doctorSpecialization').value = doctor.specialization || '';
+                document.getElementById('doctorLicense').value = doctor.licenseNumber || '';
+                document.getElementById('doctorExperience').value = doctor.experience || '';
+                document.getElementById('doctorFee').value = doctor.consultationFee || '';
+                document.getElementById('doctorStatus').value = doctor.status || 'active';
+                document.getElementById('doctorBio').value = doctor.bio || '';
+                
+                // Populate schedule
+                if (doctor.schedule) {
+                    Object.keys(doctor.schedule).forEach(day => {
+                        const checkbox = document.getElementById(day + 'Doc');
+                        const startTime = document.getElementById(day + 'StartDoc');
+                        const endTime = document.getElementById(day + 'EndDoc');
+                        
+                        if (checkbox && doctor.schedule[day]) {
+                            checkbox.checked = doctor.schedule[day].available || false;
+                            if (startTime) startTime.value = doctor.schedule[day].startTime || '09:00';
+                            if (endTime) endTime.value = doctor.schedule[day].endTime || '17:00';
+                        }
+                    });
+                }
+                
+                clearValidationMessages();
+                document.getElementById('doctorModal').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading doctor for edit:', error);
+                showMessage('error', 'Error loading doctor data');
+            }
+        }
+
+        async function deleteDoctor(doctorId, doctorName) {
+            if (!confirm(`Are you sure you want to delete Dr. ${doctorName}? This action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                await db.collection('doctors').doc(doctorId).delete();
+                await logAdminAction('Doctor Deleted', `Deleted doctor: ${doctorName}`);
+                showMessage('success', 'Doctor deleted successfully!');
+                await loadDoctors();
+                await loadInitialData();
+                
+            } catch (error) {
+                console.error('Error deleting doctor:', error);
+                showMessage('error', 'Error deleting doctor');
+            }
+        }
+
+        // Search and Filter Functions
+        function searchDoctors() {
+            const searchTerm = document.getElementById('doctorSearch').value.toLowerCase();
+            const filteredDoctors = allDoctors.filter(doctor => {
+                return doctor.name.toLowerCase().includes(searchTerm) ||
+                       doctor.email.toLowerCase().includes(searchTerm) ||
+                       doctor.specialization.toLowerCase().includes(searchTerm);
+            });
+            
+            displayDoctors(filteredDoctors);
+        }
+
+        function filterDoctors() {
+            const specializationFilter = document.getElementById('specializationFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            let filteredDoctors = allDoctors;
+            
+            if (specializationFilter) {
+                filteredDoctors = filteredDoctors.filter(doctor => 
+                    doctor.specialization === specializationFilter
+                );
+            }
+            
+            if (statusFilter) {
+                filteredDoctors = filteredDoctors.filter(doctor => 
+                    doctor.status === statusFilter
+                );
+            }
+            
+            displayDoctors(filteredDoctors);
+        }
+
+        // Profile Management
+        async function handleProfileUpdate(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showMessage('error', 'No user signed in');
+                return;
+            }
+            
+            try {
+                const profileData = {
+                    fullName: document.getElementById('editFullName').value.trim(),
+                    phone: document.getElementById('editPhone').value.trim(),
+                    department: document.getElementById('editDepartment').value,
+                    bio: document.getElementById('bio').value.trim(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('users').doc(currentUser.uid).update(profileData);
+                await logAdminAction('Profile Updated', 'User updated their profile information');
+                
+                // Update UI
+                document.getElementById('userName').textContent = profileData.fullName;
+                document.getElementById('userDepartment').textContent = profileData.department;
+                document.getElementById('userWelcome').textContent = `Welcome, ${profileData.fullName}`;
+                
+                showMessage('success', 'Profile updated successfully!');
+                
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showMessage('error', 'Error updating profile');
+            }
+        }
+
+        async function handleProfileEditUpdate(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showMessage('error', 'No user signed in');
+                return;
+            }
+            
+            try {
+                const profileData = {
+                    fullName: document.getElementById('profileEditFullName').value.trim(),
+                    phone: document.getElementById('profileEditPhone').value.trim(),
+                    department: document.getElementById('profileEditDepartment').value,
+                    bio: document.getElementById('profileEditBio').value.trim(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('users').doc(currentUser.uid).update(profileData);
+                await logAdminAction('Profile Updated', 'User updated their profile information');
+                
+                // Update UI
+                document.getElementById('userName').textContent = profileData.fullName;
+                document.getElementById('userDepartment').textContent = profileData.department;
+                document.getElementById('userWelcome').textContent = `Welcome, ${profileData.fullName}`;
+                
+                // Update other forms
+                document.getElementById('editFullName').value = profileData.fullName;
+                document.getElementById('editPhone').value = profileData.phone;
+                document.getElementById('editDepartment').value = profileData.department;
+                document.getElementById('bio').value = profileData.bio;
+                
+                closeModal('profileModal');
+                showMessage('success', 'Profile updated successfully!');
+                
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showMessage('error', 'Error updating profile');
+            }
+        }
+
+        // Availability Management
+        async function handleAvailabilityUpdate(e) {
+            e.preventDefault();
+            
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const availabilityData = {};
+            
+            days.forEach(day => {
+                const checkbox = document.getElementById(day);
+                const startTime = document.getElementById(day + 'Start');
+                const endTime = document.getElementById(day + 'End');
+                
+                availabilityData[day] = {
+                    available: checkbox ? checkbox.checked : false,
+                    startTime: startTime ? startTime.value : '09:00',
+                    endTime: endTime ? endTime.value : '17:00'
+                };
+            });
+            
+            try {
+                await db.collection('users').doc(currentUser.uid).update({
+                    availability: availabilityData,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                await logAdminAction('Availability Updated', 'User updated their availability schedule');
+                showMessage('success', 'Availability updated successfully!');
+                
+            } catch (error) {
+                console.error('Error updating availability:', error);
+                showMessage('error', 'Error updating availability');
+            }
+        }
+
+        // Export Functions
+        async function exportDoctors() {
+            try {
+                let csvContent = "Name,Email,Phone,Specialization,License,Experience,Fee,Status\n";
+                
+                allDoctors.forEach(doctor => {
+                    const row = [
+                        `"${doctor.name || ''}"`,
+                        `"${doctor.email || ''}"`,
+                        `"${doctor.phone || ''}"`,
+                        `"${doctor.specialization || ''}"`,
+                        `"${doctor.licenseNumber || ''}"`,
+                        `"${doctor.experience || 0}"`,
+                        `"${doctor.consultationFee || 0}"`,
+                        `"${doctor.status || 'active'}"`
+                    ].join(',');
+                    csvContent += row + "\n";
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `hospital_doctors_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                await logAdminAction('Data Export', 'Exported doctors data to CSV');
+                showMessage('success', 'Doctors data exported successfully!');
+                
+            } catch (error) {
+                console.error('Error exporting doctors:', error);
+                showMessage('error', 'Error exporting data');
+            }
+        }
+
+        async function exportUsers() {
+            try {
+                const snapshot = await db.collection('users').get();
+                let csvContent = "Name,Email,Role,Department,Status\n";
+                
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    const row = [
+                        `"${user.fullName || ''}"`,
+                        `"${user.email || ''}"`,
+                        `"${user.role || ''}"`,
+                        `"${user.department || ''}"`,
+                        `"${user.emailVerified ? 'Verified' : 'Unverified'}"`
+                    ].join(',');
+                    csvContent += row + "\n";
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `hospital_users_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                await logAdminAction('Data Export', 'Exported users data to CSV');
+                showMessage('success', 'Users data exported successfully!');
+                
+            } catch (error) {
+                console.error('Error exporting users:', error);
+                showMessage('error', 'Error exporting data');
+            }
+        }
+
+        // Admin logging
+        async function logAdminAction(action, details) {
+            try {
+                if (!currentUser) return;
+                
+                await db.collection('adminLogs').add({
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    action: action,
+                    details: details,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+            } catch (error) {
+                console.error('Error logging admin action:', error);
+            }
+        }
+
+        async function updateLoginHistory(userId) {
+            try {
+                await db.collection('users').doc(userId).update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error('Error updating login history:', error);
+            }
+        }
+
+        // Modal Management
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Feature Navigation Functions
+        function manageUsers() {
+            viewAllUsers();
+        }
+
+        function viewAllUsers() {
+            loadUsers();
+            openModal('userModal');
+        }
+
+        function viewAnalytics() {
+            showSection('analytics');
+        }
+
+        function systemSettings() {
+            showSection('settings');
+        }
+
+        function manageOperations() {
+            showSection('operations');
+        }
+
+        function scheduleManagement() {
+            showSection('scheduling');
+        }
+
+        function auditLogs() {
+            showSection('logs');
+        }
+
+        function viewSchedule() {
+            showSection('scheduling');
+        }
+
+        function profileSettings() {
+            editProfile();
+        }
+
+        function contactSupport() {
+            alert('Support contact: support@medicore.com\nPhone: +1 (555) 123-4567');
+        }
+
+        function viewAssignments() {
+            showSection('assignments');
+        }
+
+        function updateAvailability() {
+            showSection('availability');
+        }
+
+        // Profile Functions
+        async function editProfile() {
+            if (!currentUser) {
+                alert('No user is signed in.');
+                return;
+            }
+            
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                const userData = userDoc.data();
+                
+                // Populate form with current data
+                document.getElementById('profileEditFullName').value = userData.fullName || '';
+                document.getElementById('profileEditPhone').value = userData.phone || '';
+                document.getElementById('profileEditDepartment').value = userData.department || '';
+                document.getElementById('profileEditBio').value = userData.bio || '';
+                
+                openModal('profileModal');
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showMessage('error', 'Error loading profile data');
+            }
+        }
+
+        // Authentication Flow Functions
+        async function changePassword() {
+            const currentPassword = prompt('Enter your current password:');
+            const newPassword = prompt('Enter your new password (min 6 characters):');
+            
+            if (!currentPassword || !newPassword) return;
+            
+            if (newPassword.length < 6) {
+                showMessage('error', 'New password must be at least 6 characters');
+                return;
+            }
+            
+            try {
+                const credential = firebase.auth.EmailAuthProvider.credential(
+                    currentUser.email,
+                    currentPassword
+                );
+                
+                await currentUser.reauthenticateWithCredential(credential);
+                await currentUser.updatePassword(newPassword);
+                
+                await logAdminAction('Password Changed', 'User changed their password');
+                showMessage('success', 'Password changed successfully!');
+            } catch (error) {
+                console.error('Error changing password:', error);
+                showMessage('error', 'Error changing password. Check your current password.');
+            }
+        }
+
+        async function resetPassword() {
+            if (!currentUser) return;
+            
+            try {
+                await auth.sendPasswordResetEmail(currentUser.email);
+                showMessage('success', 'Password reset email sent!');
+            } catch (error) {
+                console.error('Error sending reset email:', error);
+                showMessage('error', 'Error sending reset email');
+            }
+        }
+
+        async function resendVerification() {
+            if (!currentUser) return;
+            
+            try {
+                await currentUser.sendEmailVerification();
+                showMessage('success', 'Verification email sent!');
+            } catch (error) {
+                console.error('Error sending verification:', error);
+                showMessage('error', 'Error sending verification email');
+            }
+        }
+
+        function viewLoginHistory() {
+            alert('Login history feature coming soon!');
+        }
+
+        // Utility Functions
+        function capitalizeFirst(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function setAuthLoading(loading) {
+            const button = document.getElementById('authButton');
+            const buttonText = document.getElementById('authButtonText');
+            const spinner = document.getElementById('authSpinner');
+            
+            button.disabled = loading;
+            if (loading) {
+                buttonText.style.display = 'none';
+                spinner.style.display = 'inline-block';
+            } else {
+                buttonText.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        }
+
+        function showAuthMessage(type, message) {
+            const errorDiv = document.getElementById('authErrorMessage');
+            const successDiv = document.getElementById('authSuccessMessage');
+            
+            hideAuthMessages();
+            
+            if (type === 'error') {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            } else {
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+            }
+            
+            setTimeout(hideAuthMessages, 5000);
+        }
+
+        function hideAuthMessages() {
+            document.getElementById('authErrorMessage').style.display = 'none';
+            document.getElementById('authSuccessMessage').style.display = 'none';
+        }
+
+        function showMessage(type, message) {
+            // Create floating notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 15px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                max-width: 400px;
+                backdrop-filter: blur(10px);
+                animation: slideInRight 0.3s ease;
+                background: ${type === 'success' ? 'rgba(39, 174, 96, 0.9)' : 'rgba(231, 76, 60, 0.9)'};
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Logout
+        async function logout() {
+            try {
+                if (currentUser) {
+                    await logAdminAction('User Logout', 'User logged out successfully');
+                }
+                
+                await auth.signOut();
+                clearInterval(sessionTimer);
+                sessionStartTime = null;
+                currentUser = null;
+                showMessage('success', 'Logged out successfully!');
+                
+            } catch (error) {
+                console.error('Error logging out:', error);
+                showMessage('error', 'Error logging out');
+            }
+        }
+
+        // Add this function to your existing code
+        async function createMissingUserProfile(user) {
+            try {
+                // Check if profile exists
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (!userDoc.exists) {
+                    // Create missing profile with default values
+                    await db.collection('users').doc(user.uid).set({
+                        email: user.email,
+                        fullName: user.displayName || 'User',
+                        role: 'user',
+                        department: 'administration',
+                        phone: '',
+                        bio: '',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        emailVerified: user.emailVerified,
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    console.log('✅ Created missing user profile');
+                    return await db.collection('users').doc(user.uid).get();
+                }
+                
+                return userDoc;
+            } catch (error) {
+                console.error('Error creating missing profile:', error);
+                throw error;
+            }
+        }
+
+        // Update your auth state listener
+        auth.onAuthStateChanged(async (user) => {
+            if (user && user.emailVerified) {
+                try {
+                    // Try to get existing profile or create missing one
+                    const userDoc = await createMissingUserProfile(user);
+                    const userData = userDoc.data();
+                    
+                    console.log('✅ User profile loaded:', userData);
+                    
+                    currentUser = user;
+                    showDashboard(userData);
+                    await loadInitialData();
+                    startSessionManagement();
+                    
+                } catch (error) {
+                    console.error('Error loading user profile:', error);
+                    showAuthMessage('error', 'Error loading profile: ' + error.message);
+                }
+            } else if (user && !user.emailVerified) {
+                showAuthMessage('error', 'Please verify your email before accessing the dashboard.');
+                showAuth();
+            } else {
+                showAuth();
+            }
+        });
+
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

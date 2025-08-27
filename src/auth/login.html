@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Hospital Operation Scheduler</title>
+  <link rel="stylesheet" href="../shared/common.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+  <script>
+    // --- Firebase Config (MUST MATCH index.html) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGO0toQ9Cpseiu3YtdM-eizthw08n7IR4",
+      authDomain: "hospital-scheduler-2025.firebaseapp.com",
+      projectId: "hospital-scheduler-2025",
+      storageBucket: "hospital-scheduler-2025.appspot.com",
+      messagingSenderId: "707345795665",
+      appId: "1:707345795665:web:adbc753023afffb8ca0670"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+  </script>
+</head>
+<body style="background:#f5f6fa; font-family:sans-serif;">
+  <div style="max-width:400px;margin:60px auto;background:white;padding:32px 24px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);">
+    <h2 style="text-align:center;margin-bottom:20px;">Login</h2>
+    <form id="loginForm" autocomplete="off">
+      <div style="margin-bottom:14px;">
+        <label>Email</label><br>
+        <input type="email" id="loginEmail" required style="width:100%;padding:8px;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label>Password</label><br>
+        <input type="password" id="loginPassword" required style="width:100%;padding:8px;">
+      </div>
+      <div style="margin-bottom:14px;text-align:right;">
+        <a href="#" id="forgotPasswordLink" style="color:#667eea;font-size:13px;">Forgot Password?</a>
+      </div>
+      <div id="resetPasswordSection" style="display:none;margin-bottom:14px;">
+        <input type="email" id="resetEmail" placeholder="Enter your email for reset" style="width:100%;padding:8px;">
+        <button id="resetPasswordBtn" class="btn btn-secondary" style="width:100%;margin-top:6px;">Send Reset Email</button>
+        <div id="resetMessage" style="margin-top:8px;font-size:13px;text-align:center;"></div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:10px;">Login</button>
+    </form>
+    <div id="loginMessage" style="margin-top:14px;color:#e74c3c;text-align:center;"></div>
+  </div>
+  <script>
+    // Validate email/password
+    function validateLogin(email, password) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) return "Invalid email format";
+      if (!password || password.length < 6) return "Password required";
+      return null;
+    }
+    // Login logic
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const loginMessage = document.getElementById('loginMessage');
+      loginMessage.style.color = '#e74c3c';
+      const error = validateLogin(email, password);
+      if (error) { loginMessage.textContent = error; return; }
+      try {
+        const cred = await firebase.auth().signInWithEmailAndPassword(email, password);
+        if (!cred.user.emailVerified) {
+          loginMessage.textContent = 'Please verify your email before logging in.';
+          await firebase.auth().signOut();
+          return;
+        }
+        // Fetch user role from Firestore
+        const userDoc = await firebase.firestore().collection('users').doc(cred.user.uid).get();
+        const userData = userDoc.data();
+        if (!userData) {
+          loginMessage.textContent = 'User profile not found.';
+          await firebase.auth().signOut();
+          return;
+        }
+        // Role-based redirect
+        if (userData.role === 'admin') {
+          window.location.href = '../admin/dashboard.html';
+        } else {
+          window.location.href = '../user/dashboard.html';
+        }
+      } catch (err) {
+        loginMessage.textContent = err.message;
+      }
+    });
+    // Forgot Password
+    const forgotLink = document.getElementById('forgotPasswordLink');
+    const resetSection = document.getElementById('resetPasswordSection');
+    const resetEmail = document.getElementById('resetEmail');
+    const resetBtn = document.getElementById('resetPasswordBtn');
+    const resetMessage = document.getElementById('resetMessage');
+    forgotLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      resetSection.style.display = resetSection.style.display === 'none' ? 'block' : 'none';
+      resetMessage.textContent = '';
+    });
+    resetBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const email = resetEmail.value.trim();
+      if (!email) { resetMessage.textContent = 'Enter your email.'; resetMessage.style.color = '#e74c3c'; return; }
+      firebase.auth().sendPasswordResetEmail(email)
+        .then(() => {
+          resetMessage.textContent = 'Password reset email sent!';
+          resetMessage.style.color = '#27ae60';
+        })
+        .catch(err => {
+          resetMessage.textContent = err.message;
+          resetMessage.style.color = '#e74c3c';
+        });
+    });
+  </script>
+</body>
+</html>

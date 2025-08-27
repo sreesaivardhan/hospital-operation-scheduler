@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Admin Dashboard - Day 5</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .admin-dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-header h1 {
+            color: #2c3e50;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin: 0 auto 15px;
+        }
+
+        .stat-icon.doctors {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .stat-icon.appointments {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .stat-icon.revenue {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .stat-icon.patients {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .content-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+        }
+
+        .doctors-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .doctors-table th,
+        .doctors-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f1f2f6;
+        }
+
+        .doctors-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .doctors-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .close:hover {
+            opacity: 1;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group .error {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .form-group .success {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .validation-message {
+            font-size: 14px;
+            margin-top: 5px;
+            padding: 5px 0;
+        }
+
+        .error-text {
+            color: #dc3545;
+        }
+
+        .success-text {
+            color: #28a745;
+        }
+
+        .schedule-builder {
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .schedule-day {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .schedule-day label {
+            min-width: 100px;
+            margin-bottom: 0;
+        }
+
+        .time-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-inputs input {
+            width: 120px;
+            padding: 8px 12px;
+        }
+
+        .doctor-card {
+            border: 2px solid #f1f2f6;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .doctor-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .doctor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .doctor-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .doctor-specialization {
+            color: #667eea;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .doctor-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .doctor-actions button {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .activity-log {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #f1f2f6;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .log-entry {
+            padding: 10px;
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .log-time {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .log-action {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .log-details {
+            font-size: 14px;
+            color: #495057;
+            margin-top: 5px;
+        }
+
+        .search-filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-day {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .doctor-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>🏥 Hospital Admin Dashboard</h1>
+            <p>Manage doctors, appointments, and hospital operations</p>
+        </div>
+
+        <!-- Dashboard Statistics -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon doctors">👨‍⚕️</div>
+                <div class="stat-number" id="totalDoctors">0</div>
+                <div class="stat-label">Total Doctors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon appointments">📅</div>
+                <div class="stat-number" id="totalAppointments">0</div>
+                <div class="stat-label">Total Appointments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon patients">👥</div>
+                <div class="stat-number" id="totalPatients">0</div>
+                <div class="stat-label">Total Patients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon revenue">💰</div>
+                <div class="stat-number" id="totalRevenue">$0</div>
+                <div class="stat-label">Revenue (Monthly)</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="section-title">
+                    👨‍⚕️ Doctor Management
+                    <button class="btn" onclick="openDoctorModal()">Add New Doctor</button>
+                </div>
+
+                <!-- Search and Filter Bar -->
+                <div class="search-filter-bar">
+                    <input type="text" class="search-input" placeholder="Search doctors by name, specialization, or email..." id="searchInput" onkeyup="searchDoctors()">
+                    <select class="filter-select" id="specializationFilter" onchange="filterDoctors()">
+                        <option value="">All Specializations</option>
+                        <option value="cardiology">Cardiology</option>
+                        <option value="neurology">Neurology</option>
+                        <option value="pediatrics">Pediatrics</option>
+                        <option value="orthopedics">Orthopedics</option>
+                        <option value="dermatology">Dermatology</option>
+                        <option value="psychiatry">Psychiatry</option>
+                        <option value="emergency">Emergency Medicine</option>
+                    </select>
+                    <select class="filter-select" id="statusFilter" onchange="filterDoctors()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <!-- Doctors List -->
+                <div id="doctorsContainer">
+                    <!-- Doctors will be loaded here -->
+                </div>
+
+                <!-- Doctors Table (Alternative View) -->
+                <div id="doctorsTableView" style="display: none;">
+                    <table class="doctors-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="doctorsTableBody">
+                            <!-- Table rows will be generated here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn" onclick="toggleView()" id="toggleViewBtn">Switch to Table View</button>
+                    <button class="btn btn-success" onclick="exportDoctors()">Export Doctors</button>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3 style="color: #2c3e50; margin-bottom: 20px;">📊 Quick Stats</h3>
+                
+                <div style="margin-bottom: 30px;">
+                    <h4 style="color: #6c757d; font-size: 14px; margin-bottom: 10px;">SPECIALIZATIONS</h4>
+                    <div id="specializationStats">
+                        <!-- Specialization stats will be loaded here -->
+                    </div>
+                </div>
+
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">📝 Recent Admin Actions</h3>
+                <div class="activity-log" id="activityLog">
+                    <!-- Activity logs will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Modal -->
+    <div id="doctorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Doctor</h2>
+                <span class="close" onclick="closeDoctorModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="doctorForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="doctorName">Full Name *</label>
+                            <input type="text" id="doctorName" required placeholder="Dr. John Smith">
+                            <div class="validation-message" id="doctorNameValidation"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorEmail">Email Address *</label>
+                            <input type="email" id="doctorEmail" required placeholder="john.smith@hospital.com">
+                            <div class="validation-message" id="doctorEmailValidation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="doctorPhone">Phone Number *</label>
+                            <input type="tel" id="doctorPhone" required placeholder="+1 (555) 123-4567">
+                            <div class="validation-message" id="doctorPhoneValidation"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorSpecialization">Specialization *</label>
+                            <select id="doctorSpecialization" required>
+                                <option value="">Select Specialization</option>
+                                <option value="cardiology">Cardiology</option>
+                                <option value="neurology">Neurology</option>
+                                <option value="pediatrics">Pediatrics</option>
+                                <option value="orthopedics">Orthopedics</option>
+                                <option value="dermatology">Dermatology</option>
+                                <option value="psychiatry">Psychiatry</option>
+                                <option value="emergency">Emergency Medicine</option>
+                                <option value="surgery">General Surgery</option>
+                                <option value="oncology">Oncology</option>
+                            </select>
+                            <div class="validation-message" id="doctorSpecializationValidation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="doctorLicense">Medical License Number</label>
+                            <input type="text" id="doctorLicense" placeholder="MD123456">
+                            <div class="validation-message" id="doctorLicenseValidation"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorExperience">Years of Experience</label>
+                            <input type="number" id="doctorExperience" min="0" max="50" placeholder="5">
+                            <div class="validation-message" id="doctorExperienceValidation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="doctorFee">Consultation Fee ($)</label>
+                            <input type="number" id="doctorFee" min="0" step="0.01" placeholder="150.00">
+                            <div class="validation-message" id="doctorFeeValidation"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorStatus">Status</label>
+                            <select id="doctorStatus">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctorBio">Biography</label>
+                        <textarea id="doctorBio" rows="3" placeholder="Brief description about the doctor's background and expertise..."></textarea>
+                        <div class="validation-message" id="doctorBioValidation"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Weekly Schedule</label>
+                        <div class="schedule-builder">
+                            <div class="schedule-day">
+                                <input type="checkbox" id="monday" value="monday">
+                                <label for="monday">Monday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="mondayStart" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="mondayEnd" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <input type="checkbox" id="tuesday" value="tuesday">
+                                <label for="tuesday">Tuesday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="tuesdayStart" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="tuesdayEnd" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <input type="checkbox" id="wednesday" value="wednesday">
+                                <label for="wednesday">Wednesday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="wednesdayStart" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="wednesdayEnd" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <input type="checkbox" id="thursday" value="thursday">
+                                <label for="thursday">Thursday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="thursdayStart" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="thursdayEnd" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <input type="checkbox" id="friday" value="friday">
+                                <label for="friday">Friday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="fridayStart" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="fridayEnd" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <input type="checkbox" id="saturday" value="saturday">
+                                <label for="saturday">Saturday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="saturdayStart" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="saturdayEnd" value="17:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <input type="checkbox" id="sunday" value="sunday">
+                                <label for="sunday">Sunday</label>
+                                <div class="time-inputs">
+                                    <input type="time" id="sundayStart" value="09:00">
+                                    <span>to</span>
+                                    <input type="time" id="sundayEnd" value="17:00">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button type="submit" class="btn btn-success">Save Doctor</button>
+                        <button type="button" class="btn" onclick="closeDoctorModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGO0toQ9Cpseiu3YtdM-eizthw08n7IR4",
+            authDomain: "hospital-scheduler-2025.firebaseapp.com",
+            projectId: "hospital-scheduler-2025",
+            storageBucket: "hospital-scheduler-2025.appspot.com",
+            messagingSenderId: "707345795665",
+            appId: "1:707345795665:web:adbc753023afffb8ca0670"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
+
+    <!-- Main Application Script -->
+    <script>
+        let currentUser = null;
+        let isEditMode = false;
+        let editingDoctorId = null;
+        let allDoctors = [];
+        let isCardView = true;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated and has admin role
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    try {
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        if (userDoc.exists) {
+                            const userData = userDoc.data();
+                            if (userData.role === 'admin' || userData.role === 'superadmin') {
+                                currentUser = user;
+                                await loadDashboardData();
+                                setupFormValidation();
+                            } else {
+                                alert('Access denied. Admin privileges required.');
+                                window.location.href = 'index.html';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error checking user role:', error);
+                    }
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadDoctors(),
+                    loadDashboardStats(),
+                    loadActivityLog()
+                ]);
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Load all doctors
+        async function loadDoctors() {
+            try {
+                const doctorsSnapshot = await db.collection('doctors')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                allDoctors = [];
+                doctorsSnapshot.forEach(doc => {
+                    allDoctors.push({ id: doc.id, ...doc.data() });
+                });
+
+                displayDoctors(allDoctors);
+                updateSpecializationStats(allDoctors);
+            } catch (error) {
+                console.error('Error loading doctors:', error);
+                showNotification('Error loading doctors', 'error');
+            }
+        }
+
+        // Display doctors in card view
+        function displayDoctors(doctors) {
+            const container = document.getElementById('doctorsContainer');
+            const tableBody = document.getElementById('doctorsTableBody');
+            
+            if (isCardView) {
+                container.innerHTML = '';
+                if (doctors.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">No doctors found. Click "Add New Doctor" to get started.</p>';
+                    return;
+                }
+
+                doctors.forEach(doctor => {
+                    const doctorCard = createDoctorCard(doctor);
+                    container.appendChild(doctorCard);
+                });
+            } else {
+                // Table view
+                tableBody.innerHTML = '';
+                doctors.forEach(doctor => {
+                    const row = createDoctorTableRow(doctor);
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        // Create doctor card element
+        function createDoctorCard(doctor) {
+            const card = document.createElement('div');
+            card.className = 'doctor-card';
+            card.innerHTML = `
+                <div class="doctor-header">
+                    <div>
+                        <div class="doctor-name">${doctor.name}</div>
+                        <div class="doctor-specialization">${capitalizeFirst(doctor.specialization)}</div>
+                        <div style="color: #6c757d; font-size: 14px; margin-top: 5px;">
+                            📧 ${doctor.email} | 📞 ${doctor.phone}
+                        </div>
+                        <div style="color: #6c757d; font-size: 14px; margin-top: 5px;">
+                            💰 $${doctor.consultationFee || 0} | 
+                            📋 ${doctor.licenseNumber || 'N/A'} | 
+                            🎓 ${doctor.experience || 0} years
+                        </div>
+                        ${doctor.schedule && Object.keys(doctor.schedule).length > 0 ? 
+                            `<div style="color: #6c757d; font-size: 14px; margin-top: 5px;">
+                                🕒 Available: ${formatSchedule(doctor.schedule)}
+                            </div>` : ''
+                        }
+                        ${doctor.bio ? `<div style="color: #495057; font-size: 14px; margin-top: 8px; font-style: italic;">${doctor.bio}</div>` : ''}
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 10px;">
+                            <span class="badge badge-${doctor.status === 'active' ? 'active' : 'inactive'}">
+                                ${doctor.status === 'active' ? 'Active' : 'Inactive'}
+                            </span>
+                        </div>
+                        <div class="doctor-actions">
+                            <button class="btn btn-warning" onclick="editDoctor('${doctor.id}')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteDoctor('${doctor.id}', '${doctor.name}')">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // Create doctor table row
+        function createDoctorTableRow(doctor) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${doctor.name}</td>
+                <td>${capitalizeFirst(doctor.specialization)}</td>
+                <td>${doctor.email}</td>
+                <td>${doctor.phone}</td>
+                <td>
+                    <span class="badge badge-${doctor.status === 'active' ? 'active' : 'inactive'}">
+                        ${doctor.status === 'active' ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-warning" style="padding: 6px 12px; margin: 2px;" onclick="editDoctor('${doctor.id}')">Edit</button>
+                    <button class="btn btn-danger" style="padding: 6px 12px; margin: 2px;" onclick="deleteDoctor('${doctor.id}', '${doctor.name}')">Delete</button>
+                </td>
+            `;
+            return row;
+        }
+
+        // Format schedule for display
+        function formatSchedule(schedule) {
+            const availableDays = Object.keys(schedule).filter(day => schedule[day].available);
+            return availableDays.length > 0 ? 
+                availableDays.slice(0, 3).map(day => capitalizeFirst(day)).join(', ') + 
+                (availableDays.length > 3 ? '...' : '') : 'No schedule set';
+        }
+
+        // Load dashboard statistics
+        async function loadDashboardStats() {
+            try {
+                // Load doctors count
+                const doctorsSnapshot = await db.collection('doctors').get();
+                document.getElementById('totalDoctors').textContent = doctorsSnapshot.size;
+
+                // For demo purposes, set some sample stats
+                document.getElementById('totalAppointments').textContent = '127';
+                document.getElementById('totalPatients').textContent = '1,248';
+                document.getElementById('totalRevenue').textContent = '$45,290';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Update specialization statistics
+        function updateSpecializationStats(doctors) {
+            const specializationCounts = {};
+            doctors.forEach(doctor => {
+                if (doctor.specialization) {
+                    specializationCounts[doctor.specialization] = (specializationCounts[doctor.specialization] || 0) + 1;
+                }
+            });
+
+            const statsContainer = document.getElementById('specializationStats');
+            statsContainer.innerHTML = '';
+
+            Object.entries(specializationCounts).forEach(([specialization, count]) => {
+                const statItem = document.createElement('div');
+                statItem.style.cssText = 'display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f2f6;';
+                statItem.innerHTML = `
+                    <span style="color: #495057;">${capitalizeFirst(specialization)}</span>
+                    <span style="color: #667eea; font-weight: 500;">${count}</span>
+                `;
+                statsContainer.appendChild(statItem);
+            });
+        }
+
+        // Load activity log
+        async function loadActivityLog() {
+            try {
+                const logsSnapshot = await db.collection('adminLogs')
+                    .orderBy('timestamp', 'desc')
+                    .limit(10)
+                    .get();
+
+                const logContainer = document.getElementById('activityLog');
+                logContainer.innerHTML = '';
+
+                if (logsSnapshot.empty) {
+                    logContainer.innerHTML = '<p style="color: #6c757d; text-align: center;">No recent activities</p>';
+                    return;
+                }
+
+                logsSnapshot.forEach(doc => {
+                    const log = doc.data();
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-entry';
+                    
+                    const timestamp = log.timestamp ? log.timestamp.toDate() : new Date();
+                    
+                    logEntry.innerHTML = `
+                        <div class="log-time">${timestamp.toLocaleString()}</div>
+                        <div class="log-action">${log.action}</div>
+                        <div class="log-details">${log.details}</div>
+                    `;
+                    logContainer.appendChild(logEntry);
+                });
+            } catch (error) {
+                console.error('Error loading activity log:', error);
+            }
+        }
+
+        // Log admin action
+        async function logAdminAction(action, details) {
+            try {
+                if (!currentUser) return;
+
+                await db.collection('adminLogs').add({
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    action: action,
+                    details: details,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Reload activity log
+                await loadActivityLog();
+            } catch (error) {
+                console.error('Error logging admin action:', error);
+            }
+        }
+
+        // Open doctor modal
+        function openDoctorModal() {
+            isEditMode = false;
+            editingDoctorId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Doctor';
+            document.getElementById('doctorForm').reset();
+            clearValidationMessages();
+            document.getElementById('doctorModal').style.display = 'block';
+        }
+
+        // Close doctor modal
+        function closeDoctorModal() {
+            document.getElementById('doctorModal').style.display = 'none';
+            clearValidationMessages();
+        }
+
+        // Form validation setup
+        function setupFormValidation() {
+            const form = document.getElementById('doctorForm');
+            
+            // Real-time validation
+            document.getElementById('doctorName').addEventListener('input', validateName);
+            document.getElementById('doctorEmail').addEventListener('input', validateEmail);
+            document.getElementById('doctorPhone').addEventListener('input', validatePhone);
+            document.getElementById('doctorSpecialization').addEventListener('change', validateSpecialization);
+            document.getElementById('doctorLicense').addEventListener('input', validateLicense);
+            document.getElementById('doctorExperience').addEventListener('input', validateExperience);
+            document.getElementById('doctorFee').addEventListener('input', validateFee);
+
+            // Form submission
+            form.addEventListener('submit', handleFormSubmit);
+        }
+
+        // Validation functions
+        function validateName() {
+            const name = document.getElementById('doctorName');
+            const validation = document.getElementById('doctorNameValidation');
+            
+            if (!name.value.trim()) {
+                setValidationError(name, validation, 'Doctor name is required');
+                return false;
+            } else if (name.value.trim().length < 3) {
+                setValidationError(name, validation, 'Name must be at least 3 characters');
+                return false;
+            } else {
+                setValidationSuccess(name, validation, 'Valid name');
+                return true;
+            }
+        }
+
+        function validateEmail() {
+            const email = document.getElementById('doctorEmail');
+            const validation = document.getElementById('doctorEmailValidation');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!email.value.trim()) {
+                setValidationError(email, validation, 'Email is required');
+                return false;
+            } else if (!emailRegex.test(email.value)) {
+                setValidationError(email, validation, 'Please enter a valid email');
+                return false;
+            } else {
+                setValidationSuccess(email, validation, 'Valid email');
+                return true;
+            }
+        }
+
+        function validatePhone() {
+            const phone = document.getElementById('doctorPhone');
+            const validation = document.getElementById('doctorPhoneValidation');
+            const phoneRegex = /^[\d\-\+\(\)\s]+$/;
+
+            if (!phone.value.trim()) {
+                setValidationError(phone, validation, 'Phone number is required');
+                return false;
+            } else if (!phoneRegex.test(phone.value)) {
+                setValidationError(phone, validation, 'Please enter a valid phone number');
+                return false;
+            } else if (phone.value.replace(/\D/g, '').length < 10) {
+                setValidationError(phone, validation, 'Phone number must be at least 10 digits');
+                return false;
+            } else {
+                setValidationSuccess(phone, validation, 'Valid phone number');
+                return true;
+            }
+        }
+
+        function validateSpecialization() {
+            const specialization = document.getElementById('doctorSpecialization');
+            const validation = document.getElementById('doctorSpecializationValidation');
+
+            if (!specialization.value) {
+                setValidationError(specialization, validation, 'Please select a specialization');
+                return false;
+            } else {
+                setValidationSuccess(specialization, validation, 'Specialization selected');
+                return true;
+            }
+        }
+
+        function validateLicense() {
+            const license = document.getElementById('doctorLicense');
+            const validation = document.getElementById('doctorLicenseValidation');
+
+            if (license.value && license.value.length < 5) {
+                setValidationError(license, validation, 'License number must be at least 5 characters');
+                return false;
+            } else {
+                setValidationSuccess(license, validation, 'Valid license number');
+                return true;
+            }
+        }
+
+        function validateExperience() {
+            const experience = document.getElementById('doctorExperience');
+            const validation = document.getElementById('doctorExperienceValidation');
+
+            if (experience.value && (experience.value < 0 || experience.value > 50)) {
+                setValidationError(experience, validation, 'Experience must be between 0 and 50 years');
+                return false;
+            } else {
+                setValidationSuccess(experience, validation, 'Valid experience');
+                return true;
+            }
+        }
+
+        function validateFee() {
+            const fee = document.getElementById('doctorFee');
+            const validation = document.getElementById('doctorFeeValidation');
+
+            if (fee.value && fee.value < 0) {
+                setValidationError(fee, validation, 'Fee cannot be negative');
+                return false;
+            } else {
+                setValidationSuccess(fee, validation, 'Valid fee');
+                return true;
+            }
+        }
+
+        function setValidationError(input, validation, message) {
+            input.classList.remove('success');
+            input.classList.add('error');
+            validation.innerHTML = `<span class="error-text">${message}</span>`;
+        }
+
+        function setValidationSuccess(input, validation, message) {
+            input.classList.remove('error');
+            input.classList.add('success');
+            validation.innerHTML = `<span class="success-text">${message}</span>`;
+        }
+
+        function clearValidationMessages() {
+            const validationElements = document.querySelectorAll('.validation-message');
+            validationElements.forEach(el => el.innerHTML = '');
+            
+            const inputs = document.querySelectorAll('#doctorForm input, #doctorForm select, #doctorForm textarea');
+            inputs.forEach(input => {
+                input.classList.remove('error', 'success');
+            });
+        }
+
+        // Validate entire form
+        function validateForm() {
+            const validations = [
+                validateName(),
+                validateEmail(),
+                validatePhone(),
+                validateSpecialization(),
+                validateLicense(),
+                validateExperience(),
+                validateFee()
+            ];
+
+            return validations.every(validation => validation);
+        }
+
+        // Handle form submission
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                showNotification('Please fix the validation errors', 'error');
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Saving...';
+            submitBtn.disabled = true;
+
+            try {
+                const doctorData = collectFormData();
+                
+                if (isEditMode && editingDoctorId) {
+                    // Update existing doctor
+                    await db.collection('doctors').doc(editingDoctorId).update({
+                        ...doctorData,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    await logAdminAction('Doctor Updated', `Updated doctor: ${doctorData.name}`);
+                    showNotification('Doctor updated successfully!', 'success');
+                } else {
+                    // Add new doctor
+                    await db.collection('doctors').add({
+                        ...doctorData,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    await logAdminAction('Doctor Added', `Added new doctor: ${doctorData.name}`);
+                    showNotification('Doctor added successfully!', 'success');
+                }
+
+                closeDoctorModal();
+                await loadDoctors();
+                await loadDashboardStats();
+
+            } catch (error) {
+                console.error('Error saving doctor:', error);
+                showNotification('Error saving doctor. Please try again.', 'error');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Collect form data
+        function collectFormData() {
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const schedule = {};
+            
+            days.forEach(day => {
+                const checkbox = document.getElementById(day);
+                const startTime = document.getElementById(day + 'Start');
+                const endTime = document.getElementById(day + 'End');
+                
+                schedule[day] = {
+                    available: checkbox.checked,
+                    startTime: startTime.value,
+                    endTime: endTime.value
+                };
+            });
+
+            return {
+                name: document.getElementById('doctorName').value.trim(),
+                email: document.getElementById('doctorEmail').value.trim().toLowerCase(),
+                phone: document.getElementById('doctorPhone').value.trim(),
+                specialization: document.getElementById('doctorSpecialization').value,
+                licenseNumber: document.getElementById('doctorLicense').value.trim(),
+                experience: parseInt(document.getElementById('doctorExperience').value) || 0,
+                consultationFee: parseFloat(document.getElementById('doctorFee').value) || 0,
+                status: document.getElementById('doctorStatus').value,
+                bio: document.getElementById('doctorBio').value.trim(),
+                schedule: schedule
+            };
+        }
+
+        // Edit doctor
+        async function editDoctor(doctorId) {
+            try {
+                const doctorDoc = await db.collection('doctors').doc(doctorId).get();
+                if (!doctorDoc.exists) {
+                    showNotification('Doctor not found', 'error');
+                    return;
+                }
+
+                const doctor = doctorDoc.data();
+                isEditMode = true;
+                editingDoctorId = doctorId;
+
+                // Populate form
+                document.getElementById('modalTitle').textContent = 'Edit Doctor';
+                document.getElementById('doctorName').value = doctor.name || '';
+                document.getElementById('doctorEmail').value = doctor.email || '';
+                document.getElementById('doctorPhone').value = doctor.phone || '';
+                document.getElementById('doctorSpecialization').value = doctor.specialization || '';
+                document.getElementById('doctorLicense').value = doctor.licenseNumber || '';
+                document.getElementById('doctorExperience').value = doctor.experience || '';
+                document.getElementById('doctorFee').value = doctor.consultationFee || '';
+                document.getElementById('doctorStatus').value = doctor.status || 'active';
+                document.getElementById('doctorBio').value = doctor.bio || '';
+
+                // Populate schedule
+                if (doctor.schedule) {
+                    Object.keys(doctor.schedule).forEach(day => {
+                        const checkbox = document.getElementById(day);
+                        const startTime = document.getElementById(day + 'Start');
+                        const endTime = document.getElementById(day + 'End');
+                        
+                        if (checkbox && doctor.schedule[day]) {
+                            checkbox.checked = doctor.schedule[day].available || false;
+                            startTime.value = doctor.schedule[day].startTime || '09:00';
+                            endTime.value = doctor.schedule[day].endTime || '17:00';
+                        }
+                    });
+                }
+
+                clearValidationMessages();
+                document.getElementById('doctorModal').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading doctor for edit:', error);
+                showNotification('Error loading doctor data', 'error');
+            }
+        }
+
+        // Delete doctor
+        async function deleteDoctor(doctorId, doctorName) {
+            if (!confirm(`Are you sure you want to delete Dr. ${doctorName}? This action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                await db.collection('doctors').doc(doctorId).delete();
+                await logAdminAction('Doctor Deleted', `Deleted doctor: ${doctorName}`);
+                showNotification('Doctor deleted successfully!', 'success');
+                await loadDoctors();
+                await loadDashboardStats();
+            } catch (error) {
+                console.error('Error deleting doctor:', error);
+                showNotification('Error deleting doctor', 'error');
+            }
+        }
+
+        // Search doctors
+        function searchDoctors() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredDoctors = allDoctors.filter(doctor => {
+                return doctor.name.toLowerCase().includes(searchTerm) ||
+                       doctor.email.toLowerCase().includes(searchTerm) ||
+                       doctor.specialization.toLowerCase().includes(searchTerm);
+            });
+            
+            displayDoctors(filteredDoctors);
+        }
+
+        // Filter doctors
+        function filterDoctors() {
+            const specializationFilter = document.getElementById('specializationFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            let filteredDoctors = allDoctors;
+            
+            if (specializationFilter) {
+                filteredDoctors = filteredDoctors.filter(doctor => 
+                    doctor.specialization === specializationFilter
+                );
+            }
+            
+            if (statusFilter) {
+                filteredDoctors = filteredDoctors.filter(doctor => 
+                    doctor.status === statusFilter
+                );
+            }
+            
+            displayDoctors(filteredDoctors);
+        }
+
+        // Toggle between card and table view
+        function toggleView() {
+            isCardView = !isCardView;
+            const container = document.getElementById('doctorsContainer');
+            const tableView = document.getElementById('doctorsTableView');
+            const toggleBtn = document.getElementById('toggleViewBtn');
+            
+            if (isCardView) {
+                container.style.display = 'block';
+                tableView.style.display = 'none';
+                toggleBtn.textContent = 'Switch to Table View';
+            } else {
+                container.style.display = 'none';
+                tableView.style.display = 'block';
+                toggleBtn.textContent = 'Switch to Card View';
+            }
+            
+            displayDoctors(allDoctors);
+        }
+
+        // Export doctors to CSV
+        async function exportDoctors() {
+            try {
+                let csvContent = "Name,Email,Phone,Specialization,License,Experience,Fee,Status,Bio\n";
+                
+                allDoctors.forEach(doctor => {
+                    const row = [
+                        `"${doctor.name || ''}"`,
+                        `"${doctor.email || ''}"`,
+                        `"${doctor.phone || ''}"`,
+                        `"${doctor.specialization || ''}"`,
+                        `"${doctor.licenseNumber || ''}"`,
+                        `"${doctor.experience || 0}"`,
+                        `"${doctor.consultationFee || 0}"`,
+                        `"${doctor.status || 'active'}"`,
+                        `"${(doctor.bio || '').replace(/"/g, '""')}"`
+                    ].join(',');
+                    csvContent += row + "\n";
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `hospital_doctors_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                await logAdminAction('Data Export', 'Exported doctors data to CSV');
+                showNotification('Doctors exported successfully!', 'success');
+            } catch (error) {
+                console.error('Error exporting doctors:', error);
+                showNotification('Error exporting doctors', 'error');
+            }
+        }
+
+        // Utility functions
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                max-width: 400px;
+                animation: slideIn 0.3s ease;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #4ecdc4, #44a08d)' : 
+                           type === 'error' ? 'linear-gradient(135deg, #ff6b6b, #ee5a52)' : 
+                           'linear-gradient(135deg, #667eea, #764ba2)'};
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 5000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('doctorModal');
+            if (event.target === modal) {
+                closeDoctorModal();
+            }
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

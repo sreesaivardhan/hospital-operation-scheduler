@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="../shared/common.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+</head>
+<body style="background:#f5f6fa; font-family:sans-serif;">
+  <div style="max-width:900px;margin:40px auto;background:white;padding:32px 24px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);">
+    <h2 style="text-align:center;margin-bottom:20px;">Admin Dashboard</h2>
+    <div id="adminContent">
+      <!-- Admin-specific content goes here -->
+      <p>Welcome, <span id="adminName"></span> (<span id="adminEmail"></span>)</p>
+      <p>Hospital ID: <span id="adminHospitalId"></span></p>
+      <button id="logoutBtn" class="btn btn-secondary" style="margin-top:18px;">Logout</button>
+    </div>
+    <div id="adminMessage" style="margin-top:14px;color:#e74c3c;text-align:center;"></div>
+  </div>
+  <script>
+    // Auth state observer for security
+    firebase.auth().onAuthStateChanged(async function(user) {
+      if (!user) {
+        window.location.href = '../auth/login.html';
+        return;
+      }
+      // Fetch user profile from Firestore
+      const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+      const userData = userDoc.data();
+      if (!userData || userData.role !== 'admin') {
+        document.getElementById('adminMessage').textContent = 'Access denied: Admins only.';
+        setTimeout(() => firebase.auth().signOut(), 2000);
+        return;
+      }
+      document.getElementById('adminName').textContent = user.displayName || 'Admin';
+      document.getElementById('adminEmail').textContent = user.email;
+      document.getElementById('adminHospitalId').textContent = userData.hospitalId;
+    });
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = '../auth/login.html';
+      });
+    });
+  </script>
+</body>
+</html>

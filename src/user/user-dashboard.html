@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="../shared/common.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+</head>
+<body style="background:#f5f6fa; font-family:sans-serif;">
+  <div style="max-width:900px;margin:40px auto;background:white;padding:32px 24px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);">
+    <h2 style="text-align:center;margin-bottom:20px;">User Dashboard</h2>
+    <div id="userContent">
+      <!-- User-specific content goes here -->
+      <p>Welcome, <span id="userName"></span> (<span id="userEmail"></span>)</p>
+      <p>Hospital ID: <span id="userHospitalId"></span></p>
+      <button id="logoutBtn" class="btn btn-secondary" style="margin-top:18px;">Logout</button>
+    </div>
+    <div id="userMessage" style="margin-top:14px;color:#e74c3c;text-align:center;"></div>
+  </div>
+  <script>
+    // Auth state observer for security
+    firebase.auth().onAuthStateChanged(async function(user) {
+      if (!user) {
+        window.location.href = '../auth/login.html';
+        return;
+      }
+      // Fetch user profile from Firestore
+      const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+      const userData = userDoc.data();
+      if (!userData || userData.role !== 'user') {
+        document.getElementById('userMessage').textContent = 'Access denied: Users only.';
+        setTimeout(() => firebase.auth().signOut(), 2000);
+        return;
+      }
+      document.getElementById('userName').textContent = user.displayName || 'User';
+      document.getElementById('userEmail').textContent = user.email;
+      document.getElementById('userHospitalId').textContent = userData.hospitalId || '';
+    });
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = '../auth/login.html';
+      });
+    });
+
+    // --- Profile Update UI & Logic ---
+    const userContent = document.getElementById('userContent');
+    const profileUpdateSection = document.createElement('div');
+    profileUpdateSection.innerHTML = `
+      <hr style="margin:30px 0;">
+      <h3>Update Profile</h3>
+      <form id="profileForm">
+        <div style="margin-bottom:12px;">
+          <label>Display Name</label><br>
+          <input type="text" id="profileDisplayName" style="width:100%;padding:7px;">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label>Hospital ID</label><br>
+          <input type="text" id="profileHospitalId" style="width:100%;padding:7px;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:10px;">Update Profile</button>
+      </form>
+      <div id="profileMessage" style="margin-top:10px;color:#e67e22;"></div>
+    `;
+    userContent.appendChild(profileUpdateSection);
+    firebase.auth().onAuthStateChanged(async function(user) {
+      if (user) {
+        document.getElementById('profileDisplayName').value = user.displayName || '';
+        // Fetch hospitalId from Firestore
+        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+        document.getElementById('profileHospitalId').value = userDoc.data()?.hospitalId || '';
+      }
+    });
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const displayName = document.getElementById('profileDisplayName').value.trim();
+      const hospitalId = document.getElementById('profileHospitalId').value.trim();
+      const profileMessage = document.getElementById('profileMessage');
+      if (!displayName) { profileMessage.textContent = 'Display name required.'; return; }
+      if (!/^HSP\d{3}$/.test(hospitalId)) { profileMessage.textContent = 'Hospital ID must be like HSP001'; return; }
+      try {
+        // Update Firebase Auth profile
+        await firebase.auth().currentUser.updateProfile({ displayName });
+        // Update Firestore
+        await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({ hospitalId });
+        profileMessage.style.color = '#27ae60';
+        profileMessage.textContent = 'Profile updated successfully!';
+        document.getElementById('userName').textContent = displayName;
+        document.getElementById('userHospitalId').textContent = hospitalId;
+      } catch (err) {
+        profileMessage.style.color = '#e74c3c';
+        profileMessage.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

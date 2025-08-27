@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Test</title>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+</head>
+<body>
+    <h1>🔥 Database Connection Test</h1>
+    <button onclick="testConnection()">1. Test Connection</button><br><br>
+    <button onclick="testRead()">2. Test Read Doctors</button><br><br>
+    <button onclick="testWrite()">3. Test Write Data</button><br><br>
+    <div id="results" style="margin-top: 20px; padding: 20px; border: 1px solid #ccc;"></div>
+
+    <script>
+        function testConnection() {
+            try {
+                if (typeof firebase !== 'undefined') {
+                    document.getElementById('results').innerHTML = '✅ Firebase SDK loaded successfully!';
+                    
+                    if (typeof window.db !== 'undefined' && window.db !== null) {
+                        document.getElementById('results').innerHTML += '<br>✅ Database object is available!';
+                        document.getElementById('results').innerHTML += '<br>✅ Ready to test database operations!';
+                    } else {
+                        document.getElementById('results').innerHTML += '<br>❌ Database object not found!';
+                        console.log("window.db:", window.db);
+                    }
+                } else {
+                    document.getElementById('results').innerHTML = '❌ Firebase SDK not loaded!';
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = `❌ Error: ${error.message}`;
+                console.error("Connection test error:", error);
+            }
+        }
+
+        async function testRead() {
+            try {
+                if (!window.db) {
+                    document.getElementById('results').innerHTML = '❌ Database not available!';
+                    return;
+                }
+                
+                document.getElementById('results').innerHTML = '🔄 Reading doctors data...';
+                
+                const snapshot = await window.db.collection('doctors').get();
+                
+                if (snapshot.empty) {
+                    document.getElementById('results').innerHTML = '⚠️ No doctors found in database! Create some doctors first.';
+                    return;
+                }
+                
+                let results = '<h3>✅ Doctors Retrieved Successfully:</h3>';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    results += `<div style="border: 1px solid #eee; padding: 10px; margin: 5px; border-radius: 5px;">`;
+                    results += `<strong>👨‍⚕️ ${data.name || 'Unknown'}</strong><br>`;
+                    results += `📋 Specialty: ${data.specialty || 'N/A'}<br>`;
+                    results += `📞 Phone: ${data.phone || 'N/A'}<br>`;
+                    results += `📧 Email: ${data.email || 'N/A'}`;
+                    results += `</div>`;
+                });
+                
+                document.getElementById('results').innerHTML = results;
+                
+            } catch (error) {
+                document.getElementById('results').innerHTML = `❌ Read Error: ${error.message}`;
+                console.error('Read error:', error);
+            }
+        }
+
+        async function testWrite() {
+            try {
+                if (!window.db) {
+                    document.getElementById('results').innerHTML = '❌ Database not available!';
+                    return;
+                }
+                
+                document.getElementById('results').innerHTML = '🔄 Writing test data...';
+                
+                const docRef = await window.db.collection('test').add({
+                    message: 'Connection test successful!',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    testDate: new Date().toISOString(),
+                    browser: navigator.userAgent.split(' ')[0]
+                });
+                
+                document.getElementById('results').innerHTML = 
+                    `✅ Write Test Successful!<br>` +
+                    `📝 Document ID: ${docRef.id}<br>` +
+                    `🎯 Check Firebase Console → Firestore → 'test' collection<br>` +
+                    `🔗 Your database is working perfectly!`;
+                    
+            } catch (error) {
+                document.getElementById('results').innerHTML = `❌ Write Error: ${error.message}`;
+                console.error('Write error:', error);
+            }
+        }
+
+        // Auto-test connection when page loads
+        window.addEventListener('load', function() {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>

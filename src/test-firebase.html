@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <!-- Firebase SDK (compat version) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <!-- Firebase configuration -->
+    <script src="assets/js/firebase-config.js"></script>
+</head>
+<body>
+    <h1>Firebase Connection Test</h1>
+    <button onclick="testConnection()">1. Test Connection</button><br><br>
+    <button onclick="testFirestore()">2. Test Firestore Write</button><br><br>
+    <button onclick="testFirestoreRead()">3. Test Firestore Read</button><br><br>
+    <button onclick="testValidateUser()">4. Test Validate User</button><br><br>
+    <button onclick="testCreateUser()">5. Test Create User</button><br><br>
+    <button onclick="testSetPersistence(true)">6. Set Persistence to LOCAL</button><br><br>
+    <button onclick="testSetPersistence(false)">7. Set Persistence to SESSION</button><br><br>
+    <div id="result" style="margin-top: 20px; padding: 20px; border: 1px solid #ccc;"></div>
+
+    <script>
+        let logoutTimer;
+        window.addEventListener("mousemove", resetTimer);
+        window.addEventListener("keydown", resetTimer);
+
+        function resetTimer() {
+          clearTimeout(logoutTimer);
+          logoutTimer = setTimeout(() => {
+            firebase.auth().signOut();
+            alert("Logged out due to inactivity");
+          }, 30 * 60 * 1000); // 30 minutes
+        }
+
+        function validateUser(data) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          const passRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+          const hospIdRegex = /^HSP\d{3}$/;
+
+          if (!emailRegex.test(data.email)) return "Invalid email format";
+          if (!passRegex.test(data.password)) return "Password must be 8+ chars, 1 capital, 1 number";
+          if (!hospIdRegex.test(data.hospitalId)) return "Hospital ID must be like HSP001";
+          if (!["admin", "user"].includes(data.role)) return "Invalid role";
+          return null;
+        }
+
+        function testConnection() {
+            try {
+                if (typeof firebase !== 'undefined') {
+                    document.getElementById('result').innerHTML = '✅ Firebase SDK loaded successfully!';
+                    
+                    if (typeof window.db !== 'undefined' && window.db !== null) {
+                        document.getElementById('result').innerHTML += '<br>✅ Database object is available!';
+                        document.getElementById('result').innerHTML += '<br>✅ Ready to test Firestore operations!';
+                    } else {
+                        document.getElementById('result').innerHTML += '<br>❌ Database object not found!';
+                        console.log("window.db:", window.db);
+                    }
+                } else {
+                    document.getElementById('result').innerHTML = '❌ Firebase SDK not loaded!';
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `❌ Error: ${error.message}`;
+                console.error("Connection test error:", error);
+            }
+        }
+
+        async function testFirestore() {
+            try {
+                // Check if database is available
+                if (!window.db) {
+                    document.getElementById('result').innerHTML = '❌ Database not available! Test connection first.';
+                    return;
+                }
+
+                document.getElementById('result').innerHTML = '🔄 Writing to Firestore...';
+
+                // Test writing to Firestore
+                const docRef = await window.db.collection('test').add({
+                    message: 'Hello Firebase!',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    testDate: new Date().toISOString(),
+                    browser: navigator.userAgent.split(' ')[0]
+                });
+                
+                document.getElementById('result').innerHTML = 
+                    `✅ Write Test Successful!<br>` +
+                    `📝 Document written with ID: ${docRef.id}<br>` +
+                    `🎯 Check Firebase Console → Firestore → 'test' collection<br>` +
+                    `🔗 Firestore is working perfectly!`;
+                
+                console.log('Firebase write test successful! Document ID:', docRef.id);
+                
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `❌ Write Error: ${error.message}`;
+                console.error('Firebase write test failed:', error);
+            }
+        }
+
+        async function testFirestoreRead() {
+            try {
+                // Check if database is available
+                if (!window.db) {
+                    document.getElementById('result').innerHTML = '❌ Database not available! Test connection first.';
+                    return;
+                }
+
+                document.getElementById('result').innerHTML = '🔄 Reading from Firestore...';
+
+                // Test reading from Firestore
+                const snapshot = await window.db.collection('test').orderBy('timestamp', 'desc').limit(5).get();
+                
+                if (snapshot.empty) {
+                    document.getElementById('result').innerHTML = '⚠️ No test documents found! Write some data first using "Test Firestore Write".';
+                    return;
+                }
+                
+                let results = '<h3>✅ Recent Test Documents:</h3>';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    results += `<div style="border: 1px solid #eee; padding: 10px; margin: 5px; border-radius: 5px;">`;
+                    results += `<strong>📄 Document ID:</strong> ${doc.id}<br>`;
+                    results += `💬 Message: ${data.message || 'N/A'}<br>`;
+                    results += `📅 Date: ${data.testDate || 'N/A'}<br>`;
+                    results += `🌐 Browser: ${data.browser || 'N/A'}`;
+                    results += `</div>`;
+                });
+                
+                document.getElementById('result').innerHTML = results;
+                console.log('Firebase read test successful!');
+                
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `❌ Read Error: ${error.message}`;
+                console.error('Firebase read test failed:', error);
+            }
+        }
+
+        function testValidateUser() {
+          // Example user data for testing
+          const userData = {
+            email: "test@example.com",
+            password: "Password1",
+            hospitalId: "HSP001",
+            role: "admin"
+          };
+          const error = validateUser(userData);
+          if (error) {
+            console.error("❌ Validation failed:", error);
+            document.getElementById('result').innerHTML = `❌ Validation failed: ${error}`;
+            return;
+          }
+          document.getElementById('result').innerHTML = "✅ Validation passed!";
+          console.log("✅ Validation passed!");
+        }
+
+        async function testCreateUser() {
+          // Example user data for testing
+          const userData = {
+            email: "testuser@example.com",
+            password: "Password1",
+            hospitalId: "HSP002",
+            role: "user"
+          };
+          const error = validateUser(userData);
+          if (error) {
+            document.getElementById('result').innerHTML = `❌ Validation failed: ${error}`;
+            return;
+          }
+          try {
+            await auth.createUserWithEmailAndPassword(userData.email, userData.password);
+            document.getElementById('result').innerHTML = `✅ User created: ${userData.email}`;
+          } catch (error) {
+            console.error("🔥 Auth error:", error.message);
+            document.getElementById('result').innerHTML = `🔥 Auth error: ${error.message}`;
+          }
+        }
+
+        async function testSetPersistence(rememberMe) {
+          try {
+            await firebase.auth().setPersistence(
+              rememberMe
+                ? firebase.auth.Auth.Persistence.LOCAL
+                : firebase.auth.Auth.Persistence.SESSION
+            );
+            document.getElementById('result').innerHTML = `✅ Auth persistence set to ${rememberMe ? 'LOCAL' : 'SESSION'}`;
+          } catch (error) {
+            document.getElementById('result').innerHTML = `❌ Error setting persistence: ${error.message}`;
+            console.error('Persistence error:', error);
+          }
+        }
+
+        // Auto-test connection when page loads
+        window.addEventListener('load', function() {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>

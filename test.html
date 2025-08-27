@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Auth - Quick Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .test-section {
+            margin-bottom: 25px;
+        }
+
+        .test-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .steps {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .steps ol {
+            margin-left: 20px;
+        }
+
+        .steps li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Hospital Auth - Quick Setup Test</h1>
+            <p>Let's verify your Firebase setup step by step</p>
+        </div>
+
+        <!-- Step 1: Firebase Connection Test -->
+        <div class="test-card">
+            <div class="test-section">
+                <div class="test-title">
+                    🔥 Step 1: Firebase SDK Test
+                </div>
+                <div id="firebaseStatus" class="status status-info">
+                    <span>📡</span>
+                    <span>Testing Firebase SDK loading...</span>
+                </div>
+                <button class="btn" onclick="testFirebaseSDK()">Test Firebase SDK</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Configuration Test -->
+        <div class="test-card">
+            <div class="test-section">
+                <div class="test-title">
+                    ⚙️ Step 2: Firebase Configuration
+                </div>
+                <div id="configStatus" class="status status-warning">
+                    <span>⚠️</span>
+                    <span>Please enter your Firebase configuration below</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>API Key:</label>
+                    <input type="text" id="apiKey" placeholder="Enter your Firebase API Key">
+                </div>
+                
+                <div class="form-group">
+                    <label>Auth Domain:</label>
+                    <input type="text" id="authDomain" placeholder="your-project.firebaseapp.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Project ID:</label>
+                    <input type="text" id="projectId" placeholder="your-project-id">
+                </div>
+                
+                <button class="btn" onclick="testConfiguration()">Test Configuration</button>
+                <button class="btn" onclick="showConfigInstructions()">Show Setup Instructions</button>
+                
+                <div id="configInstructions" class="steps hidden">
+                    <h4>🚀 How to get your Firebase configuration:</h4>
+                    <ol>
+                        <li>Go to <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
+                        <li>Select your project (or create a new one)</li>
+                        <li>Click the gear ⚙️ icon → Project settings</li>
+                        <li>Scroll down to "Your apps" section</li>
+                        <li>Click the web app icon (&lt;/&gt;) or "Add app" if no web app exists</li>
+                        <li>Copy the configuration values and paste them above</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Authentication Test -->
+        <div class="test-card">
+            <div class="test-section">
+                <div class="test-title">
+                    🔐 Step 3: Authentication Setup Test
+                </div>
+                <div id="authStatus" class="status status-info">
+                    <span>🔍</span>
+                    <span>Click test button to check authentication setup</span>
+                </div>
+                
+                <button class="btn" onclick="testAuthentication()">Test Authentication Setup</button>
+                <button class="btn" onclick="showAuthInstructions()">Show Auth Setup Instructions</button>
+                
+                <div id="authInstructions" class="steps hidden">
+                    <h4>🔑 Enable Authentication in Firebase:</h4>
+                    <ol>
+                        <li>In Firebase Console, go to Authentication</li>
+                        <li>Click "Get started" if you haven't already</li>
+                        <li>Go to "Sign-in method" tab</li>
+                        <li>Click "Email/Password"</li>
+                        <li>Enable the first option "Email/Password"</li>
+                        <li>Click "Save"</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Firestore Test -->
+        <div class="test-card">
+            <div class="test-section">
+                <div class="test-title">
+                    🗄️ Step 4: Firestore Database Test
+                </div>
+                <div id="firestoreStatus" class="status status-info">
+                    <span>🔍</span>
+                    <span>Click test button to check Firestore setup</span>
+                </div>
+                
+                <button class="btn" onclick="testFirestore()">Test Firestore Setup</button>
+                <button class="btn" onclick="showFirestoreInstructions()">Show Firestore Setup Instructions</button>
+                
+                <div id="firestoreInstructions" class="steps hidden">
+                    <h4>🗄️ Set up Firestore Database:</h4>
+                    <ol>
+                        <li>In Firebase Console, go to Firestore Database</li>
+                        <li>Click "Create database"</li>
+                        <li>Select "Start in test mode" (for development)</li>
+                        <li>Choose your preferred location</li>
+                        <li>Click "Done"</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Test Registration -->
+        <div class="test-card">
+            <div class="test-section">
+                <div class="test-title">
+                    📝 Step 5: Test User Registration
+                </div>
+                <div id="registrationStatus" class="status status-info">
+                    <span>📋</span>
+                    <span>Test user registration functionality</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Test Email:</label>
+                    <input type="email" id="testEmail" value="test@hospital.com" placeholder="Enter test email">
+                </div>
+                
+                <div class="form-group">
+                    <label>Test Password:</label>
+                    <input type="password" id="testPassword" value="Test123!" placeholder="Enter test password">
+                </div>
+                
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <input type="text" id="testName" value="Test User" placeholder="Enter full name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Role:</label>
+                    <select id="testRole">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Hospital ID:</label>
+                    <input type="text" id="testHospitalId" value="HSP001" placeholder="Enter hospital ID">
+                </div>
+                
+                <button class="btn" onclick="testRegistration()">Test Registration</button>
+                <button class="btn" onclick="testLogin()">Test Login</button>
+                <button class="btn" onclick="logoutUser()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Final Status -->
+        <div class="test-card">
+            <div class="test-section">
+                <div class="test-title">
+                    ✅ Final Status
+                </div>
+                <div id="finalStatus" class="status status-info">
+                    <span>📊</span>
+                    <span>Complete the tests above to see your overall status</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let firebaseApp = null;
+        let auth = null;
+        let db = null;
+        let testsPassed = 0;
+        let totalTests = 5;
+
+        // Utility functions
+        function updateStatus(elementId, type, icon, message) {
+            const element = document.getElementById(elementId);
+            element.className = `status status-${type}`;
+            element.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+        }
+
+        function updateFinalStatus() {
+            const percentage = Math.round((testsPassed / totalTests) * 100);
+            let type = 'error';
+            let icon = '❌';
+            let message = `${testsPassed}/${totalTests} tests passed (${percentage}%) - Setup incomplete`;
+
+            if (percentage >= 80) {
+                type = 'success';
+                icon = '🎉';
+                message = `${testsPassed}/${totalTests} tests passed (${percentage}%) - Ready to go!`;
+            } else if (percentage >= 60) {
+                type = 'warning';
+                icon = '⚠️';
+                message = `${testsPassed}/${totalTests} tests passed (${percentage}%) - Almost there!`;
+            }
+
+            updateStatus('finalStatus', type, icon, message);
+        }
+
+        // Test functions
+        function testFirebaseSDK() {
+            updateStatus('firebaseStatus', 'info', '🔄', 'Testing Firebase SDK...');
+            
+            setTimeout(() => {
+                if (typeof firebase !== 'undefined') {
+                    updateStatus('firebaseStatus', 'success', '✅', 'Firebase SDK loaded successfully!');
+                    testsPassed = Math.max(testsPassed, 1);
+                } else {
+                    updateStatus('firebaseStatus', 'error', '❌', 'Firebase SDK not found. Check your internet connection and script tags.');
+                    testsPassed = 0;
+                }
+                updateFinalStatus();
+            }, 1000);
+        }
+
+        function testConfiguration() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const authDomain = document.getElementById('authDomain').value.trim();
+            const projectId = document.getElementById('projectId').value.trim();
+
+            if (!apiKey || !authDomain || !projectId) {
+                updateStatus('configStatus', 'error', '❌', 'Please fill in all configuration fields');
+                return;
+            }
+
+            updateStatus('configStatus', 'info', '🔄', 'Testing configuration...');
+
+            try {
+                const firebaseConfig = {
+                    apiKey: apiKey,
+                    authDomain: authDomain,
+                    projectId: projectId,
+                    storageBucket: `${projectId}.appspot.com`,
+                    messagingSenderId: "123456789",
+                    appId: "test-app-id"
+                };
+
+                // Initialize Firebase
+                if (firebaseApp) {
+                    firebaseApp.delete();
+                }
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+
+                updateStatus('configStatus', 'success', '✅', 'Firebase configuration successful!');
+                testsPassed = Math.max(testsPassed, 2);
+            } catch (error) {
+                updateStatus('configStatus', 'error', '❌', `Configuration error: ${error.message}`);
+                console.error('Firebase config error:', error);
+            }
+            updateFinalStatus();
+        }
+
+        function testAuthentication() {
+            if (!auth) {
+                updateStatus('authStatus', 'error', '❌', 'Please configure Firebase first');
+                return;
+            }
+
+            updateStatus('authStatus', 'info', '🔄', 'Testing authentication setup...');
+
+            // Test if auth is properly initialized
+            setTimeout(() => {
+                try {
+                    // This will trigger an error if auth is not properly set up
+                    auth.onAuthStateChanged(() => {});
+                    updateStatus('authStatus', 'success', '✅', 'Authentication is properly configured!');
+                    testsPassed = Math.max(testsPassed, 3);
+                } catch (error) {
+                    updateStatus('authStatus', 'error', '❌', `Authentication error: ${error.message}`);
+                }
+                updateFinalStatus();
+            }, 1000);
+        }
+
+        function testFirestore() {
+            if (!db) {
+                updateStatus('firestoreStatus', 'error', '❌', 'Please configure Firebase first');
+                return;
+            }
+
+            updateStatus('firestoreStatus', 'info', '🔄', 'Testing Firestore connection...');
+
+            // Test basic Firestore connection
+            db.collection('test').limit(1).get()
+                .then(() => {
+                    updateStatus('firestoreStatus', 'success', '✅', 'Firestore is properly configured!');
+                    testsPassed = Math.max(testsPassed, 4);
+                    updateFinalStatus();
+                })
+                .catch((error) => {
+                    updateStatus('firestoreStatus', 'error', '❌', `Firestore error: ${error.message}`);
+                    updateFinalStatus();
+                });
+        }
+
+        function testRegistration() {
+            if (!auth || !db) {
+                updateStatus('registrationStatus', 'error', '❌', 'Please configure Firebase first');
+                return;
+            }
+
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            const fullName = document.getElementById('testName').value;
+            const role = document.getElementById('testRole').value;
+            const hospitalId = document.getElementById('testHospitalId').value;
+
+            updateStatus('registrationStatus', 'info', '🔄', 'Testing user registration...');
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    
+                    // Update display name
+                    return user.updateProfile({
+                        displayName: fullName
+                    }).then(() => {
+                        // Create user profile in Firestore
+                        return db.collection('users').doc(user.uid).set({
+                            uid: user.uid,
+                            email: user.email,
+                            fullName: fullName,
+                            role: role,
+                            hospitalId: hospitalId,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    });
+                })
+                .then(() => {
+                    updateStatus('registrationStatus', 'success', '✅', 'User registration successful! Check Firebase Console.');
+                    testsPassed = Math.max(testsPassed, 5);
+                    updateFinalStatus();
+                })
+                .catch((error) => {
+                    if (error.code === 'auth/email-already-in-use') {
+                        updateStatus('registrationStatus', 'warning', '⚠️', 'Email already exists. Try the login test instead.');
+                    } else {
+                        updateStatus('registrationStatus', 'error', '❌', `Registration error: ${error.message}`);
+                    }
+                    updateFinalStatus();
+                });
+        }
+
+        function testLogin() {
+            if (!auth) {
+                updateStatus('registrationStatus', 'error', '❌', 'Please configure Firebase first');
+                return;
+            }
+
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+
+            updateStatus('registrationStatus', 'info', '🔄', 'Testing user login...');
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    updateStatus('registrationStatus', 'success', '✅', `Login successful! Welcome ${userCredential.user.email}`);
+                    testsPassed = Math.max(testsPassed, 5);
+                    updateFinalStatus();
+                })
+                .catch((error) => {
+                    updateStatus('registrationStatus', 'error', '❌', `Login error: ${error.message}`);
+                    updateFinalStatus();
+                });
+        }
+
+        function logoutUser() {
+            if (!auth) {
+                return;
+            }
+
+            auth.signOut()
+                .then(() => {
+                    updateStatus('registrationStatus', 'info', 'ℹ️', 'User logged out successfully');
+                })
+                .catch((error) => {
+                    console.error('Logout error:', error);
+                });
+        }
+
+        // Show/hide instructions
+        function showConfigInstructions() {
+            const instructions = document.getElementById('configInstructions');
+            instructions.classList.toggle('hidden');
+        }
+
+        function showAuthInstructions() {
+            const instructions = document.getElementById('authInstructions');
+            instructions.classList.toggle('hidden');
+        }
+
+        function showFirestoreInstructions() {
+            const instructions = document.getElementById('firestoreInstructions');
+            instructions.classList.toggle('hidden');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            testFirebaseSDK();
+        });
+    </script>
+</body>
+</html>
