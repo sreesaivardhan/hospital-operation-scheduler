@@ -82,6 +82,7 @@ web_modules/
 # Firebase config
 firebase-config.js
 firebase-config.json
+firebase-config.js
 
 # Environment variables
 .env
