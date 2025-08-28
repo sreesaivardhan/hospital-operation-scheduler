@@ -764,21 +764,18 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
+    <!-- Load Firebase config from external file -->
+    <script src="firebase-config.js"></script>
+
     <!-- Firebase Configuration -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDGO0toQ9Cpseiu3YtdM-eizthw08n7IR4",
-            authDomain: "hospital-scheduler-2025.firebaseapp.com",
-            projectId: "hospital-scheduler-2025",
-            storageBucket: "hospital-scheduler-2025.appspot.com",
-            messagingSenderId: "707345795665",
-            appId: "1:707345795665:web:adbc753023afffb8ca0670"
-        };
+    // Load Firebase configuration from external file
+    const firebaseConfig = window.firebaseConfig;
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
     </script>
 
     <!-- Main Application Script -->

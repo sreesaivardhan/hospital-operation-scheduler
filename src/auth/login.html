@@ -8,16 +8,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+  
+  <!-- Load Firebase config from external file -->
+  <script src="../firebase-config.js"></script>
+  
   <script>
-    // --- Firebase Config (MUST MATCH index.html) ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyDGO0toQ9Cpseiu3YtdM-eizthw08n7IR4",
-      authDomain: "hospital-scheduler-2025.firebaseapp.com",
-      projectId: "hospital-scheduler-2025",
-      storageBucket: "hospital-scheduler-2025.appspot.com",
-      messagingSenderId: "707345795665",
-      appId: "1:707345795665:web:adbc753023afffb8ca0670"
-    };
+    // --- Firebase Config (loaded from external file) ---
+    const firebaseConfig = window.firebaseConfig;
+    
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
