@@ -82,7 +82,6 @@ web_modules/
 # Firebase config
 firebase-config.js
 firebase-config.json
-firebase-config.js
 
 # Environment variables
 .env
@@ -158,3 +157,6 @@ serviceAccountKey.json
 config.xml
 *env
 node_modules/
+
+
+firebase-config.js
