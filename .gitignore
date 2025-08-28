@@ -157,5 +157,3 @@ serviceAccountKey.json
 config.xml
 *env
 node_modules/
-
-firebase-config.js
