@@ -4,954 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital Management System - Complete Professional Dashboard</title>
-    <style>
-        /* Modern Executive UI/UX Styling */
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            --dark-bg: #2c3e50;
-            --light-bg: #ecf0f1;
-            --card-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            --glass-effect: rgba(255, 255, 255, 0.25);
-            --text-primary: #2c3e50;
-            --text-secondary: #7f8c8d;
-            --border-radius: 20px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--primary-gradient);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Glassmorphism Effect */
-        .glass {
-            background: var(--glass-effect);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-
-        /* Auth Container */
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-
-        .auth-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
-            padding: 3rem;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: var(--card-shadow);
-            transform: translateY(0);
-            transition: var(--transition);
-        }
-
-        .auth-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.5);
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .auth-header h1 {
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-header p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-
-        /* Dashboard Container */
-        .dashboard-container {
-            display: none;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        .dashboard-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 280px;
-            height: 100vh;
-            background: var(--glass-effect);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.18);
-            padding: 2rem 0;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .nav-brand {
-            padding: 0 2rem 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .nav-brand h2 {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .nav-menu {
-            list-style: none;
-        }
-
-        .nav-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 1rem 2rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-right: 3px solid #fff;
-        }
-
-        .nav-link i {
-            margin-right: 1rem;
-            font-size: 1.2rem;
-            width: 20px;
-        }
-
-        .dashboard-nav {
-    width: 280px;
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-    z-index: 1000;
-}
-.dashboard-nav.closed {
-    transform: translateX(-100%);
-}
-.main-content {
-    margin-left: 280px;
-    transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-.main-content.sidebar-closed {
-    margin-left: 0;
-}
-.sidebar-toggle-btn {
-    position: fixed;
-    top: 22px;
-    left: 295px;
-    z-index: 1001;
-    background: var(--primary-gradient,#667eea);
-    border: none;
-    color: #fff;
-    border-radius: 50%;
-    font-size: 22px;
-    width: 40px; height: 40px;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(31,38,135,0.19);
-    transition: left .3s cubic-bezier(0.4,0,0.2,1);
-    display: flex; align-items: center; justify-content: center;
-}
-.sidebar-toggle-btn.closed {
-    left: 15px;
-    background: #5e5c7f;
-}
-
-/* For mobile width */
-@media (max-width: 900px) {
-    .main-content, .main-content.sidebar-closed {
-        margin-left: 0;
-    }
-    .sidebar-toggle-btn, .sidebar-toggle-btn.closed {
-        left: 15px;
-    }
-}
-
-
-        .main-content {
-            margin-left: 280px;
-            padding: 2rem;
-            min-height: 100vh;
-        }
-
-        .content-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--card-shadow);
-        }
-
-        .content-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .breadcrumb {
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Mobile responsiveness for sidebar toggle */
-@media (max-width: 768px) {
-    .dashboard-nav {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-    }
-    
-    .dashboard-nav.open {
-        transform: translateX(0);
-    }
-    
-    .main-content {
-        margin-left: 0;
-    }
-}
-
-/* Mobile menu button */
-.mobile-menu-btn {
-    display: none;
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1001;
-    background: var(--primary-gradient);
-    border: none;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: block !important;
-    }
-}
-
-
-        /* Statistics Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            text-align: center;
-            box-shadow: var(--card-shadow);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--primary-gradient);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(31, 38, 135, 0.4);
-        }
-
-        .stat-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-            background: var(--primary-gradient);
-        }
-
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        /* Content Sections */
-        .content-section {
-            display: none;
-            animation: fadeInUp 0.5s ease;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Fix excessive vertical gaps between sections */
-.section-card {
-    margin-bottom: 1rem !important; /* Reduced from 2rem */
-    padding: 1.5rem !important; /* Reduced from 2rem */
-}
-
-/* Reduce spacing between content sections */
-.content-section {
-    margin-bottom: 1rem !important;
-}
-
-/* Fix spacing in cards grid */
-.cards-grid {
-    gap: 1rem !important; /* Reduced from 2rem */
-    margin-top: 1rem !important; /* Reduced from 2rem */
-}
-
-/* Reduce spacing in stats grid */
-.stats-grid {
-    gap: 1rem !important; /* Reduced from 2rem */
-    margin-bottom: 1.5rem !important; /* Reduced from 3rem */
-}
-
-/* Fix content header spacing */
-.content-header {
-    margin-bottom: 1rem !important; /* Reduced from 2rem */
-    padding: 1.5rem !important; /* Reduced from 2rem */
-}
-
-/* Reduce spacing in individual cards */
-.stat-card, .item-card {
-    margin-bottom: 0.5rem !important;
-}
-
-/* Fix section title spacing */
-.section-title {
-    margin-bottom: 1rem !important; /* Reduced from 1.5rem */
-}
-
-/* Compact form grid spacing */
-.form-grid {
-    gap: 1rem !important; /* Reduced from 1.5rem */
-    margin-bottom: 1rem !important; /* Reduced from 2rem */
-}
-
-/* Reduce overall vertical rhythm */
-.main-content {
-    padding: 1.5rem !important; /* Reduced from 2rem */
-}
-
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 3.5rem;
-            color: var(--text-primary);
-        }
-
-        /* Form Styling */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 3.5rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Ultra-compact mode */
-.compact-mode .section-card {
-    margin-bottom: 0.5rem !important;
-    padding: 1rem !important;
-}
-
-.compact-mode .stats-grid,
-.compact-mode .cards-grid {
-    gap: 0.5rem !important;
-    margin-bottom: 1rem !important;
-}
-
-.compact-mode .content-header {
-    padding: 1rem !important;
-    margin-bottom: 0.5rem !important;
-}
-
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.8);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        /* Button Styling */
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 15px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: var(--transition);
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary {
-            background: var(--primary-gradient);
-            color: white;
-        }
-
-        .btn-success {
-            background: var(--success-gradient);
-            color: white;
-        }
-
-        .btn-warning {
-            background: var(--warning-gradient);
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--danger-gradient);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Modal Styling */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 2000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
-            padding: 3rem;
-            width: 90%;
-            max-width: 700px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--card-shadow);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .modal-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .close {
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: var(--transition);
-        }
-
-        .close:hover {
-            color: var(--text-primary);
-            transform: scale(1.1);
-        }
-
-        /* Table Styling */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            background: white;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 1.5rem;
-            text-align: left;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .data-table th {
-            background: var(--primary-gradient);
-            color: white;
-            font-weight: 600;
-        }
-
-        .data-table tr:hover {
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-            background: var(--primary-gradient);
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-/* Add this CSS to your existing styles */
-@media (max-width: 768px) {
-    .dashboard-nav {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-    }
-    
-    .dashboard-nav.open {
-        transform: translateX(0);
-    }
-    
-    .main-content {
-        margin-left: 0;
-    }
-}
-
-.mobile-menu-btn {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: block !important;
-    }
-}
-
-
-
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .item-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: var(--card-shadow);
-            transition: var(--transition);
-            border-left: 5px solid transparent;
-        }
-
-        .item-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 50px rgba(31, 38, 135, 0.3);
-            border-left-color: #667eea;
-        }
-
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .item-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .item-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-
-        /* Messages */
-        .message {
-            padding: 1rem 1.5rem;
-            border-radius: 15px;
-            margin-bottom: 1rem;
-            font-weight: 500;
-            display: none;
-            animation: slideInDown 0.3s ease;
-        }
-
-        .message.error {
-            background: rgba(231, 76, 60, 0.1);
-            border: 1px solid #e74c3c;
-            color: #c0392b;
-        }
-
-        .message.success {
-            background: rgba(39, 174, 96, 0.1);
-            border: 1px solid #27ae60;
-            color: #1e8449;
-        }
-
-        @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Schedule Grid */
-        .schedule-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .schedule-day {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            padding: 1rem;
-            text-align: center;
-            transition: var(--transition);
-        }
-
-        .schedule-day:hover {
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .schedule-day.active {
-            background: var(--primary-gradient);
-            color: white;
-        }
-
-        /* Session Info */
-        .session-info {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        /* User Info */
-        .user-info {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* Admin Features */
-        .admin-features, .user-features {
-            background: #e3f2fd;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-
-        .admin-features h3, .user-features h3 {
-            color: #1976d2;
-            margin-bottom: 15px;
-        }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .feature-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid #bbdefb;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .feature-list li:hover {
-            background: #f5f5f5;
-            padding-left: 10px;
-        }
-
-        .feature-list li:last-child {
-            border-bottom: none;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        /* Desktop toggle button - always visible */
-.sidebar-toggle-btn {
-    position: fixed;
-    top: 20px;
-    left: 300px; /* Position it next to the sidebar when open */
-    z-index: 1001;
-    background: var(--primary-gradient);
-    border: none;
-    color: white;
-    padding: 10px 12px;
-    border-radius: 50%;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: var(--card-shadow);
-    transition: var(--transition);
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sidebar-toggle-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* When sidebar is closed, move button to the left */
-.dashboard-nav.closed + .main-content .sidebar-toggle-btn,
-.sidebar-closed .sidebar-toggle-btn {
-    left: 20px;
-}
-
-/* Sidebar closed state */
-.dashboard-nav.closed {
-    transform: translateX(-280px);
-}
-
-/* Main content adjustment when sidebar is closed */
-.main-content.sidebar-closed {
-    margin-left: 0;
-}
-
-/* Smooth transitions */
-.dashboard-nav {
-    transition: transform 0.3s ease;
-}
-
-.main-content {
-    transition: margin-left 0.3s ease;
-}
-
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .dashboard-nav {
-                transform: translateX(-100%);
-                transition: var(--transition);
-            }
-            
-            .dashboard-nav.open {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .modal-content {
-                padding: 2rem;
-                margin: 1rem;
-            }
-        }
-
-        .forgot-password {
-            text-align: right;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .auth-link {
-            color: #667eea;
-            text-decoration: none;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .auth-link:hover {
-            color: #5a6cd8;
-            text-decoration: underline;
-        }
-
-        .toggle-auth {
-            text-align: center;
-            margin-top: 2rem;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/index.css">
 </head>
 <body>
     <!-- Sidebar toggle button -->
@@ -1280,6 +333,44 @@
 
             <!-- Doctor Management Section -->
             <div id="section-doctors" class="content-section">
+                <!-- Doctor Modal -->
+                <div id="doctorModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="doctorModalTitle">Add New Doctor</h2>
+                            <button class="close" onclick="closeDoctorModal()">&times;</button>
+                        </div>
+                        <form id="doctorForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="doctorName">Full Name *</label>
+                                    <input type="text" id="doctorName" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="specialization">Specialization *</label>
+                            <input type="text" id="specialization" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="doctorPhone">Phone</label>
+                            <input type="tel" id="doctorPhone" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="doctorEmail">Email</label>
+                            <input type="email" id="doctorEmail" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="doctorStatus">Status</label>
+                            <select id="doctorStatus" class="form-input">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Save Doctor</button>
+                    <button type="button" class="btn btn-danger" onclick="closeDoctorModal()">Cancel</button>
+                    </form>
+                </div>
+                </div>
                 <div class="section-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                         <h2 class="section-title">Doctor Management</h2>
@@ -1312,9 +403,69 @@
                     </div>
 
                     <!-- Doctors Grid -->
-                    <div id="doctorsContainer" class="cards-grid">
-                        <!-- Doctors will be loaded here -->
-                    </div>
+                    <div id="doctorsContainer" class="cards-grid"></div>
+
+<script>
+let doctors = [];
+
+function renderDoctors() {
+  const container = document.getElementById("doctorsContainer");
+  container.innerHTML = "";
+  doctors.forEach((doc, index) => {
+    container.innerHTML += `
+      <div class="item-card">
+        <div class="item-header">
+          <div>
+            <div class="item-title">${doc.name}</div>
+            <div class="item-subtitle">${doc.specialization} | ${doc.status}</div>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm btn-primary" onclick="editDoctor(${index})">✏️ Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteDoctor(${index})">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+document.getElementById("doctorForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const doctor = {
+    name: doctorName.value,
+    specialization: specialization.value,
+    phone: doctorPhone.value,
+    email: doctorEmail.value,
+    status: doctorStatus.value
+  };
+  if (doctorForm.dataset.editIndex !== undefined) {
+    doctors[doctorForm.dataset.editIndex] = doctor;
+    delete doctorForm.dataset.editIndex;
+  } else {
+    doctors.push(doctor);
+  }
+  renderDoctors();
+  closeDoctorModal();
+});
+
+function editDoctor(index) {
+  const doc = doctors[index];
+  doctorName.value = doc.name;
+  specialization.value = doc.specialization;
+  doctorPhone.value = doc.phone;
+  doctorEmail.value = doc.email;
+  doctorStatus.value = doc.status;
+  doctorForm.dataset.editIndex = index;
+  openDoctorModal();
+}
+
+function deleteDoctor(index) {
+  if (confirm("Are you sure you want to delete this doctor?")) {
+    doctors.splice(index, 1);
+    renderDoctors();
+  }
+}
+</script>
+
                 </div>
             </div>
 
@@ -1570,20 +721,209 @@
             </div>
 
             <!-- Patient Management Section -->
-            <div id="section-patients" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Patient Management</h2>
-                        <div>
-                            <button class="btn btn-primary" onclick="openPatientModal()">
-                                <i>➕</i> Add New Patient
-                            </button>
-                            <button class="btn btn-success" onclick="exportPatients()">
-                                <i>📊</i> Export Patients
-                            </button>
-                        </div>
-                    </div>
+<div id="section-patients" class="content-section">
+    <div class="section-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 class="section-title">Patient Management</h2>
+            <div>
+                <button class="btn btn-primary" onclick="openPatientModal()">
+                    <i>➕</i> Add New Patient
+                </button>
+                <button class="btn btn-success" onclick="exportPatients()">
+                    <i>📊</i> Export Patients
+                </button>
+            </div>
+        </div>
 
+        <!-- Search and Filter -->
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+            <input type="text" id="patientSearch" class="form-input" placeholder="Search patients..." style="flex: 1; min-width: 200px;" onkeyup="searchPatients()">
+            <select id="genderFilter" class="form-input" onchange="filterPatients()">
+                <option value="">All Genders</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+            <select id="ageFilter" class="form-input" onchange="filterPatients()">
+                <option value="">All Ages</option>
+                <option value="child">Child (0-17)</option>
+                <option value="adult">Adult (18-59)</option>
+                <option value="senior">Senior (60+)</option>
+            </select>
+        </div>
+
+        <!-- Patients Statistics -->
+        <div class="stats-grid" style="margin-bottom: 2rem;">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" id="totalPatients">0</div>
+                <div class="stat-label">Total Patients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-number" id="todayAdmissions">0</div>
+                <div class="stat-label">Today's Admissions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏥</div>
+                <div class="stat-number" id="currentInpatients">0</div>
+                <div class="stat-label">Current Inpatients</div>
+            </div>
+        </div>
+
+        <!-- Patients Grid -->
+        <div id="patientsContainer" class="cards-grid"></div>
+
+<script>
+let patients = [];
+
+function renderPatients() {
+  const container = document.getElementById("patientsContainer");
+  container.innerHTML = "";
+  patients.forEach((pat, index) => {
+    container.innerHTML += `
+      <div class="item-card">
+        <div class="item-header">
+          <div>
+            <div class="item-title">${pat.name}, ${pat.age} yrs</div>
+            <div class="item-subtitle">${pat.gender} | ${pat.blood}</div>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm btn-primary" onclick="editPatient(${index})">✏️ Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deletePatient(${index})">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+document.getElementById("patientForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const patient = {
+    name: patientName.value,
+    age: patientAge.value,
+    gender: patientGender.value,
+    phone: patientPhone.value,
+    email: patientEmail.value,
+    blood: patientBloodGroup.value
+  };
+  if (patientForm.dataset.editIndex !== undefined) {
+    patients[patientForm.dataset.editIndex] = patient;
+    delete patientForm.dataset.editIndex;
+  } else {
+    patients.push(patient);
+  }
+  renderPatients();
+  closePatientModal();
+});
+
+function editPatient(index) {
+  const pat = patients[index];
+  patientName.value = pat.name;
+  patientAge.value = pat.age;
+  patientGender.value = pat.gender;
+  patientPhone.value = pat.phone;
+  patientEmail.value = pat.email;
+  patientBloodGroup.value = pat.blood;
+  patientForm.dataset.editIndex = index;
+  openPatientModal();
+}
+
+function deletePatient(index) {
+  if (confirm("Are you sure you want to delete this patient?")) {
+    patients.splice(index, 1);
+    renderPatients();
+  }
+}
+</script>
+
+    </div>
+</div>
+
+<!-- Patient Modal -->
+<div id="patientModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="patientModalTitle">Add New Patient</h2>
+            <button class="close" onclick="closePatientModal()">&times;</button>
+        </div>
+
+        <form id="patientForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="patientName">Full Name *</label>
+                    <input type="text" id="patientName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="patientAge">Age *</label>
+                    <input type="number" id="patientAge" class="form-input" min="0" max="150" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="patientGender">Gender *</label>
+                    <select id="patientGender" class="form-input" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="patientPhone">Phone Number *</label>
+                    <input type="tel" id="patientPhone" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="patientEmail">Email</label>
+                    <input type="email" id="patientEmail" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="patientBloodGroup">Blood Group</label>
+                    <select id="patientBloodGroup" class="form-input">
+                        <option value="">Select Blood Group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="emergencyContact">Emergency Contact</label>
+                    <input type="tel" id="emergencyContact" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="patientStatus">Status</label>
+                    <select id="patientStatus" class="form-input">
+                        <option value="outpatient">Outpatient</option>
+                        <option value="inpatient">Inpatient</option>
+                        <option value="emergency">Emergency</option>
+                        <option value="discharged">Discharged</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="patientAddress">Address</label>
+                <textarea id="patientAddress" class="form-input" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="medicalHistory">Medical History</label>
+                <textarea id="medicalHistory" class="form-input" rows="4" placeholder="Any allergies, chronic conditions, medications, etc."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                <button type="button" class="btn" onclick="closePatientModal()">Cancel</button>
+                <button type="submit" class="btn btn-success">
+                    <span id="patientSubmitText">Save Patient</span>
+                    <span id="patientSubmitSpinner" class="spinner" style="display: none;"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
                     <!-- Search and Filter -->
                     <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
                         <input type="text" id="patientSearch" class="form-input" placeholder="Search patients..." style="flex: 1; min-width: 200px;" onkeyup="searchPatients()">
@@ -1637,9 +977,92 @@
                         </button>
                     </div>
 
-                    <div id="otRoomsContainer" class="cards-grid">
-                        <!-- OT Rooms will be loaded here -->
+                    <div id="otRoomsContainer" class="cards-grid"></div>
+
+<script>
+let otRooms = [];
+
+function renderOTRooms() {
+  const container = document.getElementById("otRoomsContainer");
+  container.innerHTML = "";
+  otRooms.forEach((room, index) => {
+    container.innerHTML += `
+      <div class="item-card">
+        <div class="item-header">
+          <div>
+            <div class="item-title">Room: ${room.roomId}</div>
+            <div class="item-subtitle">${room.type} | Capacity: ${room.capacity}</div>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm btn-primary" onclick="editOTRoom(${index})">✏️ Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteOTRoom(${index})">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+document.getElementById("otRoomForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const room = {
+    roomId: roomId.value,
+    type: roomType.value,
+    capacity: capacity.value
+  };
+  if (otRoomForm.dataset.editIndex !== undefined) {
+    otRooms[otRoomForm.dataset.editIndex] = room;
+    delete otRoomForm.dataset.editIndex;
+  } else {
+    otRooms.push(room);
+  }
+  renderOTRooms();
+  closeOTRoomModal();
+});
+
+function editOTRoom(index) {
+  const room = otRooms[index];
+  roomId.value = room.roomId;
+  roomType.value = room.type;
+  capacity.value = room.capacity;
+  otRoomForm.dataset.editIndex = index;
+  openOTRoomModal();
+}
+
+function deleteOTRoom(index) {
+  if (confirm("Are you sure you want to delete this OT Room?")) {
+    otRooms.splice(index, 1);
+    renderOTRooms();
+  }
+}
+</script>
+
+                </div>
+                <!-- OT Room Modal -->
+                <div id="otRoomModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h2 class="modal-title">Add New OT Room</h2>
+                    <button class="close" onclick="closeOTRoomModal()">&times;</button>
                     </div>
+                    <form id="otRoomForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                        <label class="form-label" for="roomId">Room ID *</label>
+                        <input type="text" id="roomId" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                        <label class="form-label" for="roomType">Room Type</label>
+                        <input type="text" id="roomType" class="form-input" placeholder="e.g., General, Cardiac, Neuro">
+                        </div>
+                        <div class="form-group">
+                        <label class="form-label" for="capacity">Capacity</label>
+                        <input type="number" id="capacity" class="form-input">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Save Room</button>
+                    <button type="button" class="btn btn-danger" onclick="closeOTRoomModal()">Cancel</button>
+                    </form>
+                </div>
                 </div>
             </div>
 
@@ -1662,65 +1085,75 @@
 
                     <!-- OT Schedule Calendar -->
                     <div id="otScheduleContainer">
-                        <!-- Schedule will be loaded here -->
-                    </div>
-                </div>
-            </div>
+                        <div id="otScheduleModal" class="modal">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title">Schedule Operation</h2>
+                                    <button class="close" onclick="closeOTScheduleModal()">&times;</button>
+                                </div>
+                                
+                                <form id="otScheduleForm">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label class="form-label" for="surgeryDate">Date & Time *</label>
+                                            <input type="datetime-local" id="surgeryDate" class="form-input" required>
+                                        </div>
 
-                        <!-- Patient Management Section (NEW ADDITION) -->
-            <div id="section-patients" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Patient Management</h2>
-                        <div>
-                            <button class="btn btn-primary" onclick="openPatientModal()">
-                                <i>➕</i> Add New Patient
-                            </button>
-                            <button class="btn btn-success" onclick="exportPatients()">
-                                <i>📊</i> Export Patients
-                            </button>
-                        </div>
-                    </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="otRoom">OT Room ID *</label>
+                                            <input type="text" id="otRoom" class="form-input" required>
+                                        </div>
 
-                    <!-- Search and Filter -->
-                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-                        <input type="text" id="patientSearch" class="form-input" placeholder="Search patients..." style="flex: 1; min-width: 200px;" onkeyup="searchPatients()">
-                        <select id="genderFilter" class="form-input" onchange="filterPatients()">
-                            <option value="">All Genders</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <select id="ageFilter" class="form-input" onchange="filterPatients()">
-                            <option value="">All Ages</option>
-                            <option value="child">Child (0-17)</option>
-                            <option value="adult">Adult (18-59)</option>
-                            <option value="senior">Senior (60+)</option>
-                        </select>
-                    </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="anesthesia">Type of Anesthesia</label>
+                                            <input type="text" id="anesthesia" class="form-input">
+                                        </div>
 
-                    <!-- Patients Statistics -->
-                    <div class="stats-grid" style="margin-bottom: 2rem;">
-                        <div class="stat-card">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-number" id="totalPatients">0</div>
-                            <div class="stat-label">Total Patients</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">📅</div>
-                            <div class="stat-number" id="todayAdmissions">0</div>
-                            <div class="stat-label">Today's Admissions</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🏥</div>
-                            <div class="stat-number" id="currentInpatients">0</div>
-                            <div class="stat-label">Current Inpatients</div>
-                        </div>
-                    </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="anesthesiologist">Anesthesiologist</label>
+                                            <input type="text" id="anesthesiologist" class="form-input">
+                                        </div>
 
-                    <!-- Patients Grid -->
-                    <div id="patientsContainer" class="cards-grid">
-                        <!-- Patients will be loaded here -->
+                                        <div class="form-group">
+                                            <label class="form-label" for="surgeon">Surgeon</label>
+                                            <input type="text" id="surgeon" class="form-input" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="assistants">Assistant Surgeons</label>
+                                            <input type="text" id="assistants" class="form-input" placeholder="Comma-separated">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="nurses">Nurses</label>
+                                            <input type="text" id="nurses" class="form-input" placeholder="Comma-separated">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="prePost">Pre/Post-Operative Notes</label>
+                                            <textarea id="prePost" class="form-input" rows="3"></textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="surgicalReports">Surgical Reports</label>
+                                            <input type="file" id="surgicalReports" class="form-input" multiple>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="remarks">Remarks</label>
+                                            <textarea id="remarks" class="form-input" rows="2"></textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="resources">Drugs/Instruments/Materials</label>
+                                            <textarea id="resources" class="form-input" rows="2"></textarea>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success" style="margin-top: 1rem;">Save Schedule</button>
+                                    <button type="button" class="btn btn-danger" onclick="closeOTScheduleModal()">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1761,6 +1194,150 @@
                     <!-- OT Schedule Calendar -->
                     <div id="otScheduleContainer">
                         <!-- Schedule will be loaded here -->
+                         <div id="otScheduleList" class="cards-grid"></div>
+
+<script>
+// Firestore reference for schedules
+const schedulesRef = db.collection("schedules");
+
+// Render schedules from Firestore
+function renderSchedules(data) {
+  const container = document.getElementById("otScheduleList");
+  container.innerHTML = "";
+  data.forEach(sch => {
+    container.innerHTML += `
+      <div class="item-card">
+        <div class="item-header">
+          <div>
+            <div class="item-title">OT ${sch.otRoom} | ${sch.date}</div>
+            <div class="item-subtitle">Surgeon: ${sch.surgeon}</div>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm btn-primary" onclick="editSchedule('${sch.id}')">✏️ Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSchedule('${sch.id}')">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+// Listen for changes (realtime updates)
+function loadSchedules() {
+  schedulesRef.onSnapshot(snapshot => {
+    let data = [];
+    snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
+    renderSchedules(data);
+  });
+}
+loadSchedules();
+
+// Save new or edited schedule
+document.getElementById("otScheduleForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const schedule = {
+    date: surgeryDate.value,
+    otRoom: otRoom.value,
+    anesthesia: anesthesia.value,
+    anesthesiologist: anesthesiologist.value,
+    surgeon: surgeon.value,
+    assistants: assistants.value,
+    nurses: nurses.value,
+    prePost: prePost.value,
+    remarks: remarks.value,
+    resources: resources.value
+  };
+
+  if (otScheduleForm.dataset.editId) {
+    schedulesRef.doc(otScheduleForm.dataset.editId).update(schedule);
+    logAction("Updated Schedule", schedule);
+    delete otScheduleForm.dataset.editId;
+  } else {
+    schedulesRef.add(schedule);
+    logAction("Added Schedule", schedule);
+  }
+
+  closeOTScheduleModal();
+});
+
+// Edit schedule
+function editSchedule(id) {
+  schedulesRef.doc(id).get().then(doc => {
+    if (doc.exists) {
+      const sch = doc.data();
+      surgeryDate.value = sch.date;
+      otRoom.value = sch.otRoom;
+      anesthesia.value = sch.anesthesia;
+      anesthesiologist.value = sch.anesthesiologist;
+      surgeon.value = sch.surgeon;
+      assistants.value = sch.assistants;
+      nurses.value = sch.nurses;
+      prePost.value = sch.prePost;
+      remarks.value = sch.remarks;
+      resources.value = sch.resources;
+
+      otScheduleForm.dataset.editId = id;
+      openOTScheduleModal();
+    }
+  });
+}
+
+// Delete schedule
+function deleteSchedule(id) {
+  if (confirm("Delete this schedule?")) {
+    schedulesRef.doc(id).delete();
+    logAction("Deleted Schedule", { id });
+  }
+}
+
+
+document.getElementById("otScheduleForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const schedule = {
+    date: surgeryDate.value,
+    otRoom: otRoom.value,
+    anesthesia: anesthesia.value,
+    anesthesiologist: anesthesiologist.value,
+    surgeon: surgeon.value,
+    assistants: assistants.value,
+    nurses: nurses.value,
+    prePost: prePost.value,
+    remarks: remarks.value,
+    resources: resources.value
+  };
+  if (otScheduleForm.dataset.editIndex !== undefined) {
+    schedules[otScheduleForm.dataset.editIndex] = schedule;
+    delete otScheduleForm.dataset.editIndex;
+  } else {
+    schedules.push(schedule);
+  }
+  renderSchedules();
+  closeOTScheduleModal();
+});
+
+function editSchedule(index) {
+  const sch = schedules[index];
+  surgeryDate.value = sch.date;
+  otRoom.value = sch.otRoom;
+  anesthesia.value = sch.anesthesia;
+  anesthesiologist.value = sch.anesthesiologist;
+  surgeon.value = sch.surgeon;
+  assistants.value = sch.assistants;
+  nurses.value = sch.nurses;
+  prePost.value = sch.prePost;
+  remarks.value = sch.remarks;
+  resources.value = sch.resources;
+  otScheduleForm.dataset.editIndex = index;
+  openOTScheduleModal();
+}
+
+function deleteSchedule(index) {
+  if (confirm("Delete this schedule?")) {
+    schedules.splice(index, 1);
+    renderSchedules();
+  }
+}
+</script>
+
                     </div>
                 </div>
             </div>
@@ -1894,66 +1471,6 @@
                 <div style="text-align: center; margin-top: 1rem;">
                     <button type="submit" class="btn btn-success">Save OT Room</button>
                     <button type="button" class="btn" onclick="closeOTRoomModal()">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- OT Schedule Modal (NEW ADDITION) -->
-    <div id="otScheduleModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Schedule Operation</h2>
-                <button class="close" onclick="closeOTScheduleModal()">&times;</button>
-            </div>
-
-            <form id="otScheduleForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleOTRoom">OT Room *</label>
-                        <select id="scheduleOTRoom" class="form-input" required>
-                            <option value="">Select OT Room</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="schedulePatient">Patient *</label>
-                        <select id="schedulePatient" class="form-input" required>
-                            <option value="">Select Patient</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleSurgeon">Surgeon *</label>
-                        <select id="scheduleSurgeon" class="form-input" required>
-                            <option value="">Select Surgeon</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleDate">Date *</label>
-                        <input type="date" id="scheduleDate" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleStartTime">Start Time *</label>
-                        <input type="time" id="scheduleStartTime" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleEndTime">End Time *</label>
-                        <input type="time" id="scheduleEndTime" class="form-input" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="scheduleProcedure">Procedure *</label>
-                    <input type="text" id="scheduleProcedure" class="form-input" required placeholder="e.g., Appendectomy">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="scheduleNotes">Notes</label>
-                    <textarea id="scheduleNotes" class="form-input" rows="3" placeholder="Additional notes for the operation..."></textarea>
-                </div>
-
-                <div style="text-align: center; margin-top: 1rem;">
-                    <button type="submit" class="btn btn-success">Schedule Operation</button>
-                    <button type="button" class="btn" onclick="closeOTScheduleModal()">Cancel</button>
                 </div>
             </form>
         </div>
@@ -2164,67 +1681,199 @@
         </div>
     </div>
 
-    <!-- OT Schedule Modal -->
-    <div id="otScheduleModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Schedule Operation</h2>
-                <button class="close" onclick="closeOTScheduleModal()">&times;</button>
+    <!-- Enhanced OT Schedule Modal -->
+<div id="otScheduleModal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-header">
+            <h2 class="modal-title">Schedule Operation</h2>
+            <button class="close" onclick="closeOTScheduleModal()">&times;</button>
+        </div>
+
+        <form id="otScheduleForm">
+            <!-- Basic Information -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="scheduleOTRoom">OT Room *</label>
+                    <select id="scheduleOTRoom" class="form-input" required>
+                        <option value="">Select OT Room</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="schedulePatient">Patient *</label>
+                    <select id="schedulePatient" class="form-input" required>
+                        <option value="">Select Patient</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="scheduleSurgeon">Primary Surgeon *</label>
+                    <select id="scheduleSurgeon" class="form-input" required>
+                        <option value="">Select Surgeon</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="scheduleDate">Date *</label>
+                    <input type="date" id="scheduleDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="scheduleStartTime">Start Time *</label>
+                    <input type="time" id="scheduleStartTime" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="scheduleEndTime">End Time *</label>
+                    <input type="time" id="scheduleEndTime" class="form-input" required>
+                </div>
             </div>
 
-            <form id="otScheduleForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleOTRoom">OT Room *</label>
-                        <select id="scheduleOTRoom" class="form-input" required>
-                            <option value="">Select OT Room</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="schedulePatient">Patient *</label>
-                        <select id="schedulePatient" class="form-input" required>
-                            <option value="">Select Patient</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleSurgeon">Surgeon *</label>
-                        <select id="scheduleSurgeon" class="form-input" required>
-                            <option value="">Select Surgeon</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleDate">Date *</label>
-                        <input type="date" id="scheduleDate" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleStartTime">Start Time *</label>
-                        <input type="time" id="scheduleStartTime" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="scheduleEndTime">End Time *</label>
-                        <input type="time" id="scheduleEndTime" class="form-input" required>
-                    </div>
-                </div>
-
+            <!-- Surgery Details -->
+            <div class="form-grid">
                 <div class="form-group">
-                    <label class="form-label" for="scheduleProcedure">Procedure *</label>
-                    <input type="text" id="scheduleProcedure" class="form-input" required placeholder="e.g., Appendectomy">
+                    <label class="form-label" for="surgeryType">Surgery Type *</label>
+                    <select id="surgeryType" class="form-input" required>
+                        <option value="">Select Surgery Type</option>
+                        <option value="cardiac">Cardiac Surgery</option>
+                        <option value="orthopedic">Orthopedic Surgery</option>
+                        <option value="neurosurgery">Neurosurgery</option>
+                        <option value="general">General Surgery</option>
+                        <option value="gynecological">Gynecological Surgery</option>
+                        <option value="ophthalmology">Ophthalmology</option>
+                        <option value="emergency">Emergency Surgery</option>
+                        <option value="elective">Elective Surgery</option>
+                    </select>
                 </div>
-
                 <div class="form-group">
-                    <label class="form-label" for="scheduleNotes">Notes</label>
-                    <textarea id="scheduleNotes" class="form-input" rows="3" placeholder="Additional notes for the operation..."></textarea>
+                    <label class="form-label" for="surgeryPriority">Priority</label>
+                    <select id="surgeryPriority" class="form-input">
+                        <option value="normal">Normal</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="emergency">Emergency</option>
+                    </select>
                 </div>
+                <div class="form-group">
+                    <label class="form-label" for="assistantSurgeon">Assistant Surgeon</label>
+                    <select id="assistantSurgeon" class="form-input">
+                        <option value="">Select Assistant Surgeon</option>
+                    </select>
+                </div>
+            </div>
 
-                <div style="text-align: center; margin-top: 1rem;">
-                    <button type="submit" class="btn btn-success">Schedule Operation</button>
-                    <button type="button" class="btn" onclick="closeOTScheduleModal()">Cancel</button>
+            <!-- Anesthesia Team -->
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Anesthesia Team</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="anesthesiologist">Anesthesiologist *</label>
+                    <select id="anesthesiologist" class="form-input" required>
+                        <option value="">Select Anesthesiologist</option>
+                    </select>
                 </div>
-            </form>
-        </div>
+                <div class="form-group">
+                    <label class="form-label" for="anesthesiaType">Anesthesia Type *</label>
+                    <select id="anesthesiaType" class="form-input" required>
+                        <option value="">Select Anesthesia Type</option>
+                        <option value="general">General Anesthesia</option>
+                        <option value="regional">Regional Anesthesia</option>
+                        <option value="local">Local Anesthesia</option>
+                        <option value="sedation">Conscious Sedation</option>
+                        <option value="spinal">Spinal Anesthesia</option>
+                        <option value="epidural">Epidural Anesthesia</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Nursing Team -->
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Nursing Team</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="scrubNurse">Scrub Nurse *</label>
+                    <select id="scrubNurse" class="form-input" required>
+                        <option value="">Select Scrub Nurse</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="circulatingNurse">Circulating Nurse *</label>
+                    <select id="circulatingNurse" class="form-input" required>
+                        <option value="">Select Circulating Nurse</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="additionalNurses">Additional Nurses</label>
+                    <select id="additionalNurses" class="form-input" multiple>
+                        <option value="">Select Additional Nurses</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Pre-Operative Events -->
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Pre-Operative Events</h3>
+            <div id="preOpEventsContainer">
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="preOpConsent" checked> Patient Consent
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="preOpPrep" checked> Patient Preparation
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="preOpAnesthesia" checked> Anesthesia Consultation
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="preOpLabs" checked> Lab Results Review
+                    </label>
+                </div>
+            </div>
+
+            <!-- Post-Operative Events -->
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Post-Operative Events</h3>
+            <div id="postOpEventsContainer">
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="postOpRecovery"> Recovery Room Transfer
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="postOpMonitoring"> Post-Op Monitoring
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="postOpReport"> Surgical Report
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="postOpDischarge"> Discharge Planning
+                    </label>
+                </div>
+            </div>
+
+            <!-- Procedure Details -->
+            <div class="form-group">
+                <label class="form-label" for="scheduleProcedure">Procedure Name *</label>
+                <input type="text" id="scheduleProcedure" class="form-input" required placeholder="e.g., Coronary Artery Bypass Graft">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="scheduleNotes">Additional Notes</label>
+                <textarea id="scheduleNotes" class="form-input" rows="4" placeholder="Special instructions, equipment requirements, patient considerations..."></textarea>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                <button type="button" class="btn" onclick="closeOTScheduleModal()">Cancel</button>
+                <button type="submit" class="btn btn-success">
+                    <span id="scheduleSubmitText">Schedule Operation</span>
+                    <span id="scheduleSubmitSpinner" class="spinner" style="display: none;"></span>
+                </button>
+            </div>
+        </form>
     </div>
-
-    
+</div>    
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -2232,2704 +1881,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
     <script src="firebase-config.js"></script>
-
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = window.firebaseConfig;
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // Global Variables
-        let currentUser = null;
-        let currentUserData = null;
-        let isLoginMode = true;
-        let sessionStartTime = null;
-        let sessionTimer = null;
-        let allDoctors = [];
-        let isEditingDoctor = false;
-        let editingDoctorId = null;
-
-        // Role-based navigation menus
-        const adminNavigation = [
-            { id: 'overview', icon: '📊', text: 'Dashboard Overview', active: true },
-            { id: 'doctors', icon: '👨‍⚕️', text: 'Doctor Management' },
-            { id: 'users', icon: '👥', text: 'User Management' },
-            { id: 'patients', icon: '🏥', text: 'Patient Management' },
-            { id: 'ot-rooms', icon: '🚪', text: 'OT Rooms' },
-            { id: 'ot-schedule', icon: '🗓️', text: 'OT Schedule' },
-            { id: 'analytics', icon: '📈', text: 'Analytics Dashboard' },
-            { id: 'operations', icon: '⚙️', text: 'Operations Management' },
-            { id: 'scheduling', icon: '📅', text: 'Scheduling System' },
-            { id: 'profile', icon: '👤', text: 'Profile Settings' },
-            { id: 'logs', icon: '📝', text: 'Audit Logs' }
-        ];
-
-        const userNavigation = [
-            { id: 'overview', icon: '📊', text: 'Dashboard Overview', active: true },
-            { id: 'profile', icon: '👤', text: 'Profile Settings' },
-            { id: 'assignments', icon: '📋', text: 'View Assignments' },
-            { id: 'availability', icon: '🕒', text: 'Update Availability' }
-        ];
-
-        // Initialize Application
-        document.addEventListener('DOMContentLoaded', function() {
-            // Auth state listener with role-based dashboard loading
-            auth.onAuthStateChanged(async (user) => {
-                if (user && user.emailVerified) {
-                    try {
-                        const userDoc = await db.collection('users').doc(user.uid).get();
-                        
-                        if (!userDoc.exists) {
-                            console.error('❌ User profile missing in Firestore for UID:', user.uid);
-                            showAuthMessage('error', 'User profile not found. Please contact support or re-register.');
-                            await auth.signOut();
-                            return;
-                        }
-                        
-                        const userData = userDoc.data();
-                        console.log('✅ User profile loaded:', userData);
-                        
-                        currentUser = user;
-                        currentUserData = userData;
-                        showDashboard(userData);
-                        await loadInitialData();
-                        startSessionManagement();
-                        
-                    } catch (error) {
-                        console.error('Error loading user profile:', error);
-                        showAuthMessage('error', 'Error loading profile: ' + error.message);
-                    }
-                } else if (user && !user.emailVerified) {
-                    showAuthMessage('error', 'Please verify your email before accessing the dashboard.');
-                    showAuth();
-                } else {
-                    showAuth();
-                }
-            });
-
-            // Event listeners
-            document.getElementById('authForm').addEventListener('submit', handleAuth);
-            document.getElementById('toggleLink').addEventListener('click', toggleAuthMode);
-            document.getElementById('forgotPasswordLink').addEventListener('click', handleForgotPassword);
-            document.getElementById('doctorForm').addEventListener('submit', handleDoctorSubmit);
-            document.getElementById('profileForm').addEventListener('submit', handleProfileUpdate);
-            document.getElementById('availabilityForm').addEventListener('submit', handleAvailabilityUpdate);
-            document.getElementById('patientForm').addEventListener('submit', handlePatientSubmit);
-            document.getElementById('otRoomForm').addEventListener('submit', handleOTRoomSubmit);
-            document.getElementById('otScheduleForm').addEventListener('submit', handleOTScheduleSubmit);
-        });
-
-        function setupNavigation(navigationItems, userRole) {
-    const navMenu = document.getElementById('navMenu');
-    
-    // Add this check:
-    if (!navMenu) {
-        console.error('Navigation menu element not found');
-        return;
-    }
-    
-    navMenu.innerHTML = '';
-            
-            // Update subtitle based on role
-            document.getElementById('navSubtitle').textContent = 
-                userRole === 'admin' ? 'Admin Dashboard' : 'Staff Dashboard';
-            
-            navigationItems.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'nav-item';
-                
-                const a = document.createElement('a');
-                a.href = '#';
-                a.className = 'nav-link' + (item.active ? ' active' : '');
-                a.onclick = () => showSection(item.id);
-                a.innerHTML = `<i>${item.icon}</i> ${item.text}`;
-                
-                li.appendChild(a);
-                navMenu.appendChild(li);
-            });
-            
-            // Add logout link
-            const logoutLi = document.createElement('li');
-            logoutLi.className = 'nav-item';
-            logoutLi.style.marginTop = '2rem';
-            logoutLi.style.borderTop = '1px solid rgba(255,255,255,0.1)';
-            logoutLi.style.paddingTop = '1rem';
-            
-            const logoutA = document.createElement('a');
-            logoutA.href = '#';
-            logoutA.className = 'nav-link';
-            logoutA.style.color = '#ff6b6b';
-            logoutA.onclick = logout;
-            logoutA.innerHTML = '<i>🚪</i> Secure Logout';
-            
-            logoutLi.appendChild(logoutA);
-            navMenu.appendChild(logoutLi);
-        }
-
-        // Authentication Functions
-        async function handleAuth(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            
-            if (!email || !password) {
-                showAuthMessage('error', 'Please fill in all required fields');
-                return;
-            }
-
-            setAuthLoading(true);
-
-            try {
-                if (isLoginMode) {
-                    // LOGIN ATTEMPT
-                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                    if (!userCredential.user.emailVerified) {
-                        showAuthMessage('error', 'Please verify your email before logging in. Check your inbox for verification link.');
-                        await auth.signOut();
-                        return;
-                    }
-                    
-                    await logAdminAction('User Login', `User ${email} logged in successfully`);
-                    showAuthMessage('success', 'Login successful!');
-                    sessionStartTime = new Date();
-                } else {
-                    // REGISTRATION ATTEMPT
-                    const confirmPassword = document.getElementById('confirmPassword').value;
-                    const fullName = document.getElementById('fullName').value.trim();
-                    const phone = document.getElementById('phone').value.trim();
-                    const department = document.getElementById('department').value;
-                    const role = document.getElementById('role').value;
-                    
-                    if (!fullName || !department) {
-                        showAuthMessage('error', 'Please fill in all required fields');
-                        return;
-                    }
-                    
-                    if (password !== confirmPassword) {
-                        showAuthMessage('error', 'Passwords do not match');
-                        return;
-                    }
-                    
-                    if (password.length < 6) {
-                        showAuthMessage('error', 'Password must be at least 6 characters long');
-                        return;
-                    }
-                    
-                    // Create Firebase Auth user first
-                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                    const user = userCredential.user;
-                    
-                    try {
-                        // CRITICAL: Create Firestore profile document
-                        await db.collection('users').doc(user.uid).set({
-                            email: email,
-                            fullName: fullName,
-                            phone: phone || '',
-                            department: department,
-                            role: role,
-                            bio: '',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            emailVerified: false,
-                            lastLogin: null,
-                            loginHistory: []
-                        });
-                        
-                        console.log('✅ User profile created successfully in Firestore');
-                        
-                        // Send email verification
-                        await user.sendEmailVerification();
-                        
-                        showAuthMessage('success', 'Registration successful! Please check your email for verification link.');
-                        toggleAuthMode(); // Switch to login mode
-                        
-                    } catch (firestoreError) {
-                        console.error('❌ Error creating user profile:', firestoreError);
-                        
-                        // Clean up: Delete the auth user if Firestore creation failed
-                        await user.delete();
-                        
-                        showAuthMessage('error', 'Registration failed. Please try again.');
-                        return;
-                    }
-                }
-            } catch (error) {
-                console.error('Auth error:', error);
-                let errorMessage = 'An error occurred. Please try again.';
-                
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        errorMessage = 'This email is already registered. Please use the login form instead or try a different email.';
-                        // Automatically switch to login mode
-                        if (!isLoginMode) {
-                            setTimeout(() => {
-                                toggleAuthMode();
-                                showAuthMessage('success', 'Switched to login mode. Please enter your password to sign in.');
-                            }, 2000);
-                        }
-                        break;
-                    case 'auth/invalid-login-credentials':
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
-                        break;
-                    case 'auth/weak-password':
-                        errorMessage = 'Password is too weak. Please choose a stronger password (minimum 6 characters).';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'Invalid email address format. Please enter a valid email.';
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = 'Too many failed attempts. Please wait a few minutes before trying again.';
-                        break;
-                    case 'auth/network-request-failed':
-                        errorMessage = 'Network error. Please check your internet connection and try again.';
-                        break;
-                }
-                
-                showAuthMessage('error', errorMessage);
-            } finally {
-                setAuthLoading(false);
-            }
-        }
-
-        // Forgot password handler
-        async function handleForgotPassword(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value.trim();
-            
-            if (!email) {
-                showAuthMessage('error', 'Please enter your email address first');
-                document.getElementById('email').focus();
-                return;
-            }
-            
-            try {
-                await auth.sendPasswordResetEmail(email);
-                showAuthMessage('success', 'Password reset email sent! Check your inbox and spam folder.');
-            } catch (error) {
-                console.error('Error sending password reset email:', error);
-                
-                let errorMessage = 'Error sending password reset email';
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email address';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'Invalid email address format';
-                        break;
-                }
-                
-                showAuthMessage('error', errorMessage);
-            }
-        }
-
-        // Toggle login/register
-        function toggleAuthMode(e) {
-            if (e) e.preventDefault();
-            
-            isLoginMode = !isLoginMode;
-            const registerFields = document.getElementById('registerFields');
-            const authTitle = document.getElementById('authTitle');
-            const authButtonText = document.getElementById('authButtonText');
-            const toggleLink = document.getElementById('toggleLink');
-            const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
-            
-            if (isLoginMode) {
-                authTitle.textContent = 'Welcome Back to MediCore';
-                authButtonText.textContent = 'Sign In Securely';
-                toggleLink.textContent = 'Need an account? Register here';
-                registerFields.style.display = 'none';
-                forgotPasswordContainer.style.display = 'block';
-            } else {
-                authTitle.textContent = 'Join MediCore Platform';
-                authButtonText.textContent = 'Create Account';
-                toggleLink.textContent = 'Already have an account? Sign in here';
-                registerFields.style.display = 'block';
-                forgotPasswordContainer.style.display = 'none';
-            }
-            
-            hideAuthMessages();
-            document.getElementById('authForm').reset();
-        }
-
-        // Show/hide sections
-        function showAuth() {
-            document.getElementById('authContainer').style.display = 'flex';
-            document.getElementById('dashboardContainer').style.display = 'none';
-            hideAuthMessages();
-        }
-
-        function showDashboard(userData) {
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('dashboardContainer').style.display = 'block';
-            
-            // Update user info in header
-            document.getElementById('userWelcome').textContent = `Welcome, ${userData.fullName || 'User'}`;
-            
-            // Set up role-based navigation and show appropriate sections
-            if (userData.role === 'admin') {
-                setupNavigation(adminNavigation, 'admin');
-                showSection('overview'); // Show admin overview
-            } else {
-                setupNavigation(userNavigation, 'user');
-                showSection('overview'); // Show user overview
-            }
-            
-            // Update user info displays
-            document.getElementById('userName').textContent = userData.fullName || '-';
-            document.getElementById('userEmail').textContent = userData.email || currentUser.email;
-            document.getElementById('userRole').textContent = userData.role || 'user';
-            document.getElementById('userDepartment').textContent = userData.department || '-';
-            document.getElementById('userStatus').textContent = currentUser.emailVerified ? 'Verified' : 'Unverified';
-            
-            // Load profile data into forms
-            document.getElementById('editFullName').value = userData.fullName || '';
-            document.getElementById('editEmail').value = userData.email || currentUser.email;
-            document.getElementById('editPhone').value = userData.phone || '';
-            document.getElementById('editDepartment').value = userData.department || '';
-            document.getElementById('bio').value = userData.bio || '';
-        }
-
-        function showSection(sectionName) {
-            // Hide all sections
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => section.classList.remove('active'));
-            
-            // Show selected section
-            const targetSection = document.getElementById(`section-${sectionName}`);
-            if (targetSection) {
-                targetSection.classList.add('active');
-            }
-            
-            // Update navigation active state
-            const links = document.querySelectorAll('.nav-link');
-            links.forEach(link => link.classList.remove('active'));
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
-            
-            // Update page title and breadcrumb
-            const titles = {
-                'overview': 'Dashboard Overview',
-                'doctors': 'Doctor Management',
-                'users': 'User Management',
-                'patients': 'Patient Management',
-                'ot-rooms': 'OT Rooms',
-                'ot-schedule': 'OT Schedule',
-                'analytics': 'Analytics Dashboard',
-                'operations': 'Operations Management',
-                'scheduling': 'Scheduling System',
-                'profile': 'Profile Settings',
-                'assignments': 'View Assignments',
-                'availability': 'Update Availability',
-                'logs': 'Audit Logs'
-            };
-            
-            document.getElementById('pageTitle').textContent = titles[sectionName] || 'Dashboard';
-            document.getElementById('breadcrumbPath').textContent = `Home › ${titles[sectionName] || 'Dashboard'}`;
-            
-            // Load section-specific data
-            switch(sectionName) {
-                case 'doctors':
-                    loadDoctors();
-                    break;
-                case 'users':
-                    loadUsers();
-                    break;
-                case 'patients':
-                    loadPatients();
-                    break;
-                case 'ot-rooms':
-                    console.log('📋 Loading OT Rooms section');
-                    loadOTRoomsWithDebug(); // Use debug version
-                    break;
-                case 'ot-schedule':
-                    loadOTSchedule();
-                    break;
-                case 'logs':
-                    loadActivityLog();
-                    break;
-            }
-        }
-
-        // Session Management
-        function startSessionManagement() {
-            sessionStartTime = new Date();
-            updateSessionStatus();
-            
-            sessionTimer = setInterval(updateSessionStatus, 60000); // Update every minute
-            
-            // Auto-logout after 30 minutes of inactivity
-            let inactivityTimer;
-            const resetInactivityTimer = () => {
-                clearTimeout(inactivityTimer);
-                inactivityTimer = setTimeout(() => {
-                    showMessage('error', 'Session expired due to inactivity');
-                    logout();
-                }, 30 * 60 * 1000);
-            };
-            
-            document.addEventListener('click', resetInactivityTimer);
-            document.addEventListener('keypress', resetInactivityTimer);
-            resetInactivityTimer();
-        }
-
-        function updateSessionStatus() {
-            if (!sessionStartTime) return;
-            
-            const now = new Date();
-            const duration = Math.floor((now - sessionStartTime) / 1000);
-            const hours = Math.floor(duration / 3600);
-            const minutes = Math.floor((duration % 3600) / 60);
-            
-            let statusText = '● Active Session';
-            if (hours > 0) {
-                statusText += ` (${hours}h ${minutes}m)`;
-            } else if (minutes > 0) {
-                statusText += ` (${minutes}m)`;
-            }
-            
-            document.getElementById('sessionStatus').textContent = statusText;
-            document.getElementById('loginTime').textContent = sessionStartTime.toLocaleTimeString();
-            document.getElementById('sessionDuration').textContent = `${hours}h ${minutes}m`;
-        }
-
-        function extendSession() {
-            showMessage('success', 'Session extended successfully!');
-        }
-
-        function endSession() {
-            logout();
-        }
-
-        // Data Loading Functions
-        async function loadInitialData() {
-            try {
-                // Load statistics (only for admin)
-                if (currentUserData && currentUserData.role === 'admin') {
-                    const [doctorsSnapshot, usersSnapshot] = await Promise.all([
-                        db.collection('doctors').get(),
-                        db.collection('users').get()
-                    ]);
-                    
-                    document.getElementById('totalDoctors').textContent = doctorsSnapshot.size;
-                    document.getElementById('totalUsers').textContent = usersSnapshot.size;
-                    
-                    // Load doctors for management
-                    allDoctors = [];
-                    doctorsSnapshot.forEach(doc => {
-                        allDoctors.push({ id: doc.id, ...doc.data() });
-                    });
-                }
-                
-            } catch (error) {
-                console.error('Error loading initial data:', error);
-            }
-        }
-
-        async function loadDoctors() {
-            try {
-                const snapshot = await db.collection('doctors').orderBy('createdAt', 'desc').get();
-                allDoctors = [];
-                
-                snapshot.forEach(doc => {
-                    allDoctors.push({ id: doc.id, ...doc.data() });
-                });
-                
-                displayDoctors(allDoctors);
-                document.getElementById('totalDoctors').textContent = allDoctors.length;
-                
-            } catch (error) {
-                console.error('Error loading doctors:', error);
-                showMessage('error', 'Error loading doctors data');
-            }
-        }
-
-        function displayDoctors(doctors) {
-            const container = document.getElementById('doctorsContainer');
-            
-            if (doctors.length === 0) {
-                container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <h3>No doctors found</h3>
-                        <p>Click "Add New Doctor" to get started</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = doctors.map(doctor => createDoctorCardHTML(doctor)).join('');
-        }
-
-        function createDoctorCardHTML(doctor) {
-            return `
-                <div class="item-card">
-                    <div class="item-header">
-                        <div>
-                            <div class="item-title">${doctor.name}</div>
-                            <div class="item-subtitle">${capitalizeFirst(doctor.specialization)} • ${doctor.experience || 0} years</div>
-                            <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
-                                📧 ${doctor.email}<br>
-                                📞 ${doctor.phone}
-                                ${doctor.licenseNumber ? `<br>🏥 License: ${doctor.licenseNumber}` : ''}
-                                ${doctor.consultationFee ? `<br>💰 Fee: $${doctor.consultationFee}` : ''}
-                            </div>
-                            ${doctor.bio ? `<div style="margin-top: 0.5rem; font-style: italic; color: var(--text-secondary);">${doctor.bio}</div>` : ''}
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn btn-warning btn-sm" onclick="editDoctor('${doctor.id}')">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteDoctor('${doctor.id}', '${doctor.name}')">Delete</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function loadUsers() {
-            try {
-                const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
-                const users = [];
-                
-                snapshot.forEach(doc => {
-                    users.push({ id: doc.id, ...doc.data() });
-                });
-                
-                const tableHTML = `
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Department</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${users.map(user => `
-                                <tr>
-                                    <td>${user.fullName || 'N/A'}</td>
-                                    <td>${user.email}</td>
-                                    <td>${capitalizeFirst(user.department || 'N/A')}</td>
-                                    <td>${capitalizeFirst(user.role || 'user')}</td>
-                                    <td>
-                                        <span style="padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; background: ${user.emailVerified ? 'rgba(39, 174, 96, 0.1); color: #27ae60' : 'rgba(231, 76, 60, 0.1); color: #e74c3c'};">
-                                            ${user.emailVerified ? 'Verified' : 'Unverified'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-warning btn-sm">Edit</button>
-                                        <button class="btn btn-danger btn-sm">Remove</button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-                
-                document.getElementById('usersContainer').innerHTML = tableHTML;
-                
-            } catch (error) {
-                console.error('Error loading users:', error);
-            }
-        }
-
-        // Enhanced OT Rooms loading with comprehensive debugging
-async function loadOTRoomsWithDebug() {
-    try {
-        console.log('🔍 Starting to load OT rooms...');
-        console.log('🔗 Database connection:', db ? 'Connected' : 'Not connected');
-        
-        // Check if container exists
-        const container = document.getElementById('otRoomsContainer');
-        if (!container) {
-            console.error('❌ OT Rooms container not found in DOM');
-            return;
-        }
-        console.log('✅ Container found:', container);
-
-        // Query Firestore
-        console.log('📡 Querying ot_rooms collection...');
-        const snapshot = await db.collection('ot_rooms').get();
-        
-        console.log('📊 Query result - Empty:', snapshot.empty, 'Size:', snapshot.size);
-        
-        if (snapshot.empty) {
-            container.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
-                    <h3>No OT rooms found</h3>
-                    <p>Click "Add New OT Room" to get started</p>
-                    <button onclick="addSampleOTRoom()" class="btn btn-primary">Add Sample Room</button>
-                </div>
-            `;
-            console.log('📝 No OT rooms found, showing empty state');
-            return;
-        }
-
-        // Process documents
-        allOTRooms = [];
-        snapshot.forEach(doc => {
-            const roomData = { id: doc.id, ...doc.data() };
-            allOTRooms.push(roomData);
-            console.log('🏥 Found OT Room:', roomData);
-        });
-
-        console.log(`✅ Loaded ${allOTRooms.length} OT rooms total`);
-        displayOTRooms(allOTRooms);
-        
-    } catch (error) {
-        console.error('❌ Error loading OT rooms:', error);
-        showMessage('error', 'Error loading OT rooms: ' + error.message);
-    }
-}
-
-// Add sample OT room for testing
-async function addSampleOTRoom() {
-    try {
-        console.log('➕ Adding sample OT room...');
-        await db.collection('ot_rooms').add({
-            roomNumber: '101',
-            type: 'general',
-            status: 'available',
-            equipment: 'Basic surgical equipment, monitors, ventilator',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        console.log('✅ Sample OT room added successfully');
-        showMessage('success', 'Sample OT room added!');
-        loadOTRoomsWithDebug();
-    } catch (error) {
-        console.error('❌ Error adding sample OT room:', error);
-        showMessage('error', 'Error adding sample room: ' + error.message);
-    }
-}
-
-
-        async function loadActivityLog() {
-            try {
-                const snapshot = await db.collection('adminLogs')
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .get();
-                
-                const logContainer = document.getElementById('activityLog');
-                
-                if (snapshot.empty) {
-                    logContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No audit logs found</p>';
-                    return;
-                }
-                
-                let html = '';
-                snapshot.forEach(doc => {
-                    const log = doc.data();
-                    const timestamp = log.timestamp ? log.timestamp.toDate().toLocaleString() : 'Unknown time';
-                    
-                    html += `
-                        <div style="padding: 10px; border-left: 4px solid #667eea; background: #f8f9fa; margin-bottom: 10px; border-radius: 5px;">
-                            <div style="font-size: 12px; color: #6c757d; margin-bottom: 5px;">${timestamp}</div>
-                            <div style="font-weight: 500; color: #2c3e50;">${log.action}</div>
-                            <div style="font-size: 14px; color: #495057; margin-top: 5px;">${log.details}</div>
-                        </div>
-                    `;
-                });
-                
-                logContainer.innerHTML = html;
-                
-            } catch (error) {
-                console.error('Error loading activity log:', error);
-            }
-        }
-
-        // Doctor Management Functions
-        function openDoctorModal() {
-            isEditingDoctor = false;
-            editingDoctorId = null;
-            document.getElementById('doctorModalTitle').textContent = 'Add New Doctor';
-            document.getElementById('doctorForm').reset();
-            document.getElementById('doctorModal').style.display = 'block';
-        }
-
-        function closeDoctorModal() {
-            document.getElementById('doctorModal').style.display = 'none';
-        }
-
-        async function handleDoctorSubmit(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('doctorSubmitText');
-            const spinner = document.getElementById('doctorSubmitSpinner');
-            
-            submitBtn.style.display = 'none';
-            spinner.style.display = 'inline-block';
-            
-            try {
-                const doctorData = {
-                    name: document.getElementById('doctorName').value.trim(),
-                    email: document.getElementById('doctorEmail').value.trim().toLowerCase(),
-                    phone: document.getElementById('doctorPhone').value.trim(),
-                    specialization: document.getElementById('doctorSpecialization').value,
-                    licenseNumber: document.getElementById('doctorLicense').value.trim(),
-                    experience: parseInt(document.getElementById('doctorExperience').value) || 0,
-                    consultationFee: parseFloat(document.getElementById('doctorFee').value) || 0,
-                    status: document.getElementById('doctorStatus').value,
-                    bio: document.getElementById('doctorBio').value.trim()
-                };
-                
-                if (isEditingDoctor && editingDoctorId) {
-                    await db.collection('doctors').doc(editingDoctorId).update({
-                        ...doctorData,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    await logAdminAction('Doctor Updated', `Updated doctor: ${doctorData.name}`);
-                    showMessage('success', 'Doctor updated successfully!');
-                } else {
-                    await db.collection('doctors').add({
-                        ...doctorData,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    await logAdminAction('Doctor Added', `Added new doctor: ${doctorData.name}`);
-                    showMessage('success', 'Doctor added successfully!');
-                }
-                
-                closeDoctorModal();
-                await loadDoctors();
-                await loadInitialData();
-                
-            } catch (error) {
-                console.error('Error saving doctor:', error);
-                showMessage('error', 'Error saving doctor. Please try again.');
-            } finally {
-                submitBtn.style.display = 'inline';
-                spinner.style.display = 'none';
-            }
-        }
-
-        async function editDoctor(doctorId) {
-            try {
-                const doctorDoc = await db.collection('doctors').doc(doctorId).get();
-                if (!doctorDoc.exists) {
-                    showMessage('error', 'Doctor not found');
-                    return;
-                }
-                
-                const doctor = doctorDoc.data();
-                isEditingDoctor = true;
-                editingDoctorId = doctorId;
-                // Populate form
-                document.getElementById('doctorModalTitle').textContent = 'Edit Doctor';
-                document.getElementById('doctorName').value = doctor.name || '';
-                document.getElementById('doctorEmail').value = doctor.email || '';
-                document.getElementById('doctorPhone').value = doctor.phone || '';
-                document.getElementById('doctorSpecialization').value = doctor.specialization || '';
-                document.getElementById('doctorLicense').value = doctor.licenseNumber || '';
-                document.getElementById('doctorExperience').value = doctor.experience || '';
-                document.getElementById('doctorFee').value = doctor.consultationFee || '';
-                document.getElementById('doctorStatus').value = doctor.status || 'active';
-                document.getElementById('doctorBio').value = doctor.bio || '';
-                
-                document.getElementById('doctorModal').style.display = 'block';
-                
-            } catch (error) {
-                console.error('Error loading doctor for edit:', error);
-                showMessage('error', 'Error loading doctor data');
-            }
-        }
-
-        async function deleteDoctor(doctorId, doctorName) {
-            if (!confirm(`Are you sure you want to delete Dr. ${doctorName}? This action cannot be undone.`)) {
-                return;
-            }
-            
-            try {
-                await db.collection('doctors').doc(doctorId).delete();
-                await logAdminAction('Doctor Deleted', `Deleted doctor: ${doctorName}`);
-                showMessage('success', 'Doctor deleted successfully!');
-                await loadDoctors();
-                await loadInitialData();
-                
-            } catch (error) {
-                console.error('Error deleting doctor:', error);
-                showMessage('error', 'Error deleting doctor');
-            }
-        }
-
-        // Search and Filter Functions
-        function searchDoctors() {
-            const searchTerm = document.getElementById('doctorSearch').value.toLowerCase();
-            const filteredDoctors = allDoctors.filter(doctor => {
-                return doctor.name.toLowerCase().includes(searchTerm) ||
-                       doctor.email.toLowerCase().includes(searchTerm) ||
-                       doctor.specialization.toLowerCase().includes(searchTerm);
-            });
-            
-            displayDoctors(filteredDoctors);
-        }
-
-        function filterDoctors() {
-            const specializationFilter = document.getElementById('specializationFilter').value;
-            const statusFilter = document.getElementById('statusFilter').value;
-            
-            let filteredDoctors = allDoctors;
-            
-            if (specializationFilter) {
-                filteredDoctors = filteredDoctors.filter(doctor => 
-                    doctor.specialization === specializationFilter
-                );
-            }
-            
-            if (statusFilter) {
-                filteredDoctors = filteredDoctors.filter(doctor => 
-                    doctor.status === statusFilter
-                );
-            }
-            
-            displayDoctors(filteredDoctors);
-        }
-
-        // Profile Management
-        async function handleProfileUpdate(e) {
-            e.preventDefault();
-            
-            if (!currentUser) {
-                showMessage('error', 'No user signed in');
-                return;
-            }
-            
-            try {
-                const profileData = {
-                    fullName: document.getElementById('editFullName').value.trim(),
-                    phone: document.getElementById('editPhone').value.trim(),
-                    department: document.getElementById('editDepartment').value,
-                    bio: document.getElementById('bio').value.trim(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                await db.collection('users').doc(currentUser.uid).update(profileData);
-                await logAdminAction('Profile Updated', 'User updated their profile information');
-                
-                // Update current user data
-                currentUserData.fullName = profileData.fullName;
-                currentUserData.phone = profileData.phone;
-                currentUserData.department = profileData.department;
-                currentUserData.bio = profileData.bio;
-                
-                // Update UI
-                document.getElementById('userName').textContent = profileData.fullName;
-                document.getElementById('userDepartment').textContent = profileData.department;
-                document.getElementById('userWelcome').textContent = `Welcome, ${profileData.fullName}`;
-                
-                showMessage('success', 'Profile updated successfully!');
-                
-            } catch (error) {
-                console.error('Error updating profile:', error);
-                showMessage('error', 'Error updating profile');
-            }
-        }
-
-        // Availability Management
-        async function handleAvailabilityUpdate(e) {
-            e.preventDefault();
-            
-            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            const availabilityData = {};
-            
-            days.forEach(day => {
-                const checkbox = document.getElementById(day);
-                const startTime = document.getElementById(day + 'Start');
-                const endTime = document.getElementById(day + 'End');
-                
-                availabilityData[day] = {
-                    available: checkbox ? checkbox.checked : false,
-                    startTime: startTime ? startTime.value : '09:00',
-                    endTime: endTime ? endTime.value : '17:00'
-                };
-            });
-            
-            try {
-                await db.collection('users').doc(currentUser.uid).update({
-                    availability: availabilityData,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                await logAdminAction('Availability Updated', 'User updated their availability schedule');
-                showMessage('success', 'Availability updated successfully!');
-                
-            } catch (error) {
-                console.error('Error updating availability:', error);
-                showMessage('error', 'Error updating availability');
-            }
-        }
-
-        // Export Functions
-        async function exportDoctors() {
-            try {
-                let csvContent = "Name,Email,Phone,Specialization,License,Experience,Fee,Status\n";
-                
-                allDoctors.forEach(doctor => {
-                    const row = [
-                        `"${doctor.name || ''}"`,
-                        `"${doctor.email || ''}"`,
-                        `"${doctor.phone || ''}"`,
-                        `"${doctor.specialization || ''}"`,
-                        `"${doctor.licenseNumber || ''}"`,
-                        `"${doctor.experience || 0}"`,
-                        `"${doctor.consultationFee || 0}"`,
-                        `"${doctor.status || 'active'}"`
-                    ].join(',');
-                    csvContent += row + "\n";
-                });
-                
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `hospital_doctors_${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-                window.URL.revokeObjectURL(url);
-                
-                await logAdminAction('Data Export', 'Exported doctors data to CSV');
-                showMessage('success', 'Doctors data exported successfully!');
-                
-            } catch (error) {
-                console.error('Error exporting doctors:', error);
-                showMessage('error', 'Error exporting data');
-            }
-        }
-
-        // PATIENT MANAGEMENT FUNCTIONS
-        window.allPatients = window.allPatients || [];
-        window.isEditingPatient = window.isEditingPatient || false;
-        window.editingPatientId = window.editingPatientId || null;
-
-        async function loadPatients() {
-            try {
-                const snapshot = await db.collection('patients').orderBy('createdAt', 'desc').get();
-                allPatients = [];
-                
-                snapshot.forEach(doc => {
-                    allPatients.push({ id: doc.id, ...doc.data() });
-                });
-                
-                displayPatients(allPatients);
-                updatePatientStats();
-                
-            } catch (error) {
-                console.error('Error loading patients:', error);
-                showMessage('error', 'Error loading patients data');
-            }
-        }
-
-        function displayPatients(patients) {
-            const container = document.getElementById('patientsContainer');
-            
-            if (patients.length === 0) {
-                container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <h3>No patients found</h3>
-                        <p>Click "Add New Patient" to get started</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = patients.map(patient => `
-                <div class="item-card">
-                    <div class="item-header">
-                        <div>
-                            <div class="item-title">${patient.name}</div>
-                            <div class="item-subtitle">${patient.age} years • ${capitalizeFirst(patient.gender)}</div>
-                            <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
-                                📞 ${patient.phone}<br>
-                                ${patient.email ? `📧 ${patient.email}<br>` : ''}
-                                🩸 ${patient.bloodGroup || 'Unknown'}<br>
-                                📍 ${patient.status ? capitalizeFirst(patient.status) : 'Outpatient'}
-                            </div>
-                            ${patient.medicalHistory ? `<div style="margin-top: 0.5rem; font-style: italic; color: var(--text-secondary);">Medical: ${patient.medicalHistory.substring(0, 100)}${patient.medicalHistory.length > 100 ? '...' : ''}</div>` : ''}
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-sm" onclick="viewPatientDetails('${patient.id}')">View</button>
-                            <button class="btn btn-warning btn-sm" onclick="editPatient('${patient.id}')">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="deletePatient('${patient.id}', '${patient.name}')">Delete</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updatePatientStats() {
-            const total = allPatients.length;
-            const today = new Date().toDateString();
-            const todayAdmissions = allPatients.filter(p => {
-                const createdAt = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate() : new Date();
-                return createdAt.toDateString() === today;
-            }).length;
-            const inpatients = allPatients.filter(p => p.status === 'inpatient').length;
-            
-            document.getElementById('totalPatients').textContent = total;
-            document.getElementById('todayAdmissions').textContent = todayAdmissions;
-            document.getElementById('currentInpatients').textContent = inpatients;
-        }
-
-        function searchPatients() {
-            const searchTerm = document.getElementById('patientSearch').value.toLowerCase();
-            const filteredPatients = allPatients.filter(patient => {
-                return patient.name.toLowerCase().includes(searchTerm) ||
-                       patient.phone.includes(searchTerm) ||
-                       (patient.email && patient.email.toLowerCase().includes(searchTerm));
-            });
-            
-            displayPatients(filteredPatients);
-        }
-
-        // Toggle sidebar open/close function
-        function toggleNavigation() {
-            const nav = document.getElementById('dashboardNav');
-            nav.classList.toggle('open');
-        }
-
-        // Add mobile menu button dynamically
-        function addMobileMenuButton() {
-            if (window.innerWidth <= 768 && !document.getElementById('mobileMenuBtn')) {
-                const btn = document.createElement('button');
-                btn.id = 'mobileMenuBtn';
-                btn.className = 'mobile-menu-btn';
-                btn.innerHTML = '☰';
-                btn.onclick = toggleNavigation;
-                document.body.appendChild(btn);
-            } else if (window.innerWidth > 768) {
-                const btn = document.getElementById('mobileMenuBtn');
-                if (btn) btn.remove();
-            }
-        }
-
-        // Initialize on load and resize
-        window.addEventListener('load', addMobileMenuButton);
-        window.addEventListener('resize', addMobileMenuButton);
-
-
-        function filterPatients() {
-            const genderFilter = document.getElementById('genderFilter').value;
-            const ageFilter = document.getElementById('ageFilter').value;
-            
-            let filteredPatients = allPatients;
-            
-            if (genderFilter) {
-                filteredPatients = filteredPatients.filter(patient => 
-                    patient.gender === genderFilter
-                );
-            }
-            
-            if (ageFilter) {
-                filteredPatients = filteredPatients.filter(patient => {
-                    const age = patient.age;
-                    switch(ageFilter) {
-                        case 'child': return age < 18;
-                        case 'adult': return age >= 18 && age < 60;
-                        case 'senior': return age >= 60;
-                        default: return true;
-                    }
-                });
-            }
-            
-            displayPatients(filteredPatients);
-        }
-
-        function openPatientModal() {
-            isEditingPatient = false;
-            editingPatientId = null;
-            document.getElementById('patientModalTitle').textContent = 'Add New Patient';
-            document.getElementById('patientForm').reset();
-            document.getElementById('patientModal').style.display = 'block';
-        }
-
-        function closePatientModal() {
-            document.getElementById('patientModal').style.display = 'none';
-        }
-
-        async function handlePatientSubmit(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('patientSubmitText');
-            const spinner = document.getElementById('patientSubmitSpinner');
-            
-            submitBtn.style.display = 'none';
-            spinner.style.display = 'inline-block';
-            
-            try {
-                const patientData = {
-                    name: document.getElementById('patientName').value.trim(),
-                    age: parseInt(document.getElementById('patientAge').value),
-                    gender: document.getElementById('patientGender').value,
-                    phone: document.getElementById('patientPhone').value.trim(),
-                    email: document.getElementById('patientEmail').value.trim(),
-                    bloodGroup: document.getElementById('patientBloodGroup').value,
-                    emergencyContact: document.getElementById('emergencyContact').value.trim(),
-                    status: document.getElementById('patientStatus').value,
-                    address: document.getElementById('patientAddress').value.trim(),
-                    medicalHistory: document.getElementById('medicalHistory').value.trim()
-                };
-                
-                if (isEditingPatient && editingPatientId) {
-                    await db.collection('patients').doc(editingPatientId).update({
-                        ...patientData,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    await logAdminAction('Patient Updated', `Updated patient: ${patientData.name}`);
-                    showMessage('success', 'Patient updated successfully!');
-                } else {
-                    await db.collection('patients').add({
-                        ...patientData,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    await logAdminAction('Patient Added', `Added new patient: ${patientData.name}`);
-                    showMessage('success', 'Patient added successfully!');
-                }
-                
-                closePatientModal();
-                await loadPatients();
-                
-            } catch (error) {
-                console.error('Error saving patient:', error);
-                showMessage('error', 'Error saving patient. Please try again.');
-            } finally {
-                submitBtn.style.display = 'inline';
-                spinner.style.display = 'none';
-            }
-        }
-
-        async function editPatient(patientId) {
-            try {
-                const patientDoc = await db.collection('patients').doc(patientId).get();
-                if (!patientDoc.exists) {
-                    showMessage('error', 'Patient not found');
-                    return;
-                }
-                
-                const patient = patientDoc.data();
-                isEditingPatient = true;
-                editingPatientId = patientId;
-                
-                // Populate form
-                document.getElementById('patientModalTitle').textContent = 'Edit Patient';
-                document.getElementById('patientName').value = patient.name || '';
-                document.getElementById('patientAge').value = patient.age || '';
-                document.getElementById('patientGender').value = patient.gender || '';
-                document.getElementById('patientPhone').value = patient.phone || '';
-                document.getElementById('patientEmail').value = patient.email || '';
-                document.getElementById('patientBloodGroup').value = patient.bloodGroup || '';
-                document.getElementById('emergencyContact').value = patient.emergencyContact || '';
-                document.getElementById('patientStatus').value = patient.status || 'outpatient';
-                document.getElementById('patientAddress').value = patient.address || '';
-                document.getElementById('medicalHistory').value = patient.medicalHistory || '';
-                
-                document.getElementById('patientModal').style.display = 'block';
-                
-            } catch (error) {
-                console.error('Error loading patient for edit:', error);
-                showMessage('error', 'Error loading patient data');
-            }
-        }
-
-        async function deletePatient(patientId, patientName) {
-            if (!confirm(`Are you sure you want to delete ${patientName}? This action cannot be undone.`)) {
-                return;
-            }
-            
-            try {
-                await db.collection('patients').doc(patientId).delete();
-                await logAdminAction('Patient Deleted', `Deleted patient: ${patientName}`);
-                showMessage('success', 'Patient deleted successfully!');
-                await loadPatients();
-                
-            } catch (error) {
-                console.error('Error deleting patient:', error);
-                showMessage('error', 'Error deleting patient');
-            }
-        }
-
-        function viewPatientDetails(patientId) {
-            const patient = allPatients.find(p => p.id === patientId);
-            if (patient) {
-                alert(`Patient Details:
-                
-Name: ${patient.name}
-Age: ${patient.age} years
-Gender: ${capitalizeFirst(patient.gender)}
-Phone: ${patient.phone}
-Email: ${patient.email || 'Not provided'}
-Blood Group: ${patient.bloodGroup || 'Unknown'}
-Status: ${capitalizeFirst(patient.status || 'outpatient')}
-Emergency Contact: ${patient.emergencyContact || 'Not provided'}
-Address: ${patient.address || 'Not provided'}
-Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
-            }
-        }
-
-        async function exportPatients() {
-            try {
-                let csvContent = "Name,Age,Gender,Phone,Email,Blood Group,Status,Emergency Contact,Address\n";
-                
-                allPatients.forEach(patient => {
-                    const row = [
-                        `"${patient.name || ''}"`,
-                        `"${patient.age || ''}"`,
-                        `"${patient.gender || ''}"`,
-                        `"${patient.phone || ''}"`,
-                        `"${patient.email || ''}"`,
-                        `"${patient.bloodGroup || ''}"`,
-                        `"${patient.status || ''}"`,
-                        `"${patient.emergencyContact || ''}"`,
-                        `"${(patient.address || '').replace(/"/g, '""')}"`
-                    ].join(',');
-                    csvContent += row + "\n";
-                });
-                
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `hospital_patients_${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-                window.URL.revokeObjectURL(url);
-                
-                await logAdminAction('Data Export', 'Exported patients data to CSV');
-                showMessage('success', 'Patients data exported successfully!');
-                
-            } catch (error) {
-                console.error('Error exporting patients:', error);
-                showMessage('error', 'Error exporting data');
-            }
-        }
-
-        // OPERATION THEATER MANAGEMENT FUNCTIONS
-        window.allOTRooms = window.allOTRooms || [];
-        window.allOTSchedules = window.allOTSchedules || [];
-
-        async function loadOTRooms() {
-            try {
-                const snapshot = await db.collection('ot_rooms').orderBy('roomNumber').get();
-                allOTRooms = [];
-                
-                snapshot.forEach(doc => {
-                    allOTRooms.push({ id: doc.id, ...doc.data() });
-                });
-                
-                displayOTRooms(allOTRooms);
-                populateOTRoomSelects();
-                
-            } catch (error) {
-                console.error('Error loading OT rooms:', error);
-                showMessage('error', 'Error loading OT rooms data');
-            }
-        }
-
-        function displayOTRooms(rooms) {
-            const container = document.getElementById('otRoomsContainer');
-            
-            if (rooms.length === 0) {
-                container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <h3>No OT rooms found</h3>
-                        <p>Click "Add New OT Room" to get started</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = rooms.map(room => `
-                <div class="item-card">
-                    <div class="item-header">
-                        <div>
-                            <div class="item-title">OT Room ${room.roomNumber}</div>
-                            <div class="item-subtitle">${capitalizeFirst(room.type)} Surgery</div>
-                            <div style="margin-top: 0.5rem;">
-                                <span style="padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; background: ${getStatusColor(room.status)};">
-                                    ${capitalizeFirst(room.status)}
-                                </span>
-                            </div>
-                            ${room.equipment ? `<div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">Equipment: ${room.equipment}</div>` : ''}
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn btn-warning btn-sm" onclick="editOTRoom('${room.id}')">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteOTRoom('${room.id}', '${room.roomNumber}')">Delete</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function getStatusColor(status) {
-            switch(status) {
-                case 'available': return 'rgba(39, 174, 96, 0.1); color: #27ae60';
-                case 'occupied': return 'rgba(231, 76, 60, 0.1); color: #e74c3c';
-                case 'maintenance': return 'rgba(255, 193, 7, 0.1); color: #b45309';
-                case 'cleaning': return 'rgba(52, 152, 219, 0.1); color: #2980b9';
-                default: return 'rgba(149, 165, 166, 0.1); color: #7f8c8d';
-            }
-        }
-
-        function openOTRoomModal() {
-            document.getElementById('otRoomForm').reset();
-            document.getElementById('otRoomModal').style.display = 'block';
-        }
-
-        function closeOTRoomModal() {
-            document.getElementById('otRoomModal').style.display = 'none';
-        }
-
-        async function handleOTRoomSubmit(e) {
-            e.preventDefault();
-            
-            try {
-                const roomData = {
-                    roomNumber: document.getElementById('otRoomNumber').value.trim(),
-                    type: document.getElementById('otRoomType').value,
-                    status: document.getElementById('otRoomStatus').value,
-                    equipment: document.getElementById('otRoomEquipment').value.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                await db.collection('ot_rooms').add(roomData);
-                
-                await logAdminAction('OT Room Added', `Added new OT room: ${roomData.roomNumber}`);
-                showMessage('success', 'OT Room added successfully!');
-                
-                closeOTRoomModal();
-                await loadOTRooms();
-                
-            } catch (error) {
-                console.error('Error saving OT room:', error);
-                showMessage('error', 'Error saving OT room. Please try again.');
-            }
-        }
-
-        async function deleteOTRoom(roomId, roomNumber) {
-            if (!confirm(`Are you sure you want to delete OT Room ${roomNumber}? This action cannot be undone.`)) {
-                return;
-            }
-            
-            try {
-                await db.collection('ot_rooms').doc(roomId).delete();
-                await logAdminAction('OT Room Deleted', `Deleted OT room: ${roomNumber}`);
-                showMessage('success', 'OT Room deleted successfully!');
-                await loadOTRooms();
-                
-            } catch (error) {
-                console.error('Error deleting OT room:', error);
-                showMessage('error', 'Error deleting OT room');
-            }
-        }
-
-        function openOTScheduleModal() {
-            populateScheduleSelects();
-            document.getElementById('otScheduleForm').reset();
-            // Set default date to today
-            document.getElementById('scheduleDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('otScheduleModal').style.display = 'block';
-        }
-
-        function closeOTScheduleModal() {
-            document.getElementById('otScheduleModal').style.display = 'none';
-        }
-
-        function populateScheduleSelects() {
-            // Populate OT Rooms
-            const otRoomSelect = document.getElementById('scheduleOTRoom');
-            otRoomSelect.innerHTML = '<option value="">Select OT Room</option>';
-            allOTRooms.filter(room => room.status === 'available').forEach(room => {
-                otRoomSelect.innerHTML += `<option value="${room.id}">OT Room ${room.roomNumber} (${capitalizeFirst(room.type)})</option>`;
-            });
-            
-            // Populate Patients
-            const patientSelect = document.getElementById('schedulePatient');
-            patientSelect.innerHTML = '<option value="">Select Patient</option>';
-            allPatients.forEach(patient => {
-                patientSelect.innerHTML += `<option value="${patient.id}">${patient.name} (${patient.age}y, ${capitalizeFirst(patient.gender)})</option>`;
-            });
-            
-            // Populate Surgeons (from doctors)
-            const surgeonSelect = document.getElementById('scheduleSurgeon');
-            surgeonSelect.innerHTML = '<option value="">Select Surgeon</option>';
-            allDoctors.forEach(doctor => {
-                surgeonSelect.innerHTML += `<option value="${doctor.id}">${doctor.name} (${capitalizeFirst(doctor.specialization)})</option>`;
-            });
-        }
-
-        function populateOTRoomSelects() {
-            // This is called when OT rooms are loaded to update any selects
-            populateScheduleSelects();
-        }
-
-        async function handleOTScheduleSubmit(e) {
-            e.preventDefault();
-            
-            try {
-                const scheduleData = {
-                    otRoomId: document.getElementById('scheduleOTRoom').value,
-                    patientId: document.getElementById('schedulePatient').value,
-                    surgeonId: document.getElementById('scheduleSurgeon').value,
-                    date: document.getElementById('scheduleDate').value,
-                    startTime: document.getElementById('scheduleStartTime').value,
-                    endTime: document.getElementById('scheduleEndTime').value,
-                    procedure: document.getElementById('scheduleProcedure').value.trim(),
-                    notes: document.getElementById('scheduleNotes').value.trim(),
-                    status: 'scheduled',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                // Check for conflicts
-                const isConflict = await checkOTConflict(scheduleData.otRoomId, scheduleData.date, scheduleData.startTime, scheduleData.endTime);
-                if (isConflict) {
-                    showMessage('error', 'Time conflict detected! The selected OT room is already booked for this time.');
-                    return;
-                }
-                
-                await db.collection('ot_schedules').add(scheduleData);
-                
-                await logAdminAction('Operation Scheduled', `Scheduled operation: ${scheduleData.procedure}`);
-                showMessage('success', 'Operation scheduled successfully!');
-                
-                closeOTScheduleModal();
-                await loadOTSchedule();
-                
-            } catch (error) {
-                console.error('Error scheduling operation:', error);
-                showMessage('error', 'Error scheduling operation. Please try again.');
-            }
-        }
-
-        async function checkOTConflict(roomId, date, startTime, endTime) {
-            try {
-                const snapshot = await db.collection('ot_schedules')
-                    .where('otRoomId', '==', roomId)
-                    .where('date', '==', date)
-                    .get();
-                
-                const existingSchedules = snapshot.docs.map(doc => doc.data());
-                
-                return existingSchedules.some(schedule => {
-                    return (startTime < schedule.endTime && endTime > schedule.startTime);
-                });
-                
-            } catch (error) {
-                console.error('Error checking OT conflict:', error);
-                return false;
-            }
-        }
-
-        async function loadOTSchedule() {
-            const selectedDate = document.getElementById('otScheduleDate').value || new Date().toISOString().split('T')[0];
-            
-            try {
-                const snapshot = await db.collection('ot_schedules')
-                    .where('date', '==', selectedDate)
-                    .orderBy('startTime')
-                    .get();
-                
-                allOTSchedules = [];
-                snapshot.forEach(doc => {
-                    allOTSchedules.push({ id: doc.id, ...doc.data() });
-                });
-                
-                await displayOTSchedule();
-                
-            } catch (error) {
-                console.error('Error loading OT schedule:', error);
-                showMessage('error', 'Error loading OT schedule');
-            }
-        }
-
-        async function displayOTSchedule() {
-            const container = document.getElementById('otScheduleContainer');
-            
-            if (allOTSchedules.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <h3>No operations scheduled for this date</h3>
-                        <p>Click "Schedule Operation" to add a new operation</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let scheduleHTML = '<div class="schedule-table" style="overflow-x: auto;"><table class="data-table"><thead><tr><th>Time</th><th>OT Room</th><th>Patient</th><th>Surgeon</th><th>Procedure</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-            
-            for (const schedule of allOTSchedules) {
-                const room = allOTRooms.find(r => r.id === schedule.otRoomId);
-                const patient = allPatients.find(p => p.id === schedule.patientId);
-                const surgeon = allDoctors.find(d => d.id === schedule.surgeonId);
-                
-                scheduleHTML += `
-                    <tr>
-                        <td>${schedule.startTime} - ${schedule.endTime}</td>
-                        <td>OT ${room ? room.roomNumber : 'Unknown'}</td>
-                        <td>${patient ? patient.name : 'Unknown Patient'}</td>
-                        <td>${surgeon ? surgeon.name : 'Unknown Surgeon'}</td>
-                        <td>${schedule.procedure}</td>
-                        <td>
-                            <span style="padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; background: ${getScheduleStatusColor(schedule.status)};">
-                                ${capitalizeFirst(schedule.status)}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="updateOTStatus('${schedule.id}')">Update</button>
-                            <button class="btn btn-danger btn-sm" onclick="cancelOperation('${schedule.id}')">Cancel</button>
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            scheduleHTML += '</tbody></table></div>';
-            container.innerHTML = scheduleHTML;
-        }
-
-        function getScheduleStatusColor(status) {
-            switch(status) {
-                case 'scheduled': return 'rgba(52, 152, 219, 0.1); color: #2980b9';
-                case 'in-progress': return 'rgba(255, 193, 7, 0.1); color: #b45309';
-                case 'completed': return 'rgba(39, 174, 96, 0.1); color: #27ae60';
-                case 'cancelled': return 'rgba(231, 76, 60, 0.1); color: #e74c3c';
-                default: return 'rgba(149, 165, 166, 0.1); color: #7f8c8d';
-            }
-        }
-
-        function changeOTDate(days) {
-            const currentDate = new Date(document.getElementById('otScheduleDate').value || new Date());
-            currentDate.setDate(currentDate.getDate() + days);
-            document.getElementById('otScheduleDate').value = currentDate.toISOString().split('T')[0];
-            loadOTSchedule();
-        }
-
-        async function updateOTStatus(scheduleId) {
-            const newStatus = prompt('Update status to:\n1. scheduled\n2. in-progress\n3. completed\n4. cancelled\n\nEnter status:');
-            
-            if (newStatus && ['scheduled', 'in-progress', 'completed', 'cancelled'].includes(newStatus)) {
-                try {
-                    await db.collection('ot_schedules').doc(scheduleId).update({
-                        status: newStatus,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    showMessage('success', 'Operation status updated successfully!');
-                    await loadOTSchedule();
-                    
-                } catch (error) {
-                    console.error('Error updating operation status:', error);
-                    showMessage('error', 'Error updating status');
-                }
-            }
-        }
-
-        async function cancelOperation(scheduleId) {
-            if (!confirm('Are you sure you want to cancel this operation?')) {
-                return;
-            }
-            
-            try {
-                await db.collection('ot_schedules').doc(scheduleId).update({
-                    status: 'cancelled',
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                await logAdminAction('Operation Cancelled', 'Cancelled scheduled operation');
-                showMessage('success', 'Operation cancelled successfully!');
-                await loadOTSchedule();
-                
-            } catch (error) {
-                console.error('Error cancelling operation:', error);
-                showMessage('error', 'Error cancelling operation');
-            }
-        }
-
-        // Initialize OT schedule date to today
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            const otDateInput = document.getElementById('otScheduleDate');
-            if (otDateInput) {
-                otDateInput.value = today;
-            }
-        });
-
-        // Authentication Flow Functions
-        async function changePassword() {
-            const currentPassword = prompt('Enter your current password:');
-            const newPassword = prompt('Enter your new password (minimum 6 characters):');
-            
-            if (!currentPassword || !newPassword) return;
-            
-            if (newPassword.length < 6) {
-                showMessage('error', 'New password must be at least 6 characters');
-                return;
-            }
-            
-            try {
-                const credential = firebase.auth.EmailAuthProvider.credential(
-                    currentUser.email,
-                    currentPassword
-                );
-                
-                await currentUser.reauthenticateWithCredential(credential);
-                await currentUser.updatePassword(newPassword);
-                
-                await logAdminAction('Password Changed', 'User changed their password');
-                showMessage('success', 'Password changed successfully!');
-            } catch (error) {
-                console.error('Error changing password:', error);
-                showMessage('error', 'Error changing password. Check your current password.');
-            }
-        }
-
-        async function resetPassword() {
-            if (!currentUser) return;
-            
-            try {
-                await auth.sendPasswordResetEmail(currentUser.email);
-                showMessage('success', 'Password reset email sent!');
-            } catch (error) {
-                console.error('Error sending reset email:', error);
-                showMessage('error', 'Error sending reset email');
-            }
-        }
-
-        async function resendVerification() {
-            if (!currentUser) return;
-            
-            try {
-                await currentUser.sendEmailVerification();
-                showMessage('success', 'Verification email sent!');
-            } catch (error) {
-                console.error('Error sending verification:', error);
-                showMessage('error', 'Error sending verification email');
-            }
-        }
-
-        function viewLoginHistory() {
-            alert('Login history feature coming soon!');
-        }
-
-        // Additional Functions
-        function contactSupport() {
-            alert('Support Contact:\n\nEmail: support@hospital.com\nPhone: +1 (555) 123-4567\nHours: 24/7 Emergency Support');
-        }
-
-        function editProfile() {
-            showSection('profile');
-        }
-
-        function viewAllUsers() {
-            showSection('users');
-        }
-
-        function exportUsers() {
-            showMessage('success', 'Users export feature coming soon!');
-        }
-
-        function manageUsers() {
-            showSection('users');
-        }
-
-        function viewAnalytics() {
-            showSection('analytics');
-        }
-
-        function systemSettings() {
-            showMessage('success', 'System settings feature coming soon!');
-        }
-
-        function manageOperations() {
-            showSection('operations');
-        }
-
-        function scheduleManagement() {
-            showSection('scheduling');
-        }
-
-        function auditLogs() {
-            showSection('logs');
-        }
-
-        function viewSchedule() {
-            showSection('assignments');
-        }
-
-        function profileSettings() {
-            showSection('profile');
-        }
-
-        function viewAssignments() {
-            showSection('assignments');
-        }
-
-        function updateAvailability() {
-            showSection('availability');
-        }
-
-        // Enhanced toggle function with debugging
-// Enhanced sidebar toggle for all screen sizes
-let sidebarOpen = true; // default: open
-
-function toggleSidebar() {
-    const nav = document.getElementById('dashboardNav');
-    const main = document.querySelector('.main-content');
-    const btn = document.getElementById('sidebarToggleBtn');
-    sidebarOpen = !sidebarOpen;
-    if (sidebarOpen) {
-        nav.classList.remove('closed');
-        main.classList.remove('sidebar-closed');
-        btn.classList.remove('closed');
-        btn.innerHTML = '‹';
-        btn.title = 'Close Sidebar';
-        btn.setAttribute('aria-label', 'Close sidebar');
-    } else {
-        nav.classList.add('closed');
-        main.classList.add('sidebar-closed');
-        btn.classList.add('closed');
-        btn.innerHTML = '›';
-        btn.title = 'Open Sidebar';
-        btn.setAttribute('aria-label', 'Open sidebar');
-    }
-}
-
-// Optional: set initial state on DOM load
-document.addEventListener('DOMContentLoaded', function() {
-    sidebarOpen = true;
-    toggleSidebar(); // This will initially close it, call twice if you want to initialize open
-    toggleSidebar();
-});
- // Track sidebar state
-
-function toggleSidebar() {
-    console.log('🔄 Toggle sidebar called');
-    
-    const nav = document.getElementById('dashboardNav');
-    const mainContent = document.querySelector('.main-content');
-    const toggleBtn = document.getElementById('sidebarToggleBtn');
-    
-    if (nav && mainContent) {
-        sidebarOpen = !sidebarOpen;
-        
-        if (sidebarOpen) {
-            // Open sidebar
-            nav.classList.remove('closed');
-            mainContent.classList.remove('sidebar-closed');
-            if (toggleBtn) {
-                toggleBtn.style.left = '300px';
-                toggleBtn.innerHTML = '‹';
-                toggleBtn.title = 'Close Sidebar';
-            }
-            console.log('✅ Sidebar opened');
-        } else {
-            // Close sidebar
-            nav.classList.add('closed');
-            mainContent.classList.add('sidebar-closed');
-            if (toggleBtn) {
-                toggleBtn.style.left = '20px';
-                toggleBtn.innerHTML = '›';
-                toggleBtn.title = 'Open Sidebar';
-            }
-            console.log('✅ Sidebar closed');
-        }
-    } else {
-        console.error('❌ Navigation or main content element not found');
-    }
-}
-
-// Create and add the toggle button
-function createSidebarToggle() {
-    // Remove existing button if any
-    const existingBtn = document.getElementById('sidebarToggleBtn');
-    if (existingBtn) existingBtn.remove();
-    
-    // Create new toggle button
-    const toggleBtn = document.createElement('button');
-    toggleBtn.id = 'sidebarToggleBtn';
-    toggleBtn.className = 'sidebar-toggle-btn';
-    toggleBtn.innerHTML = '‹'; // Left arrow when sidebar is open
-    toggleBtn.title = 'Close Sidebar';
-    toggleBtn.onclick = toggleSidebar;
-    
-    // Add to body
-    document.body.appendChild(toggleBtn);
-    console.log('✅ Sidebar toggle button created');
-}
-
-// Initialize toggle button when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Create toggle button after a short delay to ensure DOM is ready
-    setTimeout(createSidebarToggle, 500);
-});
-
-// Also create on window load as backup
-window.addEventListener('load', function() {
-    if (!document.getElementById('sidebarToggleBtn')) {
-        createSidebarToggle();
-    }
-});
-
-// Optional: Add keyboard shortcut (Ctrl+B to toggle)
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.key === 'b') {
-        e.preventDefault();
-        toggleSidebar();
-    }
-});
-
-        // Admin logging
-        async function logAdminAction(action, details) {
-            try {
-                if (!currentUser) return;
-                
-                await db.collection('adminLogs').add({
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    action: action,
-                    details: details,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-            } catch (error) {
-                console.error('Error logging admin action:', error);
-            }
-        }
-
-        // Utility Functions
-        function capitalizeFirst(str) {
-            if (!str) return '';
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        function setAuthLoading(loading) {
-            const button = document.getElementById('authButton');
-            const buttonText = document.getElementById('authButtonText');
-            const spinner = document.getElementById('authSpinner');
-            
-            button.disabled = loading;
-            if (loading) {
-                buttonText.style.display = 'none';
-                spinner.style.display = 'inline-block';
-            } else {
-                buttonText.style.display = 'inline';
-                spinner.style.display = 'none';
-            }
-        }
-
-        function showAuthMessage(type, message) {
-            const errorDiv = document.getElementById('authErrorMessage');
-            const successDiv = document.getElementById('authSuccessMessage');
-            
-            hideAuthMessages();
-            
-            if (type === 'error') {
-                errorDiv.textContent = message;
-                errorDiv.style.display = 'block';
-            } else {
-                successDiv.textContent = message;
-                successDiv.style.display = 'block';
-            }
-            
-            setTimeout(hideAuthMessages, 5000);
-        }
-
-        function hideAuthMessages() {
-            document.getElementById('authErrorMessage').style.display = 'none';
-            document.getElementById('authSuccessMessage').style.display = 'none';
-        }
-
-        function showMessage(type, message) {
-            // Create floating notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 1rem 1.5rem;
-                border-radius: 15px;
-                color: white;
-                font-weight: 500;
-                z-index: 10000;
-                max-width: 400px;
-                backdrop-filter: blur(10px);
-                animation: slideInRight 0.3s ease;
-                background: ${type === 'success' ? 'rgba(39, 174, 96, 0.9)' : 'rgba(231, 76, 60, 0.9)'};
-            `;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease';
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }, 4000);
-        }
-
-        // Logout
-        async function logout() {
-            try {
-                if (currentUser) {
-                    await logAdminAction('User Logout', 'User logged out successfully');
-                }
-                
-                await auth.signOut();
-                clearInterval(sessionTimer);
-                sessionStartTime = null;
-                currentUser = null;
-                currentUserData = null;
-                showMessage('success', 'Logged out successfully!');
-                
-            } catch (error) {
-                console.error('Error logging out:', error);
-                showMessage('error', 'Error logging out');
-            }
-        }
-
-        // Add CSS animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOutRight {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Close modals when clicking outside
-        window.onclick = function(event) {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        }
-
-        console.log('🏥 Hospital Management System loaded successfully!');
-        console.log('📧 For support: support@hospital.com');
-        console.log('🔗 Version: 2.0.0 - Complete with Patient & OT Management');
-
-                // PATIENT MANAGEMENT FUNCTIONS (NEW ADDITION)
-        let allPatients = [];
-        let isEditingPatient = false;
-        let editingPatientId = null;
-
-        async function loadPatients() {
-            try {
-                const snapshot = await db.collection('patients').orderBy('createdAt', 'desc').get();
-                allPatients = [];
-                
-                snapshot.forEach(doc => {
-                    allPatients.push({ id: doc.id, ...doc.data() });
-                });
-                
-                displayPatients(allPatients);
-                updatePatientStats();
-                
-            } catch (error) {
-                console.error('Error loading patients:', error);
-                showMessage('error', 'Error loading patients data');
-            }
-        }
-
-        function displayPatients(patients) {
-            const container = document.getElementById('patientsContainer');
-            
-            if (patients.length === 0) {
-                container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <h3>No patients found</h3>
-                        <p>Click "Add New Patient" to get started</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = patients.map(patient => `
-                <div class="item-card">
-                    <div class="item-header">
-                        <div>
-                            <div class="item-title">${patient.name}</div>
-                            <div class="item-subtitle">${patient.age} years • ${capitalizeFirst(patient.gender)}</div>
-                            <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
-                                📞 ${patient.phone}<br>
-                                ${patient.email ? `📧 ${patient.email}<br>` : ''}
-                                🩸 ${patient.bloodGroup || 'Unknown'}<br>
-                                📍 ${patient.status ? capitalizeFirst(patient.status) : 'Outpatient'}
-                            </div>
-                            ${patient.medicalHistory ? `<div style="margin-top: 0.5rem; font-style: italic; color: var(--text-secondary);">Medical: ${patient.medicalHistory.substring(0, 100)}${patient.medicalHistory.length > 100 ? '...' : ''}</div>` : ''}
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-sm" onclick="viewPatientDetails('${patient.id}')">View</button>
-                            <button class="btn btn-warning btn-sm" onclick="editPatient('${patient.id}')">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="deletePatient('${patient.id}', '${patient.name}')">Delete</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updatePatientStats() {
-            const total = allPatients.length;
-            const today = new Date().toDateString();
-            const todayAdmissions = allPatients.filter(p => {
-                const createdAt = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate() : new Date();
-                return createdAt.toDateString() === today;
-            }).length;
-            const inpatients = allPatients.filter(p => p.status === 'inpatient').length;
-            
-            document.getElementById('totalPatients').textContent = total;
-            document.getElementById('todayAdmissions').textContent = todayAdmissions;
-            document.getElementById('currentInpatients').textContent = inpatients;
-        }
-
-        function searchPatients() {
-            const searchTerm = document.getElementById('patientSearch').value.toLowerCase();
-            const filteredPatients = allPatients.filter(patient => {
-                return patient.name.toLowerCase().includes(searchTerm) ||
-                       patient.phone.includes(searchTerm) ||
-                       (patient.email && patient.email.toLowerCase().includes(searchTerm));
-            });
-            
-            displayPatients(filteredPatients);
-        }
-
-        function filterPatients() {
-            const genderFilter = document.getElementById('genderFilter').value;
-            const ageFilter = document.getElementById('ageFilter').value;
-            
-            let filteredPatients = allPatients;
-            
-            if (genderFilter) {
-                filteredPatients = filteredPatients.filter(patient => 
-                    patient.gender === genderFilter
-                );
-            }
-            
-            if (ageFilter) {
-                filteredPatients = filteredPatients.filter(patient => {
-                    const age = patient.age;
-                    switch(ageFilter) {
-                        case 'child': return age < 18;
-                        case 'adult': return age >= 18 && age < 60;
-                        case 'senior': return age >= 60;
-                        default: return true;
-                    }
-                });
-            }
-            
-            displayPatients(filteredPatients);
-        }
-
-        function openPatientModal() {
-            isEditingPatient = false;
-            editingPatientId = null;
-            document.getElementById('patientModalTitle').textContent = 'Add New Patient';
-            document.getElementById('patientForm').reset();
-            document.getElementById('patientModal').style.display = 'block';
-        }
-
-        function closePatientModal() {
-            document.getElementById('patientModal').style.display = 'none';
-        }
-
-        async function handlePatientSubmit(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('patientSubmitText');
-            const spinner = document.getElementById('patientSubmitSpinner');
-            
-            submitBtn.style.display = 'none';
-            spinner.style.display = 'inline-block';
-            
-            try {
-                const patientData = {
-                    name: document.getElementById('patientName').value.trim(),
-                    age: parseInt(document.getElementById('patientAge').value),
-                    gender: document.getElementById('patientGender').value,
-                    phone: document.getElementById('patientPhone').value.trim(),
-                    email: document.getElementById('patientEmail').value.trim(),
-                    bloodGroup: document.getElementById('patientBloodGroup').value,
-                    emergencyContact: document.getElementById('emergencyContact').value.trim(),
-                    status: document.getElementById('patientStatus').value,
-                    address: document.getElementById('patientAddress').value.trim(),
-                    medicalHistory: document.getElementById('medicalHistory').value.trim()
-                };
-                
-                if (isEditingPatient && editingPatientId) {
-                    await db.collection('patients').doc(editingPatientId).update({
-                        ...patientData,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    await logAdminAction('Patient Updated', `Updated patient: ${patientData.name}`);
-                    showMessage('success', 'Patient updated successfully!');
-                } else {
-                    await db.collection('patients').add({
-                        ...patientData,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    await logAdminAction('Patient Added', `Added new patient: ${patientData.name}`);
-                    showMessage('success', 'Patient added successfully!');
-                }
-                
-                closePatientModal();
-                await loadPatients();
-                
-            } catch (error) {
-                console.error('Error saving patient:', error);
-                showMessage('error', 'Error saving patient. Please try again.');
-            } finally {
-                submitBtn.style.display = 'inline';
-                spinner.style.display = 'none';
-            }
-        }
-
-        async function editPatient(patientId) {
-            try {
-                const patientDoc = await db.collection('patients').doc(patientId).get();
-                if (!patientDoc.exists) {
-                    showMessage('error', 'Patient not found');
-                    return;
-                }
-                
-                const patient = patientDoc.data();
-                isEditingPatient = true;
-                editingPatientId = patientId;
-                
-                // Populate form
-                document.getElementById('patientModalTitle').textContent = 'Edit Patient';
-                document.getElementById('patientName').value = patient.name || '';
-                document.getElementById('patientAge').value = patient.age || '';
-                document.getElementById('patientGender').value = patient.gender || '';
-                document.getElementById('patientPhone').value = patient.phone || '';
-                document.getElementById('patientEmail').value = patient.email || '';
-                document.getElementById('patientBloodGroup').value = patient.bloodGroup || '';
-                document.getElementById('emergencyContact').value = patient.emergencyContact || '';
-                document.getElementById('patientStatus').value = patient.status || 'outpatient';
-                document.getElementById('patientAddress').value = patient.address || '';
-                document.getElementById('medicalHistory').value = patient.medicalHistory || '';
-                
-                document.getElementById('patientModal').style.display = 'block';
-                
-            } catch (error) {
-                console.error('Error loading patient for edit:', error);
-                showMessage('error', 'Error loading patient data');
-            }
-        }
-
-        async function deletePatient(patientId, patientName) {
-            if (!confirm(`Are you sure you want to delete ${patientName}? This action cannot be undone.`)) {
-                return;
-            }
-            
-            try {
-                await db.collection('patients').doc(patientId).delete();
-                await logAdminAction('Patient Deleted', `Deleted patient: ${patientName}`);
-                showMessage('success', 'Patient deleted successfully!');
-                await loadPatients();
-                
-            } catch (error) {
-                console.error('Error deleting patient:', error);
-                showMessage('error', 'Error deleting patient');
-            }
-        }
-
-        function viewPatientDetails(patientId) {
-            const patient = allPatients.find(p => p.id === patientId);
-            if (patient) {
-                alert(`Patient Details:
-                
-Name: ${patient.name}
-Age: ${patient.age} years
-Gender: ${capitalizeFirst(patient.gender)}
-Phone: ${patient.phone}
-Email: ${patient.email || 'Not provided'}
-Blood Group: ${patient.bloodGroup || 'Unknown'}
-Status: ${capitalizeFirst(patient.status || 'outpatient')}
-Emergency Contact: ${patient.emergencyContact || 'Not provided'}
-Address: ${patient.address || 'Not provided'}
-Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
-            }
-        }
-
-        async function exportPatients() {
-            try {
-                let csvContent = "Name,Age,Gender,Phone,Email,Blood Group,Status,Emergency Contact,Address\n";
-                
-                allPatients.forEach(patient => {
-                    const row = [
-                        `"${patient.name || ''}"`,
-                        `"${patient.age || ''}"`,
-                        `"${patient.gender || ''}"`,
-                        `"${patient.phone || ''}"`,
-                        `"${patient.email || ''}"`,
-                        `"${patient.bloodGroup || ''}"`,
-                        `"${patient.status || ''}"`,
-                        `"${patient.emergencyContact || ''}"`,
-                        `"${(patient.address || '').replace(/"/g, '""')}"`
-                    ].join(',');
-                    csvContent += row + "\n";
-                });
-                
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `hospital_patients_${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-                window.URL.revokeObjectURL(url);
-                
-                await logAdminAction('Data Export', 'Exported patients data to CSV');
-                showMessage('success', 'Patients data exported successfully!');
-                
-            } catch (error) {
-                console.error('Error exporting patients:', error);
-                showMessage('error', 'Error exporting data');
-            }
-        }
-
-        // OPERATION THEATER MANAGEMENT FUNCTIONS (NEW ADDITION)
-        let allOTRooms = [];
-        let allOTSchedules = [];
-
-        async function loadOTRooms() {
-            try {
-                const snapshot = await db.collection('ot_rooms').orderBy('roomNumber').get();
-                allOTRooms = [];
-                
-                snapshot.forEach(doc => {
-                    allOTRooms.push({ id: doc.id, ...doc.data() });
-                });
-                
-                displayOTRooms(allOTRooms);
-                populateOTRoomSelects();
-                
-            } catch (error) {
-                console.error('Error loading OT rooms:', error);
-                showMessage('error', 'Error loading OT rooms data');
-            }
-        }
-
-        function displayOTRooms(rooms) {
-            const container = document.getElementById('otRoomsContainer');
-            
-            if (rooms.length === 0) {
-                container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <h3>No OT rooms found</h3>
-                        <p>Click "Add New OT Room" to get started</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = rooms.map(room => `
-                <div class="item-card">
-                    <div class="item-header">
-                        <div>
-                            <div class="item-title">OT Room ${room.roomNumber}</div>
-                            <div class="item-subtitle">${capitalizeFirst(room.type)} Surgery</div>
-                            <div style="margin-top: 0.5rem;">
-                                <span style="padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; background: ${getStatusColor(room.status)};">
-                                    ${capitalizeFirst(room.status)}
-                                </span>
-                            </div>
-                            ${room.equipment ? `<div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">Equipment: ${room.equipment}</div>` : ''}
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn btn-warning btn-sm" onclick="editOTRoom('${room.id}')">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteOTRoom('${room.id}', '${room.roomNumber}')">Delete</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function getStatusColor(status) {
-            switch(status) {
-                case 'available': return 'rgba(39, 174, 96, 0.1); color: #27ae60';
-                case 'occupied': return 'rgba(231, 76, 60, 0.1); color: #e74c3c';
-                case 'maintenance': return 'rgba(255, 193, 7, 0.1); color: #b45309';
-                case 'cleaning': return 'rgba(52, 152, 219, 0.1); color: #2980b9';
-                default: return 'rgba(149, 165, 166, 0.1); color: #7f8c8d';
-            }
-        }
-
-        function openOTRoomModal() {
-            document.getElementById('otRoomForm').reset();
-            document.getElementById('otRoomModal').style.display = 'block';
-        }
-
-        function closeOTRoomModal() {
-            document.getElementById('otRoomModal').style.display = 'none';
-        }
-
-        async function handleOTRoomSubmit(e) {
-            e.preventDefault();
-            
-            try {
-                const roomData = {
-                    roomNumber: document.getElementById('otRoomNumber').value.trim(),
-                    type: document.getElementById('otRoomType').value,
-                    status: document.getElementById('otRoomStatus').value,
-                    equipment: document.getElementById('otRoomEquipment').value.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                await db.collection('ot_rooms').add(roomData);
-                
-                await logAdminAction('OT Room Added', `Added new OT room: ${roomData.roomNumber}`);
-                showMessage('success', 'OT Room added successfully!');
-                
-                closeOTRoomModal();
-                await loadOTRooms();
-                
-            } catch (error) {
-                console.error('Error saving OT room:', error);
-                showMessage('error', 'Error saving OT room. Please try again.');
-            }
-        }
-
-        async function deleteOTRoom(roomId, roomNumber) {
-            if (!confirm(`Are you sure you want to delete OT Room ${roomNumber}? This action cannot be undone.`)) {
-                return;
-            }
-            
-            try {
-                await db.collection('ot_rooms').doc(roomId).delete();
-                await logAdminAction('OT Room Deleted', `Deleted OT room: ${roomNumber}`);
-                showMessage('success', 'OT Room deleted successfully!');
-                await loadOTRooms();
-                
-            } catch (error) {
-                console.error('Error deleting OT room:', error);
-                showMessage('error', 'Error deleting OT room');
-            }
-        }
-
-        function openOTScheduleModal() {
-            populateScheduleSelects();
-            document.getElementById('otScheduleForm').reset();
-            // Set default date to today
-            document.getElementById('scheduleDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('otScheduleModal').style.display = 'block';
-        }
-
-        function closeOTScheduleModal() {
-            document.getElementById('otScheduleModal').style.display = 'none';
-        }
-
-        function populateScheduleSelects() {
-            // Populate OT Rooms
-            const otRoomSelect = document.getElementById('scheduleOTRoom');
-            otRoomSelect.innerHTML = '<option value="">Select OT Room</option>';
-            allOTRooms.filter(room => room.status === 'available').forEach(room => {
-                otRoomSelect.innerHTML += `<option value="${room.id}">OT Room ${room.roomNumber} (${capitalizeFirst(room.type)})</option>`;
-            });
-            
-            // Populate Patients
-            const patientSelect = document.getElementById('schedulePatient');
-            patientSelect.innerHTML = '<option value="">Select Patient</option>';
-            allPatients.forEach(patient => {
-                patientSelect.innerHTML += `<option value="${patient.id}">${patient.name} (${patient.age}y, ${capitalizeFirst(patient.gender)})</option>`;
-            });
-            
-            // Populate Surgeons (from doctors)
-            const surgeonSelect = document.getElementById('scheduleSurgeon');
-            surgeonSelect.innerHTML = '<option value="">Select Surgeon</option>';
-            allDoctors.forEach(doctor => {
-                surgeonSelect.innerHTML += `<option value="${doctor.id}">${doctor.name} (${capitalizeFirst(doctor.specialization)})</option>`;
-            });
-        }
-
-        function populateOTRoomSelects() {
-            // This is called when OT rooms are loaded to update any selects
-            populateScheduleSelects();
-        }
-
-        async function handleOTScheduleSubmit(e) {
-            e.preventDefault();
-            
-            try {
-                const scheduleData = {
-                    otRoomId: document.getElementById('scheduleOTRoom').value,
-                    patientId: document.getElementById('schedulePatient').value,
-                    surgeonId: document.getElementById('scheduleSurgeon').value,
-                    date: document.getElementById('scheduleDate').value,
-                    startTime: document.getElementById('scheduleStartTime').value,
-                    endTime: document.getElementById('scheduleEndTime').value,
-                    procedure: document.getElementById('scheduleProcedure').value.trim(),
-                    notes: document.getElementById('scheduleNotes').value.trim(),
-                    status: 'scheduled',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                // Check for conflicts
-                const isConflict = await checkOTConflict(scheduleData.otRoomId, scheduleData.date, scheduleData.startTime, scheduleData.endTime);
-                if (isConflict) {
-                    showMessage('error', 'Time conflict detected! The selected OT room is already booked for this time.');
-                    return;
-                }
-                
-                await db.collection('ot_schedules').add(scheduleData);
-                
-                await logAdminAction('Operation Scheduled', `Scheduled operation: ${scheduleData.procedure}`);
-                showMessage('success', 'Operation scheduled successfully!');
-                
-                closeOTScheduleModal();
-                await loadOTSchedule();
-                
-            } catch (error) {
-                console.error('Error scheduling operation:', error);
-                showMessage('error', 'Error scheduling operation. Please try again.');
-            }
-        }
-
-        async function checkOTConflict(roomId, date, startTime, endTime) {
-            try {
-                const snapshot = await db.collection('ot_schedules')
-                    .where('otRoomId', '==', roomId)
-                    .where('date', '==', date)
-                    .get();
-                
-                const existingSchedules = snapshot.docs.map(doc => doc.data());
-                
-                return existingSchedules.some(schedule => {
-                    return (startTime < schedule.endTime && endTime > schedule.startTime);
-                });
-                
-            } catch (error) {
-                console.error('Error checking OT conflict:', error);
-                return false;
-            }
-        }
-
-        async function loadOTSchedule() {
-            const selectedDate = document.getElementById('otScheduleDate').value || new Date().toISOString().split('T')[0];
-            
-            try {
-                const snapshot = await db.collection('ot_schedules')
-                    .where('date', '==', selectedDate)
-                    .orderBy('startTime')
-                    .get();
-                
-                allOTSchedules = [];
-                snapshot.forEach(doc => {
-                    allOTSchedules.push({ id: doc.id, ...doc.data() });
-                });
-                
-                await displayOTSchedule();
-                
-            } catch (error) {
-                console.error('Error loading OT schedule:', error);
-                showMessage('error', 'Error loading OT schedule');
-            }
-        }
-
-        async function displayOTSchedule() {
-            const container = document.getElementById('otScheduleContainer');
-            
-            if (allOTSchedules.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                        <h3>No operations scheduled for this date</h3>
-                        <p>Click "Schedule Operation" to add a new operation</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let scheduleHTML = '<div class="schedule-table" style="overflow-x: auto;"><table class="data-table"><thead><tr><th>Time</th><th>OT Room</th><th>Patient</th><th>Surgeon</th><th>Procedure</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-            
-            for (const schedule of allOTSchedules) {
-                const room = allOTRooms.find(r => r.id === schedule.otRoomId);
-                const patient = allPatients.find(p => p.id === schedule.patientId);
-                const surgeon = allDoctors.find(d => d.id === schedule.surgeonId);
-                
-                scheduleHTML += `
-                    <tr>
-                        <td>${schedule.startTime} - ${schedule.endTime}</td>
-                        <td>OT ${room ? room.roomNumber : 'Unknown'}</td>
-                        <td>${patient ? patient.name : 'Unknown Patient'}</td>
-                        <td>${surgeon ? surgeon.name : 'Unknown Surgeon'}</td>
-                        <td>${schedule.procedure}</td>
-                        <td>
-                            <span style="padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; background: ${getScheduleStatusColor(schedule.status)};">
-                                ${capitalizeFirst(schedule.status)}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="updateOTStatus('${schedule.id}')">Update</button>
-                            <button class="btn btn-danger btn-sm" onclick="cancelOperation('${schedule.id}')">Cancel</button>
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            scheduleHTML += '</tbody></table></div>';
-            container.innerHTML = scheduleHTML;
-        }
-
-        function getScheduleStatusColor(status) {
-            switch(status) {
-                case 'scheduled': return 'rgba(52, 152, 219, 0.1); color: #2980b9';
-                case 'in-progress': return 'rgba(255, 193, 7, 0.1); color: #b45309';
-                case 'completed': return 'rgba(39, 174, 96, 0.1); color: #27ae60';
-                case 'cancelled': return 'rgba(231, 76, 60, 0.1); color: #e74c3c';
-                default: return 'rgba(149, 165, 166, 0.1); color: #7f8c8d';
-            }
-        }
-
-        function changeOTDate(days) {
-            const currentDate = new Date(document.getElementById('otScheduleDate').value || new Date());
-            currentDate.setDate(currentDate.getDate() + days);
-            document.getElementById('otScheduleDate').value = currentDate.toISOString().split('T')[0];
-            loadOTSchedule();
-        }
-
-        async function updateOTStatus(scheduleId) {
-            const newStatus = prompt('Update status to:\n1. scheduled\n2. in-progress\n3. completed\n4. cancelled\n\nEnter status:');
-            
-            if (newStatus && ['scheduled', 'in-progress', 'completed', 'cancelled'].includes(newStatus)) {
-                try {
-                    await db.collection('ot_schedules').doc(scheduleId).update({
-                        status: newStatus,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    showMessage('success', 'Operation status updated successfully!');
-                    await loadOTSchedule();
-                    
-                } catch (error) {
-                    console.error('Error updating operation status:', error);
-                    showMessage('error', 'Error updating status');
-                }
-            }
-        }
-
-        async function cancelOperation(scheduleId) {
-            if (!confirm('Are you sure you want to cancel this operation?')) {
-                return;
-            }
-            
-            try {
-                await db.collection('ot_schedules').doc(scheduleId).update({
-                    status: 'cancelled',
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                await logAdminAction('Operation Cancelled', 'Cancelled scheduled operation');
-                showMessage('success', 'Operation cancelled successfully!');
-                await loadOTSchedule();
-                
-            } catch (error) {
-                console.error('Error cancelling operation:', error);
-                showMessage('error', 'Error cancelling operation');
-            }
-        }
-
-        async function handlePatientSubmit(e) {
-            e.preventDefault();
-            
-            // Check if user is authenticated
-            if (!currentUser) {
-                showMessage('error', 'User not authenticated. Please log in first.');
-                return;
-            }
-            
-            console.log('Current user:', currentUser.uid); // Debug log
-            
-            const submitBtn = document.getElementById('patientSubmitText');
-            const spinner = document.getElementById('patientSubmitSpinner');
-            
-            submitBtn.style.display = 'none';
-            spinner.style.display = 'inline-block';
-            
-            try {
-                const patientData = {
-                    name: document.getElementById('patientName').value.trim(),
-                    age: parseInt(document.getElementById('patientAge').value),
-                    gender: document.getElementById('patientGender').value,
-                    phone: document.getElementById('patientPhone').value.trim(),
-                    email: document.getElementById('patientEmail').value.trim(),
-                    bloodGroup: document.getElementById('patientBloodGroup').value,
-                    emergencyContact: document.getElementById('emergencyContact').value.trim(),
-                    status: document.getElementById('patientStatus').value || 'outpatient',
-                    address: document.getElementById('patientAddress').value.trim(),
-                    medicalHistory: document.getElementById('medicalHistory').value.trim(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                console.log('Saving patient data:', patientData); // Debug log
-                
-                const docRef = await db.collection('patients').add(patientData);
-                console.log('Patient saved with ID:', docRef.id); // Debug log
-                
-                await logAdminAction('Patient Added', `Added new patient: ${patientData.name}`);
-                showMessage('success', 'Patient added successfully!');
-                
-                closePatientModal();
-                await loadPatients();
-                
-            } catch (error) {
-                console.error('Error saving patient:', error);
-                showMessage('error', 'Error saving patient: ' + error.message);
-            } finally {
-                submitBtn.style.display = 'inline';
-                spinner.style.display = 'none';
-            }
-        }
-
-        // Initialize OT schedule date to today (NEW ADDITION)
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            const otDateInput = document.getElementById('otScheduleDate');
-            if (otDateInput) {
-                otDateInput.value = today;
-            }
-
-            // Add event listeners for new forms
-            const patientForm = document.getElementById('patientForm');
-            const otRoomForm = document.getElementById('otRoomForm');
-            const otScheduleForm = document.getElementById('otScheduleForm');
-            
-            if (patientForm) {
-                patientForm.addEventListener('submit', handlePatientSubmit);
-            }
-            
-            if (otRoomForm) {
-                otRoomForm.addEventListener('submit', handleOTRoomSubmit);
-            }
-            
-            if (otScheduleForm) {
-                otScheduleForm.addEventListener('submit', handleOTScheduleSubmit);
-            }
-        });
-
-    </script>
+    <script src="assets/js/index.js"></script>
 </body>
 </html>
