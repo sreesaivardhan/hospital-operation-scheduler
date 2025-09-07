@@ -1749,15 +1749,17 @@ Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
         }
 
         // Enhanced toggle function with debugging
-// Enhanced sidebar toggle for all screen sizes
-let sidebarOpen = true; // default: open
+let sidebarOpen = true; // define globally once
 
 function toggleSidebar() {
     const nav = document.getElementById('dashboardNav');
     const main = document.querySelector('.main-content');
     const btn = document.getElementById('sidebarToggleBtn');
+
     sidebarOpen = !sidebarOpen;
+
     if (sidebarOpen) {
+        // Open sidebar
         nav.classList.remove('closed');
         main.classList.remove('sidebar-closed');
         btn.classList.remove('closed');
@@ -1765,6 +1767,7 @@ function toggleSidebar() {
         btn.title = 'Close Sidebar';
         btn.setAttribute('aria-label', 'Close sidebar');
     } else {
+        // Close sidebar
         nav.classList.add('closed');
         main.classList.add('sidebar-closed');
         btn.classList.add('closed');
@@ -1780,43 +1783,6 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleSidebar(); // This will initially close it, call twice if you want to initialize open
     toggleSidebar();
 });
- // Track sidebar state
-
-function toggleSidebar() {
-    console.log('🔄 Toggle sidebar called');
-    
-    const nav = document.getElementById('dashboardNav');
-    const mainContent = document.querySelector('.main-content');
-    const toggleBtn = document.getElementById('sidebarToggleBtn');
-    
-    if (nav && mainContent) {
-        sidebarOpen = !sidebarOpen;
-        
-        if (sidebarOpen) {
-            // Open sidebar
-            nav.classList.remove('closed');
-            mainContent.classList.remove('sidebar-closed');
-            if (toggleBtn) {
-                toggleBtn.style.left = '300px';
-                toggleBtn.innerHTML = '‹';
-                toggleBtn.title = 'Close Sidebar';
-            }
-            console.log('✅ Sidebar opened');
-        } else {
-            // Close sidebar
-            nav.classList.add('closed');
-            mainContent.classList.add('sidebar-closed');
-            if (toggleBtn) {
-                toggleBtn.style.left = '20px';
-                toggleBtn.innerHTML = '›';
-                toggleBtn.title = 'Open Sidebar';
-            }
-            console.log('✅ Sidebar closed');
-        }
-    } else {
-        console.error('❌ Navigation or main content element not found');
-    }
-}
 
 // Create and add the toggle button
 function createSidebarToggle() {
@@ -3129,3 +3095,19 @@ function logAction(action, details) {
     timestamp: new Date().toISOString()
   }).catch(err => console.error("Log failed:", err));
 }
+
+// In your authentication success handler
+if (loginSuccessful) {
+    showDashboard();
+}
+
+document.getElementById("authContainer").style.display = "none";
+document.getElementById("dashboardContainer").style.display = "flex";
+
+// Mark dashboard as active (so CSS rule applies)
+document.getElementById("dashboardContainer").classList.add("active");
+
+document.getElementById("dashboardContainer").style.display = "none";
+document.getElementById("dashboardContainer").classList.remove("active");
+document.getElementById("authContainer").style.display = "flex";
+
