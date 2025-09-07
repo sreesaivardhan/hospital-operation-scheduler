@@ -6,15 +6,13 @@
     <title>Hospital Management System - Complete Professional Dashboard</title>
     <link rel="stylesheet" href="assets/css/index.css">
 </head>
-<body>
-    <!-- Sidebar toggle button -->
-<button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle sidebar" onclick="toggleSidebar()">‹</button>
+<body>    
     <!-- Authentication Container -->
     <div class="auth-container" id="authContainer">
         <div class="auth-card">
             <div class="auth-header">
-                <h1>🏥 MediCore</h1>
-                <p id="authTitle">Welcome to Professional Healthcare Management</p>
+                <h1>MediCore Hospital</h1>
+                <p id="authTitle">Professional Healthcare Management System</p>
             </div>
 
             <!-- Messages -->
@@ -94,105 +92,90 @@
 
     <!-- Dashboard Container -->
     <div class="dashboard-container" id="dashboardContainer">
-    <!-- Navigation Sidebar -->
-    <nav class="dashboard-nav" id="dashboardNav">
-        <div class="nav-brand">
-            <h2>🏥 MediCore</h2>
-            <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;" id="navSubtitle">Healthcare Management</p>
-        </div>
+            <!-- Sidebar toggle button -->
+            <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle sidebar" onclick="toggleSidebar()">‹</button>
 
-        <!-- FIXED: Added id="navMenu" to this ul element -->
-        <ul class="nav-menu" id="navMenu">
-            <!-- Navigation will be populated dynamically based on user role -->
-            <li class="nav-item">
-                <a href="#" class="nav-link active" onclick="showSection('overview')">
-                    <i>📊</i> Dashboard Overview
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('doctors')">
-                    <i>👨‍⚕️</i> Doctor Management
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('users')">
-                    <i>👥</i> User Management
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('patients')">
-                    <i>🏥</i> Patient Management
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('ot-rooms')">
-                    <i>🚪</i> OT Rooms
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('ot-schedule')">
-                    <i>🗓️</i> OT Schedule
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('analytics')">
-                    <i>📈</i> Analytics Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('operations')">
-                    <i>⚙️</i> Operations Management
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('scheduling')">
-                    <i>📅</i> Scheduling System
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('profile')">
-                    <i>👤</i> Profile Settings
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('assignments')">
-                    <i>📋</i> View Assignments
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('availability')">
-                    <i>🕒</i> Update Availability
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" onclick="showSection('logs')">
-                    <i>📝</i> Audit Logs
-                </a>
-            </li>
-            <li class="nav-item" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-                <a href="#" class="nav-link" onclick="logout()" style="color: #ff6b6b;">
-                    <i>🚪</i> Secure Logout
-                </a>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- Main Content Area -->
-    <div class="main-content">
-        <!-- Content Header -->
-        <div class="content-header">
-            <h1 id="pageTitle">Dashboard Overview</h1>
-            <div class="breadcrumb">
-                <span id="breadcrumbPath">Home › Dashboard</span>
-                <div style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
-                    <span id="userWelcome">Welcome, Professional</span>
-                    <span id="sessionStatus" style="padding: 0.5rem 1rem; background: rgba(39, 174, 96, 0.1); color: #27ae60; border-radius: 20px; font-size: 0.9rem;">● Active Session</span>
-                </div>
+        <!-- Navigation Sidebar -->
+        <nav class="dashboard-nav" id="dashboardNav">
+            <div class="nav-brand">
+                <h2>MediCore</h2>
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;" id="navSubtitle">Healthcare Management</p>
             </div>
-        </div>
 
-        <!-- Your existing content sections go here -->
-        <!-- All your dashboard sections like overview, doctors, patients, etc. -->
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showSection('overview')">
+                        <i>📊</i> Dashboard Overview
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('doctors')">
+                        <i>👨‍⚕️</i> Doctor Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('users')">
+                        <i>👥</i> User Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('patients')">
+                        <i>🏥</i> Patient Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('ot-rooms')">
+                        <i>🚪</i> OT Rooms
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('ot-schedule')">
+                        <i>🗓️</i> OT Schedule
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('analytics')">
+                        <i>📈</i> Analytics Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('operations')">
+                        <i>⚙️</i> Operations Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('scheduling')">
+                        <i>📅</i> Scheduling System
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('profile')">
+                        <i>👤</i> Profile Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('assignments')">
+                        <i>📋</i> View Assignments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('availability')">
+                        <i>🕒</i> Update Availability
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showSection('logs')">
+                        <i>📝</i> Audit Logs
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                    <a href="#" class="nav-link" onclick="logout()" style="color: #ff6b6b;">
+                        <i>🚪</i> Secure Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
         <!-- Main Content Area -->
         <main class="main-content">
             <!-- Content Header -->
@@ -308,75 +291,37 @@
 
                 <!-- Feature Lists Based on Role -->
                 <div id="adminFeatures" class="admin-features" style="display: none;">
-                    <h3>🔧 Admin Features</h3>
+                    <h3>Admin Features</h3>
                     <ul class="feature-list">
-                        <li onclick="manageUsers()">👥 Manage Users</li>
-                        <li onclick="viewAnalytics()">📊 View Analytics</li>
-                        <li onclick="systemSettings()">⚙️ System Settings</li>
-                        <li onclick="manageOperations()">📋 Manage Operations</li>
-                        <li onclick="scheduleManagement()">📅 Schedule Management</li>
-                        <li onclick="auditLogs()">📝 Audit Logs</li>
+                        <li onclick="manageUsers()">Manage Users</li>
+                        <li onclick="viewAnalytics()">View Analytics</li>
+                        <li onclick="systemSettings()">System Settings</li>
+                        <li onclick="manageOperations()">Manage Operations</li>
+                        <li onclick="scheduleManagement()">Schedule Management</li>
+                        <li onclick="auditLogs()">Audit Logs</li>
                     </ul>
                 </div>
                 
                 <div id="userFeatures" class="user-features">
-                    <h3>👤 User Features</h3>
+                    <h3>User Features</h3>
                     <ul class="feature-list">
-                        <li onclick="viewSchedule()">📅 View Schedule</li>
-                        <li onclick="profileSettings()">👤 Profile Settings</li>
-                        <li onclick="contactSupport()">📞 Contact Support</li>
-                        <li onclick="viewAssignments()">📋 View Assignments</li>
-                        <li onclick="updateAvailability()">🕒 Update Availability</li>
+                        <li onclick="viewSchedule()">View Schedule</li>
+                        <li onclick="profileSettings()">Profile Settings</li>
+                        <li onclick="contactSupport()">Contact Support</li>
+                        <li onclick="viewAssignments()">View Assignments</li>
+                        <li onclick="updateAvailability()">Update Availability</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Doctor Management Section -->
             <div id="section-doctors" class="content-section">
-                <!-- Doctor Modal -->
-                <div id="doctorModal" class="modal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2 class="modal-title" id="doctorModalTitle">Add New Doctor</h2>
-                            <button class="close" onclick="closeDoctorModal()">&times;</button>
-                        </div>
-                        <form id="doctorForm">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label" for="doctorName">Full Name *</label>
-                                    <input type="text" id="doctorName" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="specialization">Specialization *</label>
-                            <input type="text" id="specialization" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="doctorPhone">Phone</label>
-                            <input type="tel" id="doctorPhone" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="doctorEmail">Email</label>
-                            <input type="email" id="doctorEmail" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="doctorStatus">Status</label>
-                            <select id="doctorStatus" class="form-input">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-success">Save Doctor</button>
-                    <button type="button" class="btn btn-danger" onclick="closeDoctorModal()">Cancel</button>
-                    </form>
-                </div>
-                </div>
                 <div class="section-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                         <h2 class="section-title">Doctor Management</h2>
                         <div>
                             <button class="btn btn-primary" onclick="openDoctorModal()">
-                                <i>➕</i> Add New Doctor
+                                <i>+</i> Add New Doctor
                             </button>
                             <button class="btn btn-success" onclick="exportDoctors()">
                                 <i>📊</i> Export Data
@@ -404,68 +349,6 @@
 
                     <!-- Doctors Grid -->
                     <div id="doctorsContainer" class="cards-grid"></div>
-
-<script>
-let doctors = [];
-
-function renderDoctors() {
-  const container = document.getElementById("doctorsContainer");
-  container.innerHTML = "";
-  doctors.forEach((doc, index) => {
-    container.innerHTML += `
-      <div class="item-card">
-        <div class="item-header">
-          <div>
-            <div class="item-title">${doc.name}</div>
-            <div class="item-subtitle">${doc.specialization} | ${doc.status}</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn btn-sm btn-primary" onclick="editDoctor(${index})">✏️ Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteDoctor(${index})">🗑️ Delete</button>
-          </div>
-        </div>
-      </div>`;
-  });
-}
-
-document.getElementById("doctorForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const doctor = {
-    name: doctorName.value,
-    specialization: specialization.value,
-    phone: doctorPhone.value,
-    email: doctorEmail.value,
-    status: doctorStatus.value
-  };
-  if (doctorForm.dataset.editIndex !== undefined) {
-    doctors[doctorForm.dataset.editIndex] = doctor;
-    delete doctorForm.dataset.editIndex;
-  } else {
-    doctors.push(doctor);
-  }
-  renderDoctors();
-  closeDoctorModal();
-});
-
-function editDoctor(index) {
-  const doc = doctors[index];
-  doctorName.value = doc.name;
-  specialization.value = doc.specialization;
-  doctorPhone.value = doc.phone;
-  doctorEmail.value = doc.email;
-  doctorStatus.value = doc.status;
-  doctorForm.dataset.editIndex = index;
-  openDoctorModal();
-}
-
-function deleteDoctor(index) {
-  if (confirm("Are you sure you want to delete this doctor?")) {
-    doctors.splice(index, 1);
-    renderDoctors();
-  }
-}
-</script>
-
                 </div>
             </div>
 
@@ -475,6 +358,100 @@ function deleteDoctor(index) {
                     <h2 class="section-title">Healthcare Staff Management</h2>
                     <div id="usersContainer">
                         <!-- Users will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Management Section -->
+            <div id="section-patients" class="content-section">
+                <div class="section-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 class="section-title">Patient Management</h2>
+                        <div>
+                            <button class="btn btn-primary" onclick="openPatientModal()">
+                                <i>+</i> Add New Patient
+                            </button>
+                            <button class="btn btn-success" onclick="exportPatients()">
+                                <i>📊</i> Export Patients
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                        <input type="text" id="patientSearch" class="form-input" placeholder="Search patients..." style="flex: 1; min-width: 200px;" onkeyup="searchPatients()">
+                        <select id="genderFilter" class="form-input" onchange="filterPatients()">
+                            <option value="">All Genders</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <select id="ageFilter" class="form-input" onchange="filterPatients()">
+                            <option value="">All Ages</option>
+                            <option value="child">Child (0-17)</option>
+                            <option value="adult">Adult (18-59)</option>
+                            <option value="senior">Senior (60+)</option>
+                        </select>
+                    </div>
+
+                    <!-- Patients Statistics -->
+                    <div class="stats-grid" style="margin-bottom: 2rem;">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-number" id="totalPatients">0</div>
+                            <div class="stat-label">Total Patients</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-number" id="todayAdmissions">0</div>
+                            <div class="stat-label">Today's Admissions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏥</div>
+                            <div class="stat-number" id="currentInpatients">0</div>
+                            <div class="stat-label">Current Inpatients</div>
+                        </div>
+                    </div>
+
+                    <!-- Patients Grid -->
+                    <div id="patientsContainer" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <!-- Operation Theater Rooms Section -->
+            <div id="section-ot-rooms" class="content-section">
+                <div class="section-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 class="section-title">Operation Theater Rooms</h2>
+                        <button class="btn btn-primary" onclick="openOTRoomModal()">
+                            <i>+</i> Add New OT Room
+                        </button>
+                    </div>
+
+                    <div id="otRoomsContainer" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <!-- Operation Theater Scheduling Section -->
+            <div id="section-ot-schedule" class="content-section">
+                <div class="section-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 class="section-title">Operation Theater Scheduling</h2>
+                        <button class="btn btn-primary" onclick="openOTScheduleModal()">
+                            <i>+</i> Schedule Operation
+                        </button>
+                    </div>
+
+                    <!-- Date Navigation -->
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+                        <button class="btn" onclick="changeOTDate(-1)">← Previous Day</button>
+                        <input type="date" id="otScheduleDate" class="form-input" onchange="loadOTSchedule()" style="width: auto;">
+                        <button class="btn" onclick="changeOTDate(1)">Next Day →</button>
+                    </div>
+
+                    <!-- OT Schedule Calendar -->
+                    <div id="otScheduleContainer">
+                        <div id="otScheduleList" class="cards-grid"></div>
                     </div>
                 </div>
             </div>
@@ -719,761 +696,7 @@ function deleteDoctor(index) {
                     </div>
                 </div>
             </div>
-
-            <!-- Patient Management Section -->
-<div id="section-patients" class="content-section">
-    <div class="section-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h2 class="section-title">Patient Management</h2>
-            <div>
-                <button class="btn btn-primary" onclick="openPatientModal()">
-                    <i>➕</i> Add New Patient
-                </button>
-                <button class="btn btn-success" onclick="exportPatients()">
-                    <i>📊</i> Export Patients
-                </button>
-            </div>
-        </div>
-
-        <!-- Search and Filter -->
-        <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-            <input type="text" id="patientSearch" class="form-input" placeholder="Search patients..." style="flex: 1; min-width: 200px;" onkeyup="searchPatients()">
-            <select id="genderFilter" class="form-input" onchange="filterPatients()">
-                <option value="">All Genders</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-            </select>
-            <select id="ageFilter" class="form-input" onchange="filterPatients()">
-                <option value="">All Ages</option>
-                <option value="child">Child (0-17)</option>
-                <option value="adult">Adult (18-59)</option>
-                <option value="senior">Senior (60+)</option>
-            </select>
-        </div>
-
-        <!-- Patients Statistics -->
-        <div class="stats-grid" style="margin-bottom: 2rem;">
-            <div class="stat-card">
-                <div class="stat-icon">👥</div>
-                <div class="stat-number" id="totalPatients">0</div>
-                <div class="stat-label">Total Patients</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">📅</div>
-                <div class="stat-number" id="todayAdmissions">0</div>
-                <div class="stat-label">Today's Admissions</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">🏥</div>
-                <div class="stat-number" id="currentInpatients">0</div>
-                <div class="stat-label">Current Inpatients</div>
-            </div>
-        </div>
-
-        <!-- Patients Grid -->
-        <div id="patientsContainer" class="cards-grid"></div>
-
-<script>
-let patients = [];
-
-function renderPatients() {
-  const container = document.getElementById("patientsContainer");
-  container.innerHTML = "";
-  patients.forEach((pat, index) => {
-    container.innerHTML += `
-      <div class="item-card">
-        <div class="item-header">
-          <div>
-            <div class="item-title">${pat.name}, ${pat.age} yrs</div>
-            <div class="item-subtitle">${pat.gender} | ${pat.blood}</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn btn-sm btn-primary" onclick="editPatient(${index})">✏️ Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deletePatient(${index})">🗑️ Delete</button>
-          </div>
-        </div>
-      </div>`;
-  });
-}
-
-document.getElementById("patientForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const patient = {
-    name: patientName.value,
-    age: patientAge.value,
-    gender: patientGender.value,
-    phone: patientPhone.value,
-    email: patientEmail.value,
-    blood: patientBloodGroup.value
-  };
-  if (patientForm.dataset.editIndex !== undefined) {
-    patients[patientForm.dataset.editIndex] = patient;
-    delete patientForm.dataset.editIndex;
-  } else {
-    patients.push(patient);
-  }
-  renderPatients();
-  closePatientModal();
-});
-
-function editPatient(index) {
-  const pat = patients[index];
-  patientName.value = pat.name;
-  patientAge.value = pat.age;
-  patientGender.value = pat.gender;
-  patientPhone.value = pat.phone;
-  patientEmail.value = pat.email;
-  patientBloodGroup.value = pat.blood;
-  patientForm.dataset.editIndex = index;
-  openPatientModal();
-}
-
-function deletePatient(index) {
-  if (confirm("Are you sure you want to delete this patient?")) {
-    patients.splice(index, 1);
-    renderPatients();
-  }
-}
-</script>
-
-    </div>
-</div>
-
-<!-- Patient Modal -->
-<div id="patientModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title" id="patientModalTitle">Add New Patient</h2>
-            <button class="close" onclick="closePatientModal()">&times;</button>
-        </div>
-
-        <form id="patientForm">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label" for="patientName">Full Name *</label>
-                    <input type="text" id="patientName" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="patientAge">Age *</label>
-                    <input type="number" id="patientAge" class="form-input" min="0" max="150" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="patientGender">Gender *</label>
-                    <select id="patientGender" class="form-input" required>
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="patientPhone">Phone Number *</label>
-                    <input type="tel" id="patientPhone" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="patientEmail">Email</label>
-                    <input type="email" id="patientEmail" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="patientBloodGroup">Blood Group</label>
-                    <select id="patientBloodGroup" class="form-input">
-                        <option value="">Select Blood Group</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="emergencyContact">Emergency Contact</label>
-                    <input type="tel" id="emergencyContact" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="patientStatus">Status</label>
-                    <select id="patientStatus" class="form-input">
-                        <option value="outpatient">Outpatient</option>
-                        <option value="inpatient">Inpatient</option>
-                        <option value="emergency">Emergency</option>
-                        <option value="discharged">Discharged</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="patientAddress">Address</label>
-                <textarea id="patientAddress" class="form-input" rows="3"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="medicalHistory">Medical History</label>
-                <textarea id="medicalHistory" class="form-input" rows="4" placeholder="Any allergies, chronic conditions, medications, etc."></textarea>
-            </div>
-
-            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
-                <button type="button" class="btn" onclick="closePatientModal()">Cancel</button>
-                <button type="submit" class="btn btn-success">
-                    <span id="patientSubmitText">Save Patient</span>
-                    <span id="patientSubmitSpinner" class="spinner" style="display: none;"></span>
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-                    <!-- Search and Filter -->
-                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-                        <input type="text" id="patientSearch" class="form-input" placeholder="Search patients..." style="flex: 1; min-width: 200px;" onkeyup="searchPatients()">
-                        <select id="genderFilter" class="form-input" onchange="filterPatients()">
-                            <option value="">All Genders</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <select id="ageFilter" class="form-input" onchange="filterPatients()">
-                            <option value="">All Ages</option>
-                            <option value="child">Child (0-17)</option>
-                            <option value="adult">Adult (18-59)</option>
-                            <option value="senior">Senior (60+)</option>
-                        </select>
-                    </div>
-
-                    <!-- Patients Statistics -->
-                    <div class="stats-grid" style="margin-bottom: 2rem;">
-                        <div class="stat-card">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-number" id="totalPatients">0</div>
-                            <div class="stat-label">Total Patients</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">📅</div>
-                            <div class="stat-number" id="todayAdmissions">0</div>
-                            <div class="stat-label">Today's Admissions</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🏥</div>
-                            <div class="stat-number" id="currentInpatients">0</div>
-                            <div class="stat-label">Current Inpatients</div>
-                        </div>
-                    </div>
-
-                    <!-- Patients Grid -->
-                    <div id="patientsContainer" class="cards-grid">
-                        <!-- Patients will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Operation Theater Rooms Section -->
-            <div id="section-ot-rooms" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Operation Theater Rooms</h2>
-                        <button class="btn btn-primary" onclick="openOTRoomModal()">
-                            <i>➕</i> Add New OT Room
-                        </button>
-                    </div>
-
-                    <div id="otRoomsContainer" class="cards-grid"></div>
-
-<script>
-let otRooms = [];
-
-function renderOTRooms() {
-  const container = document.getElementById("otRoomsContainer");
-  container.innerHTML = "";
-  otRooms.forEach((room, index) => {
-    container.innerHTML += `
-      <div class="item-card">
-        <div class="item-header">
-          <div>
-            <div class="item-title">Room: ${room.roomId}</div>
-            <div class="item-subtitle">${room.type} | Capacity: ${room.capacity}</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn btn-sm btn-primary" onclick="editOTRoom(${index})">✏️ Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteOTRoom(${index})">🗑️ Delete</button>
-          </div>
-        </div>
-      </div>`;
-  });
-}
-
-document.getElementById("otRoomForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const room = {
-    roomId: roomId.value,
-    type: roomType.value,
-    capacity: capacity.value
-  };
-  if (otRoomForm.dataset.editIndex !== undefined) {
-    otRooms[otRoomForm.dataset.editIndex] = room;
-    delete otRoomForm.dataset.editIndex;
-  } else {
-    otRooms.push(room);
-  }
-  renderOTRooms();
-  closeOTRoomModal();
-});
-
-function editOTRoom(index) {
-  const room = otRooms[index];
-  roomId.value = room.roomId;
-  roomType.value = room.type;
-  capacity.value = room.capacity;
-  otRoomForm.dataset.editIndex = index;
-  openOTRoomModal();
-}
-
-function deleteOTRoom(index) {
-  if (confirm("Are you sure you want to delete this OT Room?")) {
-    otRooms.splice(index, 1);
-    renderOTRooms();
-  }
-}
-</script>
-
-                </div>
-                <!-- OT Room Modal -->
-                <div id="otRoomModal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <h2 class="modal-title">Add New OT Room</h2>
-                    <button class="close" onclick="closeOTRoomModal()">&times;</button>
-                    </div>
-                    <form id="otRoomForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                        <label class="form-label" for="roomId">Room ID *</label>
-                        <input type="text" id="roomId" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                        <label class="form-label" for="roomType">Room Type</label>
-                        <input type="text" id="roomType" class="form-input" placeholder="e.g., General, Cardiac, Neuro">
-                        </div>
-                        <div class="form-group">
-                        <label class="form-label" for="capacity">Capacity</label>
-                        <input type="number" id="capacity" class="form-input">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-success">Save Room</button>
-                    <button type="button" class="btn btn-danger" onclick="closeOTRoomModal()">Cancel</button>
-                    </form>
-                </div>
-                </div>
-            </div>
-
-            <!-- Operation Theater Scheduling Section -->
-            <div id="section-ot-schedule" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Operation Theater Scheduling</h2>
-                        <button class="btn btn-primary" onclick="openOTScheduleModal()">
-                            <i>➕</i> Schedule Operation
-                        </button>
-                    </div>
-
-                    <!-- Date Navigation -->
-                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
-                        <button class="btn" onclick="changeOTDate(-1)">← Previous Day</button>
-                        <input type="date" id="otScheduleDate" class="form-input" onchange="loadOTSchedule()" style="width: auto;">
-                        <button class="btn" onclick="changeOTDate(1)">Next Day →</button>
-                    </div>
-
-                    <!-- OT Schedule Calendar -->
-                    <div id="otScheduleContainer">
-                        <div id="otScheduleModal" class="modal">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h2 class="modal-title">Schedule Operation</h2>
-                                    <button class="close" onclick="closeOTScheduleModal()">&times;</button>
-                                </div>
-                                
-                                <form id="otScheduleForm">
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label class="form-label" for="surgeryDate">Date & Time *</label>
-                                            <input type="datetime-local" id="surgeryDate" class="form-input" required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="otRoom">OT Room ID *</label>
-                                            <input type="text" id="otRoom" class="form-input" required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="anesthesia">Type of Anesthesia</label>
-                                            <input type="text" id="anesthesia" class="form-input">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="anesthesiologist">Anesthesiologist</label>
-                                            <input type="text" id="anesthesiologist" class="form-input">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="surgeon">Surgeon</label>
-                                            <input type="text" id="surgeon" class="form-input" required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="assistants">Assistant Surgeons</label>
-                                            <input type="text" id="assistants" class="form-input" placeholder="Comma-separated">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="nurses">Nurses</label>
-                                            <input type="text" id="nurses" class="form-input" placeholder="Comma-separated">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="prePost">Pre/Post-Operative Notes</label>
-                                            <textarea id="prePost" class="form-input" rows="3"></textarea>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="surgicalReports">Surgical Reports</label>
-                                            <input type="file" id="surgicalReports" class="form-input" multiple>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="remarks">Remarks</label>
-                                            <textarea id="remarks" class="form-input" rows="2"></textarea>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="resources">Drugs/Instruments/Materials</label>
-                                            <textarea id="resources" class="form-input" rows="2"></textarea>
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-success" style="margin-top: 1rem;">Save Schedule</button>
-                                    <button type="button" class="btn btn-danger" onclick="closeOTScheduleModal()">Cancel</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Operation Theater Rooms Section (NEW ADDITION) -->
-            <div id="section-ot-rooms" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Operation Theater Rooms</h2>
-                        <button class="btn btn-primary" onclick="openOTRoomModal()">
-                            <i>➕</i> Add New OT Room
-                        </button>
-                    </div>
-
-                    <div id="otRoomsContainer" class="cards-grid">
-                        <!-- OT Rooms will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Operation Theater Scheduling Section (NEW ADDITION) -->
-            <div id="section-ot-schedule" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Operation Theater Scheduling</h2>
-                        <button class="btn btn-primary" onclick="openOTScheduleModal()">
-                            <i>➕</i> Schedule Operation
-                        </button>
-                    </div>
-
-                    <!-- Date Navigation -->
-                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
-                        <button class="btn" onclick="changeOTDate(-1)">← Previous Day</button>
-                        <input type="date" id="otScheduleDate" class="form-input" onchange="loadOTSchedule()" style="width: auto;">
-                        <button class="btn" onclick="changeOTDate(1)">Next Day →</button>
-                    </div>
-
-                    <!-- OT Schedule Calendar -->
-                    <div id="otScheduleContainer">
-                        <!-- Schedule will be loaded here -->
-                         <div id="otScheduleList" class="cards-grid"></div>
-
-<script>
-// Firestore reference for schedules
-const schedulesRef = db.collection("schedules");
-
-// Render schedules from Firestore
-function renderSchedules(data) {
-  const container = document.getElementById("otScheduleList");
-  container.innerHTML = "";
-  data.forEach(sch => {
-    container.innerHTML += `
-      <div class="item-card">
-        <div class="item-header">
-          <div>
-            <div class="item-title">OT ${sch.otRoom} | ${sch.date}</div>
-            <div class="item-subtitle">Surgeon: ${sch.surgeon}</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn btn-sm btn-primary" onclick="editSchedule('${sch.id}')">✏️ Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteSchedule('${sch.id}')">🗑️ Delete</button>
-          </div>
-        </div>
-      </div>`;
-  });
-}
-
-// Listen for changes (realtime updates)
-function loadSchedules() {
-  schedulesRef.onSnapshot(snapshot => {
-    let data = [];
-    snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
-    renderSchedules(data);
-  });
-}
-loadSchedules();
-
-// Save new or edited schedule
-document.getElementById("otScheduleForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const schedule = {
-    date: surgeryDate.value,
-    otRoom: otRoom.value,
-    anesthesia: anesthesia.value,
-    anesthesiologist: anesthesiologist.value,
-    surgeon: surgeon.value,
-    assistants: assistants.value,
-    nurses: nurses.value,
-    prePost: prePost.value,
-    remarks: remarks.value,
-    resources: resources.value
-  };
-
-  if (otScheduleForm.dataset.editId) {
-    schedulesRef.doc(otScheduleForm.dataset.editId).update(schedule);
-    logAction("Updated Schedule", schedule);
-    delete otScheduleForm.dataset.editId;
-  } else {
-    schedulesRef.add(schedule);
-    logAction("Added Schedule", schedule);
-  }
-
-  closeOTScheduleModal();
-});
-
-// Edit schedule
-function editSchedule(id) {
-  schedulesRef.doc(id).get().then(doc => {
-    if (doc.exists) {
-      const sch = doc.data();
-      surgeryDate.value = sch.date;
-      otRoom.value = sch.otRoom;
-      anesthesia.value = sch.anesthesia;
-      anesthesiologist.value = sch.anesthesiologist;
-      surgeon.value = sch.surgeon;
-      assistants.value = sch.assistants;
-      nurses.value = sch.nurses;
-      prePost.value = sch.prePost;
-      remarks.value = sch.remarks;
-      resources.value = sch.resources;
-
-      otScheduleForm.dataset.editId = id;
-      openOTScheduleModal();
-    }
-  });
-}
-
-// Delete schedule
-function deleteSchedule(id) {
-  if (confirm("Delete this schedule?")) {
-    schedulesRef.doc(id).delete();
-    logAction("Deleted Schedule", { id });
-  }
-}
-
-
-document.getElementById("otScheduleForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const schedule = {
-    date: surgeryDate.value,
-    otRoom: otRoom.value,
-    anesthesia: anesthesia.value,
-    anesthesiologist: anesthesiologist.value,
-    surgeon: surgeon.value,
-    assistants: assistants.value,
-    nurses: nurses.value,
-    prePost: prePost.value,
-    remarks: remarks.value,
-    resources: resources.value
-  };
-  if (otScheduleForm.dataset.editIndex !== undefined) {
-    schedules[otScheduleForm.dataset.editIndex] = schedule;
-    delete otScheduleForm.dataset.editIndex;
-  } else {
-    schedules.push(schedule);
-  }
-  renderSchedules();
-  closeOTScheduleModal();
-});
-
-function editSchedule(index) {
-  const sch = schedules[index];
-  surgeryDate.value = sch.date;
-  otRoom.value = sch.otRoom;
-  anesthesia.value = sch.anesthesia;
-  anesthesiologist.value = sch.anesthesiologist;
-  surgeon.value = sch.surgeon;
-  assistants.value = sch.assistants;
-  nurses.value = sch.nurses;
-  prePost.value = sch.prePost;
-  remarks.value = sch.remarks;
-  resources.value = sch.resources;
-  otScheduleForm.dataset.editIndex = index;
-  openOTScheduleModal();
-}
-
-function deleteSchedule(index) {
-  if (confirm("Delete this schedule?")) {
-    schedules.splice(index, 1);
-    renderSchedules();
-  }
-}
-</script>
-
-                    </div>
-                </div>
-            </div>
         </main>
-            <!-- Patient Modal (NEW ADDITION) -->
-    <div id="patientModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="patientModalTitle">Add New Patient</h2>
-                <button class="close" onclick="closePatientModal()">&times;</button>
-            </div>
-
-            <form id="patientForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="patientName">Full Name *</label>
-                        <input type="text" id="patientName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientAge">Age *</label>
-                        <input type="number" id="patientAge" class="form-input" min="0" max="150" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientGender">Gender *</label>
-                        <select id="patientGender" class="form-input" required>
-                            <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientPhone">Phone Number *</label>
-                        <input type="tel" id="patientPhone" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientEmail">Email</label>
-                        <input type="email" id="patientEmail" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientBloodGroup">Blood Group</label>
-                        <select id="patientBloodGroup" class="form-input">
-                            <option value="">Select Blood Group</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="emergencyContact">Emergency Contact</label>
-                        <input type="tel" id="emergencyContact" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientStatus">Status</label>
-                        <select id="patientStatus" class="form-input">
-                            <option value="outpatient">Outpatient</option>
-                            <option value="inpatient">Inpatient</option>
-                            <option value="emergency">Emergency</option>
-                            <option value="discharged">Discharged</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="patientAddress">Address</label>
-                    <textarea id="patientAddress" class="form-input" rows="3"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="medicalHistory">Medical History</label>
-                    <textarea id="medicalHistory" class="form-input" rows="4" placeholder="Any allergies, chronic conditions, medications, etc."></textarea>
-                </div>
-
-                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
-                    <button type="button" class="btn" onclick="closePatientModal()">Cancel</button>
-                    <button type="submit" class="btn btn-success">
-                        <span id="patientSubmitText">Save Patient</span>
-                        <span id="patientSubmitSpinner" class="spinner" style="display: none;"></span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- OT Room Modal (NEW ADDITION) -->
-    <div id="otRoomModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Add New OT Room</h2>
-                <button class="close" onclick="closeOTRoomModal()">&times;</button>
-            </div>
-
-            <form id="otRoomForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="otRoomNumber">Room Number *</label>
-                        <input type="text" id="otRoomNumber" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="otRoomType">Room Type *</label>
-                        <select id="otRoomType" class="form-input" required>
-                            <option value="">Select Type</option>
-                            <option value="general">General Surgery</option>
-                            <option value="cardiac">Cardiac Surgery</option>
-                            <option value="neuro">Neurosurgery</option>
-                            <option value="orthopedic">Orthopedic</option>
-                            <option value="emergency">Emergency</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="otRoomStatus">Status</label>
-                        <select id="otRoomStatus" class="form-input">
-                            <option value="available">Available</option>
-                            <option value="occupied">Occupied</option>
-                            <option value="maintenance">Under Maintenance</option>
-                            <option value="cleaning">Cleaning</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="otRoomEquipment">Equipment</label>
-                    <textarea id="otRoomEquipment" class="form-input" rows="3" placeholder="List available equipment..."></textarea>
-                </div>
-
-                <div style="text-align: center; margin-top: 1rem;">
-                    <button type="submit" class="btn btn-success">Save OT Room</button>
-                    <button type="button" class="btn" onclick="closeOTRoomModal()">Cancel</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <!-- Doctor Modal -->
@@ -1483,7 +706,6 @@ function deleteSchedule(index) {
                 <h2 class="modal-title" id="doctorModalTitle">Add New Doctor</h2>
                 <button class="close" onclick="closeDoctorModal()">&times;</button>
             </div>
-
             <form id="doctorForm">
                 <div class="form-grid">
                     <div class="form-group">
@@ -1491,36 +713,16 @@ function deleteSchedule(index) {
                         <input type="text" id="doctorName" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="doctorEmail">Email Address *</label>
-                        <input type="email" id="doctorEmail" class="form-input" required>
+                        <label class="form-label" for="specialization">Specialization *</label>
+                        <input type="text" id="specialization" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="doctorPhone">Phone Number *</label>
-                        <input type="tel" id="doctorPhone" class="form-input" required>
+                        <label class="form-label" for="doctorPhone">Phone</label>
+                        <input type="tel" id="doctorPhone" class="form-input">
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="doctorSpecialization">Specialization *</label>
-                        <select id="doctorSpecialization" class="form-input" required>
-                            <option value="">Select Specialization</option>
-                            <option value="cardiology">Cardiology</option>
-                            <option value="neurology">Neurology</option>
-                            <option value="pediatrics">Pediatrics</option>
-                            <option value="orthopedics">Orthopedics</option>
-                            <option value="emergency">Emergency Medicine</option>
-                            <option value="oncology">Oncology</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="doctorLicense">Medical License</label>
-                        <input type="text" id="doctorLicense" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="doctorExperience">Years of Experience</label>
-                        <input type="number" id="doctorExperience" class="form-input" min="0" max="50">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="doctorFee">Consultation Fee ($)</label>
-                        <input type="number" id="doctorFee" class="form-input" min="0" step="0.01">
+                        <label class="form-label" for="doctorEmail">Email</label>
+                        <input type="email" id="doctorEmail" class="form-input">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="doctorStatus">Status</label>
@@ -1530,19 +732,8 @@ function deleteSchedule(index) {
                         </select>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="doctorBio">Biography</label>
-                    <textarea id="doctorBio" class="form-input" rows="3" placeholder="Brief description about the doctor's background and expertise..."></textarea>
-                </div>
-
-                <div style="text-align: center; margin-top: 30px;">
-                    <button type="submit" class="btn btn-success">
-                        <span id="doctorSubmitText">Save Doctor</span>
-                        <span id="doctorSubmitSpinner" class="spinner" style="display: none;"></span>
-                    </button>
-                    <button type="button" class="btn" onclick="closeDoctorModal()">Cancel</button>
-                </div>
+                <button type="submit" class="btn btn-success">Save Doctor</button>
+                <button type="button" class="btn btn-danger" onclick="closeDoctorModal()">Cancel</button>
             </form>
         </div>
     </div>
@@ -1554,7 +745,6 @@ function deleteSchedule(index) {
                 <h2 class="modal-title" id="patientModalTitle">Add New Patient</h2>
                 <button class="close" onclick="closePatientModal()">&times;</button>
             </div>
-
             <form id="patientForm">
                 <div class="form-grid">
                     <div class="form-group">
@@ -1610,17 +800,14 @@ function deleteSchedule(index) {
                         </select>
                     </div>
                 </div>
-
                 <div class="form-group">
                     <label class="form-label" for="patientAddress">Address</label>
                     <textarea id="patientAddress" class="form-input" rows="3"></textarea>
                 </div>
-
                 <div class="form-group">
                     <label class="form-label" for="medicalHistory">Medical History</label>
                     <textarea id="medicalHistory" class="form-input" rows="4" placeholder="Any allergies, chronic conditions, medications, etc."></textarea>
                 </div>
-
                 <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
                     <button type="button" class="btn" onclick="closePatientModal()">Cancel</button>
                     <button type="submit" class="btn btn-success">
@@ -1639,241 +826,433 @@ function deleteSchedule(index) {
                 <h2 class="modal-title">Add New OT Room</h2>
                 <button class="close" onclick="closeOTRoomModal()">&times;</button>
             </div>
-
             <form id="otRoomForm">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label class="form-label" for="otRoomNumber">Room Number *</label>
-                        <input type="text" id="otRoomNumber" class="form-input" required>
+                        <label class="form-label" for="roomId">Room ID *</label>
+                        <input type="text" id="roomId" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="otRoomType">Room Type *</label>
-                        <select id="otRoomType" class="form-input" required>
-                            <option value="">Select Type</option>
-                            <option value="general">General Surgery</option>
-                            <option value="cardiac">Cardiac Surgery</option>
-                            <option value="neuro">Neurosurgery</option>
-                            <option value="orthopedic">Orthopedic</option>
-                            <option value="emergency">Emergency</option>
-                        </select>
+                        <label class="form-label" for="roomType">Room Type</label>
+                        <input type="text" id="roomType" class="form-input" placeholder="e.g., General, Cardiac, Neuro">
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="otRoomStatus">Status</label>
-                        <select id="otRoomStatus" class="form-input">
-                            <option value="available">Available</option>
-                            <option value="occupied">Occupied</option>
-                            <option value="maintenance">Under Maintenance</option>
-                            <option value="cleaning">Cleaning</option>
-                        </select>
+                        <label class="form-label" for="capacity">Capacity</label>
+                        <input type="number" id="capacity" class="form-input">
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="otRoomEquipment">Equipment</label>
-                    <textarea id="otRoomEquipment" class="form-input" rows="3" placeholder="List available equipment..."></textarea>
-                </div>
-
-                <div style="text-align: center; margin-top: 1rem;">
-                    <button type="submit" class="btn btn-success">Save OT Room</button>
-                    <button type="button" class="btn" onclick="closeOTRoomModal()">Cancel</button>
-                </div>
+                <button type="submit" class="btn btn-success">Save Room</button>
+                <button type="button" class="btn btn-danger" onclick="closeOTRoomModal()">Cancel</button>
             </form>
         </div>
     </div>
 
-    <!-- Enhanced OT Schedule Modal -->
-<div id="otScheduleModal" class="modal">
-    <div class="modal-content" style="max-width: 900px;">
-        <div class="modal-header">
-            <h2 class="modal-title">Schedule Operation</h2>
-            <button class="close" onclick="closeOTScheduleModal()">&times;</button>
+    <!-- OT Schedule Modal -->
+    <div id="otScheduleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Schedule Operation</h2>
+                <button class="close" onclick="closeOTScheduleModal()">&times;</button>
+            </div>
+            <form id="otScheduleForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="surgeryDate">Date & Time *</label>
+                        <input type="datetime-local" id="surgeryDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="otRoom">OT Room ID *</label>
+                        <input type="text" id="otRoom" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="anesthesia">Type of Anesthesia</label>
+                        <input type="text" id="anesthesia" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="anesthesiologist">Anesthesiologist</label>
+                        <input type="text" id="anesthesiologist" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="surgeon">Surgeon</label>
+                        <input type="text" id="surgeon" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="assistants">Assistant Surgeons</label>
+                        <input type="text" id="assistants" class="form-input" placeholder="Comma-separated">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="nurses">Nurses</label>
+                        <input type="text" id="nurses" class="form-input" placeholder="Comma-separated">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="prePost">Pre/Post-Operative Notes</label>
+                        <textarea id="prePost" class="form-input" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="surgicalReports">Surgical Reports</label>
+                        <input type="file" id="surgicalReports" class="form-input" multiple>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="remarks">Remarks</label>
+                        <textarea id="remarks" class="form-input" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="resources">Drugs/Instruments/Materials</label>
+                        <textarea id="resources" class="form-input" rows="2"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success" style="margin-top: 1rem;">Save Schedule</button>
+                <button type="button" class="btn btn-danger" onclick="closeOTScheduleModal()">Cancel</button>
+            </form>
         </div>
-
-        <form id="otScheduleForm">
-            <!-- Basic Information -->
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label" for="scheduleOTRoom">OT Room *</label>
-                    <select id="scheduleOTRoom" class="form-input" required>
-                        <option value="">Select OT Room</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="schedulePatient">Patient *</label>
-                    <select id="schedulePatient" class="form-input" required>
-                        <option value="">Select Patient</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="scheduleSurgeon">Primary Surgeon *</label>
-                    <select id="scheduleSurgeon" class="form-input" required>
-                        <option value="">Select Surgeon</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="scheduleDate">Date *</label>
-                    <input type="date" id="scheduleDate" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="scheduleStartTime">Start Time *</label>
-                    <input type="time" id="scheduleStartTime" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="scheduleEndTime">End Time *</label>
-                    <input type="time" id="scheduleEndTime" class="form-input" required>
-                </div>
-            </div>
-
-            <!-- Surgery Details -->
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label" for="surgeryType">Surgery Type *</label>
-                    <select id="surgeryType" class="form-input" required>
-                        <option value="">Select Surgery Type</option>
-                        <option value="cardiac">Cardiac Surgery</option>
-                        <option value="orthopedic">Orthopedic Surgery</option>
-                        <option value="neurosurgery">Neurosurgery</option>
-                        <option value="general">General Surgery</option>
-                        <option value="gynecological">Gynecological Surgery</option>
-                        <option value="ophthalmology">Ophthalmology</option>
-                        <option value="emergency">Emergency Surgery</option>
-                        <option value="elective">Elective Surgery</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="surgeryPriority">Priority</label>
-                    <select id="surgeryPriority" class="form-input">
-                        <option value="normal">Normal</option>
-                        <option value="urgent">Urgent</option>
-                        <option value="emergency">Emergency</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="assistantSurgeon">Assistant Surgeon</label>
-                    <select id="assistantSurgeon" class="form-input">
-                        <option value="">Select Assistant Surgeon</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Anesthesia Team -->
-            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Anesthesia Team</h3>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label" for="anesthesiologist">Anesthesiologist *</label>
-                    <select id="anesthesiologist" class="form-input" required>
-                        <option value="">Select Anesthesiologist</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="anesthesiaType">Anesthesia Type *</label>
-                    <select id="anesthesiaType" class="form-input" required>
-                        <option value="">Select Anesthesia Type</option>
-                        <option value="general">General Anesthesia</option>
-                        <option value="regional">Regional Anesthesia</option>
-                        <option value="local">Local Anesthesia</option>
-                        <option value="sedation">Conscious Sedation</option>
-                        <option value="spinal">Spinal Anesthesia</option>
-                        <option value="epidural">Epidural Anesthesia</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Nursing Team -->
-            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Nursing Team</h3>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label" for="scrubNurse">Scrub Nurse *</label>
-                    <select id="scrubNurse" class="form-input" required>
-                        <option value="">Select Scrub Nurse</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="circulatingNurse">Circulating Nurse *</label>
-                    <select id="circulatingNurse" class="form-input" required>
-                        <option value="">Select Circulating Nurse</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="additionalNurses">Additional Nurses</label>
-                    <select id="additionalNurses" class="form-input" multiple>
-                        <option value="">Select Additional Nurses</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Pre-Operative Events -->
-            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Pre-Operative Events</h3>
-            <div id="preOpEventsContainer">
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="preOpConsent" checked> Patient Consent
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="preOpPrep" checked> Patient Preparation
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="preOpAnesthesia" checked> Anesthesia Consultation
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="preOpLabs" checked> Lab Results Review
-                    </label>
-                </div>
-            </div>
-
-            <!-- Post-Operative Events -->
-            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Post-Operative Events</h3>
-            <div id="postOpEventsContainer">
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="postOpRecovery"> Recovery Room Transfer
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="postOpMonitoring"> Post-Op Monitoring
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="postOpReport"> Surgical Report
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="postOpDischarge"> Discharge Planning
-                    </label>
-                </div>
-            </div>
-
-            <!-- Procedure Details -->
-            <div class="form-group">
-                <label class="form-label" for="scheduleProcedure">Procedure Name *</label>
-                <input type="text" id="scheduleProcedure" class="form-input" required placeholder="e.g., Coronary Artery Bypass Graft">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="scheduleNotes">Additional Notes</label>
-                <textarea id="scheduleNotes" class="form-input" rows="4" placeholder="Special instructions, equipment requirements, patient considerations..."></textarea>
-            </div>
-
-            <!-- Submit Buttons -->
-            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
-                <button type="button" class="btn" onclick="closeOTScheduleModal()">Cancel</button>
-                <button type="submit" class="btn btn-success">
-                    <span id="scheduleSubmitText">Schedule Operation</span>
-                    <span id="scheduleSubmitSpinner" class="spinner" style="display: none;"></span>
-                </button>
-            </div>
-        </form>
     </div>
-</div>    
+
+    <script>
+        let doctors = [];
+        let patients = [];
+        let otRooms = [];
+        let schedules = [];
+
+        // Doctor Management Functions
+        function renderDoctors() {
+            const container = document.getElementById("doctorsContainer");
+            container.innerHTML = "";
+            doctors.forEach((doc, index) => {
+                container.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-title">${doc.name}</div>
+                                <div class="item-subtitle">${doc.specialization} | ${doc.status}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-sm btn-primary" onclick="editDoctor(${index})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteDoctor(${index})">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        document.getElementById("doctorForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const doctor = {
+                name: doctorName.value,
+                specialization: specialization.value,
+                phone: doctorPhone.value,
+                email: doctorEmail.value,
+                status: doctorStatus.value
+            };
+            if (doctorForm.dataset.editIndex !== undefined) {
+                doctors[doctorForm.dataset.editIndex] = doctor;
+                delete doctorForm.dataset.editIndex;
+            } else {
+                doctors.push(doctor);
+            }
+            renderDoctors();
+            closeDoctorModal();
+        });
+
+        function editDoctor(index) {
+            const doc = doctors[index];
+            doctorName.value = doc.name;
+            specialization.value = doc.specialization;
+            doctorPhone.value = doc.phone;
+            doctorEmail.value = doc.email;
+            doctorStatus.value = doc.status;
+            doctorForm.dataset.editIndex = index;
+            openDoctorModal();
+        }
+
+        function deleteDoctor(index) {
+            if (confirm("Are you sure you want to delete this doctor?")) {
+                doctors.splice(index, 1);
+                renderDoctors();
+            }
+        }
+
+        // Patient Management Functions
+        function renderPatients() {
+            const container = document.getElementById("patientsContainer");
+            container.innerHTML = "";
+            patients.forEach((pat, index) => {
+                container.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-title">${pat.name}, ${pat.age} yrs</div>
+                                <div class="item-subtitle">${pat.gender} | ${pat.blood}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-sm btn-primary" onclick="editPatient(${index})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deletePatient(${index})">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        document.getElementById("patientForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const patient = {
+                name: patientName.value,
+                age: patientAge.value,
+                gender: patientGender.value,
+                phone: patientPhone.value,
+                email: patientEmail.value,
+                blood: patientBloodGroup.value
+            };
+            if (patientForm.dataset.editIndex !== undefined) {
+                patients[patientForm.dataset.editIndex] = patient;
+                delete patientForm.dataset.editIndex;
+            } else {
+                patients.push(patient);
+            }
+            renderPatients();
+            closePatientModal();
+        });
+
+        function editPatient(index) {
+            const pat = patients[index];
+            patientName.value = pat.name;
+            patientAge.value = pat.age;
+            patientGender.value = pat.gender;
+            patientPhone.value = pat.phone;
+            patientEmail.value = pat.email;
+            patientBloodGroup.value = pat.blood;
+            patientForm.dataset.editIndex = index;
+            openPatientModal();
+        }
+
+        function deletePatient(index) {
+            if (confirm("Are you sure you want to delete this patient?")) {
+                patients.splice(index, 1);
+                renderPatients();
+            }
+        }
+
+        // OT Room Management Functions
+        function renderOTRooms() {
+            const container = document.getElementById("otRoomsContainer");
+            container.innerHTML = "";
+            otRooms.forEach((room, index) => {
+                container.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-title">Room: ${room.roomId}</div>
+                                <div class="item-subtitle">${room.type} | Capacity: ${room.capacity}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-sm btn-primary" onclick="editOTRoom(${index})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteOTRoom(${index})">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        document.getElementById("otRoomForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const room = {
+                roomId: roomId.value,
+                type: roomType.value,
+                capacity: capacity.value
+            };
+            if (otRoomForm.dataset.editIndex !== undefined) {
+                otRooms[otRoomForm.dataset.editIndex] = room;
+                delete otRoomForm.dataset.editIndex;
+            } else {
+                otRooms.push(room);
+            }
+            renderOTRooms();
+            closeOTRoomModal();
+        });
+
+        function editOTRoom(index) {
+            const room = otRooms[index];
+            roomId.value = room.roomId;
+            roomType.value = room.type;
+            capacity.value = room.capacity;
+            otRoomForm.dataset.editIndex = index;
+            openOTRoomModal();
+        }
+
+        function deleteOTRoom(index) {
+            if (confirm("Are you sure you want to delete this OT Room?")) {
+                otRooms.splice(index, 1);
+                renderOTRooms();
+            }
+        }
+
+        // OT Schedule Management Functions
+        function renderSchedules() {
+            const container = document.getElementById("otScheduleList");
+            container.innerHTML = "";
+            schedules.forEach((sch, index) => {
+                container.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-title">OT ${sch.otRoom} | ${sch.date}</div>
+                                <div class="item-subtitle">Surgeon: ${sch.surgeon}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-sm btn-primary" onclick="editSchedule(${index})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteSchedule(${index})">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        document.getElementById("otScheduleForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const schedule = {
+                date: surgeryDate.value,
+                otRoom: otRoom.value,
+                anesthesia: anesthesia.value,
+                anesthesiologist: anesthesiologist.value,
+                surgeon: surgeon.value,
+                assistants: assistants.value,
+                nurses: nurses.value,
+                prePost: prePost.value,
+                remarks: remarks.value,
+                resources: resources.value
+            };
+            if (otScheduleForm.dataset.editIndex !== undefined) {
+                schedules[otScheduleForm.dataset.editIndex] = schedule;
+                delete otScheduleForm.dataset.editIndex;
+            } else {
+                schedules.push(schedule);
+            }
+            renderSchedules();
+            closeOTScheduleModal();
+        });
+
+        function editSchedule(index) {
+            const sch = schedules[index];
+            surgeryDate.value = sch.date;
+            otRoom.value = sch.otRoom;
+            anesthesia.value = sch.anesthesia;
+            anesthesiologist.value = sch.anesthesiologist;
+            surgeon.value = sch.surgeon;
+            assistants.value = sch.assistants;
+            nurses.value = sch.nurses;
+            prePost.value = sch.prePost;
+            remarks.value = sch.remarks;
+            resources.value = sch.resources;
+            otScheduleForm.dataset.editIndex = index;
+            openOTScheduleModal();
+        }
+
+        function deleteSchedule(index) {
+            if (confirm("Delete this schedule?")) {
+                schedules.splice(index, 1);
+                renderSchedules();
+            }
+        }
+
+        // Modal Functions
+        function openDoctorModal() {
+            document.getElementById('doctorModal').style.display = 'flex';
+        }
+
+        function closeDoctorModal() {
+            document.getElementById('doctorModal').style.display = 'none';
+            document.getElementById('doctorForm').reset();
+        }
+
+        function openPatientModal() {
+            document.getElementById('patientModal').style.display = 'flex';
+        }
+
+        function closePatientModal() {
+            document.getElementById('patientModal').style.display = 'none';
+            document.getElementById('patientForm').reset();
+        }
+
+        function openOTRoomModal() {
+            document.getElementById('otRoomModal').style.display = 'flex';
+        }
+
+        function closeOTRoomModal() {
+            document.getElementById('otRoomModal').style.display = 'none';
+            document.getElementById('otRoomForm').reset();
+        }
+
+        function openOTScheduleModal() {
+            document.getElementById('otScheduleModal').style.display = 'flex';
+        }
+
+        function closeOTScheduleModal() {
+            document.getElementById('otScheduleModal').style.display = 'none';
+            document.getElementById('otScheduleForm').reset();
+        }
+
+        // Navigation Functions
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`section-${sectionName}`).classList.add('active');
+            
+            // Add active class to clicked nav link
+            event.target.classList.add('active');
+            
+            // Update page title
+            const titles = {
+                'overview': 'Dashboard Overview',
+                'doctors': 'Doctor Management',
+                'users': 'User Management',
+                'patients': 'Patient Management',
+                'ot-rooms': 'OT Rooms',
+                'ot-schedule': 'OT Schedule',
+                'analytics': 'Analytics Dashboard',
+                'operations': 'Operations Management',
+                'scheduling': 'Scheduling System',
+                'profile': 'Profile Settings',
+                'assignments': 'View Assignments',
+                'availability': 'Update Availability',
+                'logs': 'Audit Logs'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[sectionName] || 'Dashboard';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show authentication by default
+            document.getElementById('authContainer').style.display = 'flex';
+            document.getElementById('dashboardContainer').style.display = 'none';
+            // Hide sidebar toggle button on login page
+            document.getElementById('sidebarToggleBtn').style.display = 'none';
+        });
+
+        // Function to handle successful login (you'll need to call this after authentication)
+        function showDashboard() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('dashboardContainer').style.display = 'block';
+            // Show sidebar toggle button after login
+            document.getElementById('sidebarToggleBtn').style.display = 'block';
+        }
+
+        // Function to logout and return to login page
+        function logout() {
+            document.getElementById('authContainer').style.display = 'flex';
+            document.getElementById('dashboardContainer').style.display = 'none';
+            // Hide sidebar toggle button on logout
+            document.getElementById('sidebarToggleBtn').style.display = 'none';
+        }
+    </script>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>

@@ -944,3 +944,36 @@
             text-align: center;
             margin-top: 2rem;
         }
+
+
+#dashboardContainer #sidebarToggleBtn {
+  display: none;
+}
+
+#dashboardContainer.active #sidebarToggleBtn {
+  display: flex;
+}
+
+/* Hide toggle button until dashboard is active */
+#authContainer .sidebar-toggle-btn {
+  display: none !important;
+}
+
+#dashboardContainer:not(.active) .sidebar-toggle-btn {
+  display: none !important;
+}
+
+#dashboardContainer.active .sidebar-toggle-btn {
+  display: flex !important;
+}
+
+/* Hide toggle button until dashboard is active */
+.sidebar-toggle-btn {
+  display: none;
+}
+
+.dashboard-container.active .sidebar-toggle-btn {
+  display: flex; /* use flex so it's centered as before */
+}
+
+
