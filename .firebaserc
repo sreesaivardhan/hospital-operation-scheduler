@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "hospital-scheduler-2025"
-  }
+    "default": "hospital-scheduler-2025",
+    "opscheduler": "hospital-scheduler-2025"
+  },
+  "targets": {},
+  "etags": {}
 }

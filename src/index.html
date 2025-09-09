@@ -1,913 +1,866 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Management System - Complete Professional Dashboard</title>
-    <link rel="stylesheet" href="assets/css/index.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hospital Management System - Complete Professional Dashboard</title>
+<link href="assets/css/index.css" rel="stylesheet"/>
 </head>
-<body>    
-    <!-- Authentication Container -->
-    <div class="auth-container" id="authContainer">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>MediCore Hospital</h1>
-                <p id="authTitle">Professional Healthcare Management System</p>
-            </div>
-
-            <!-- Messages -->
-            <div id="authErrorMessage" class="message error"></div>
-            <div id="authSuccessMessage" class="message success"></div>
-
-            <!-- Auth Form -->
-            <form id="authForm">
-                <div class="form-group">
-                    <label class="form-label" for="email">Email Address</label>
-                    <input type="email" id="email" class="form-input" autocomplete="off" required placeholder="Enter your professional email">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input type="password" id="password" class="form-input" autocomplete="new-password" required placeholder="Enter secure password">
-                </div>
-
-                <!-- Forgot Password Link -->
-                <div class="forgot-password" id="forgotPasswordContainer" style="display: block;">
-                    <a href="#" class="auth-link" id="forgotPasswordLink">Forgot Password?</a>
-                </div>
-
-                <!-- Registration Fields -->
-                <div id="registerFields" style="display: none;">
-                    <div class="form-group">
-                        <label class="form-label" for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" class="form-input" autocomplete="new-password" placeholder="Confirm your password">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="fullName">Full Name</label>
-                        <input type="text" id="fullName" class="form-input" placeholder="Dr. John Smith">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="phone">Phone Number</label>
-                        <input type="tel" id="phone" class="form-input" placeholder="+1 (555) 123-4567">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="department">Department</label>
-                        <select id="department" class="form-input">
-                            <option value="">Select Department</option>
-                            <option value="emergency">Emergency Medicine</option>
-                            <option value="cardiology">Cardiology</option>
-                            <option value="neurology">Neurology</option>
-                            <option value="pediatrics">Pediatrics</option>
-                            <option value="orthopedics">Orthopedics</option>
-                            <option value="administration">Administration</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="role">Role</label>
-                        <select id="role" class="form-input">
-                            <option value="user">Healthcare Professional</option>
-                            <option value="admin">Department Admin</option>
-                            <option value="superadmin">System Administrator</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary" id="authButton" style="width: 100%; margin-top: 1rem;">
-                    <span id="authButtonText">Sign In Securely</span>
-                    <span id="authSpinner" class="spinner" style="display: none;"></span>
-                </button>
-            </form>
-
-            <div class="toggle-auth">
-                <a href="#" id="toggleLink" class="auth-link">
+<body>
+<!-- Authentication Container -->
+<div class="auth-container" id="authContainer">
+<div class="auth-card">
+<div class="auth-header">
+<h1>MediCore Hospital</h1>
+<p id="authTitle">Professional Healthcare Management System</p>
+</div>
+<!-- Messages -->
+<div class="message error" id="authErrorMessage"></div>
+<div class="message success" id="authSuccessMessage"></div>
+<!-- Auth Form -->
+<form id="authForm">
+<div class="form-group">
+<label class="form-label" for="email">Email Address</label>
+<input autocomplete="off" class="form-input" id="email" placeholder="Enter your professional email" required="" type="email"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="password">Password</label>
+<input autocomplete="new-password" class="form-input" id="password" placeholder="Enter secure password" required="" type="password"/>
+</div>
+<!-- Forgot Password Link -->
+<div class="forgot-password" id="forgotPasswordContainer" style="display: block;">
+<a class="auth-link" href="#" id="forgotPasswordLink">Forgot Password?</a>
+</div>
+<!-- Registration Fields -->
+<div id="registerFields" style="display: none;">
+<div class="form-group">
+<label class="form-label" for="confirmPassword">Confirm Password</label>
+<input autocomplete="new-password" class="form-input" id="confirmPassword" placeholder="Confirm your password" type="password"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="fullName">Full Name</label>
+<input class="form-input" id="fullName" placeholder="Dr. John Smith" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="phone">Phone Number</label>
+<input class="form-input" id="phone" placeholder="+1 (555) 123-4567" type="tel"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="department">Department</label>
+<select class="form-input" id="department">
+<option value="">Select Department</option>
+<option value="emergency">Emergency Medicine</option>
+<option value="cardiology">Cardiology</option>
+<option value="neurology">Neurology</option>
+<option value="pediatrics">Pediatrics</option>
+<option value="orthopedics">Orthopedics</option>
+<option value="administration">Administration</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" for="role">Role</label>
+<select class="form-input" id="role">
+<option value="user">Healthcare Professional</option>
+<option value="admin">Department Admin</option>
+<option value="superadmin">System Administrator</option>
+</select>
+</div>
+</div>
+<button class="btn btn-primary" id="authButton" style="width: 100%; margin-top: 1rem;" type="submit">
+<span id="authButtonText">Sign In Securely</span>
+<span class="spinner" id="authSpinner" style="display: none;"></span>
+</button>
+</form>
+<div class="toggle-auth">
+<a class="auth-link" href="#" id="toggleLink">
                     Need an account? Register here
                 </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard Container -->
-    <div class="dashboard-container" id="dashboardContainer">
-            <!-- Sidebar toggle button -->
-            <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle sidebar" onclick="toggleSidebar()">‹</button>
-
-        <!-- Navigation Sidebar -->
-        <nav class="dashboard-nav" id="dashboardNav">
-            <div class="nav-brand">
-                <h2>MediCore</h2>
-                <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;" id="navSubtitle">Healthcare Management</p>
-            </div>
-
-            <ul class="nav-menu" id="navMenu">
-                <li class="nav-item">
-                    <a href="#" class="nav-link active" onclick="showSection('overview')">
-                        <i>📊</i> Dashboard Overview
+</div>
+</div>
+</div>
+<!-- Dashboard Container -->
+<div class="dashboard-container" id="dashboardContainer">
+<!-- Sidebar toggle button -->
+<button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Toggle sidebar">‹</button>
+<!-- Navigation Sidebar -->
+<nav class="dashboard-nav" id="dashboardNav">
+<div class="nav-brand">
+<h2>MediCore</h2>
+<p id="navSubtitle" style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Healthcare Management</p>
+</div>
+<ul class="nav-menu" id="navMenu">
+<li class="nav-item">
+<a class="nav-link active" href="#" onclick="showSection('overview')">
+<i class="fas fa-chart-pie"></i> Dashboard Overview
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('doctors')">
-                        <i>👨‍⚕️</i> Doctor Management
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('doctors')">
+<i class="fas fa-user-md"></i> Doctor Management
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('users')">
-                        <i>👥</i> User Management
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('users')">
+<i class="fas fa-users"></i> User Management
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('patients')">
-                        <i>🏥</i> Patient Management
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('patients')">
+<i class="fas fa-procedures"></i> Patient Management
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('ot-rooms')">
-                        <i>🚪</i> OT Rooms
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('ot-rooms')">
+<i class="fas fa-door-open"></i> OT Rooms
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('ot-schedule')">
-                        <i>🗓️</i> OT Schedule
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('ot-schedule')">
+<i class="fas fa-calendar-alt"></i> OT Schedule
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('analytics')">
-                        <i>📈</i> Analytics Dashboard
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('analytics')">
+<i class="fas fa-chart-line"></i> Analytics Dashboard
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('operations')">
-                        <i>⚙️</i> Operations Management
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('operations')">
+<i class="fas fa-cogs"></i> Operations Management
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('scheduling')">
-                        <i>📅</i> Scheduling System
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('scheduling')">
+<i class="fas fa-calendar-check"></i> Scheduling System
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('profile')">
-                        <i>👤</i> Profile Settings
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('profile')">
+<i class="fas fa-user-cog"></i> Profile Settings
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('assignments')">
-                        <i>📋</i> View Assignments
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('assignments')">
+<i class="fas fa-tasks"></i> View Assignments
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('availability')">
-                        <i>🕒</i> Update Availability
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('availability')">
+<i class="fas fa-clock"></i> Update Availability
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="showSection('logs')">
-                        <i>📝</i> Audit Logs
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showSection('logs')">
+<i class="fas fa-file-alt"></i> Audit Logs
                     </a>
-                </li>
-                <li class="nav-item" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-                    <a href="#" class="nav-link" onclick="logout()" style="color: #ff6b6b;">
-                        <i>🚪</i> Secure Logout
+</li>
+<li class="nav-item" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+<a class="nav-link" href="#" onclick="logout()" style="color: #ff6b6b;">
+<i class="fas fa-door-open"></i> Secure Logout
                     </a>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Content Header -->
-            <div class="content-header">
-                <h1 id="pageTitle">Dashboard Overview</h1>
-                <div class="breadcrumb">
-                    <span id="breadcrumbPath">Home › Dashboard</span>
-                    <div style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
-                        <span id="userWelcome">Welcome, Professional</span>
-                        <span id="sessionStatus" style="padding: 0.5rem 1rem; background: rgba(39, 174, 96, 0.1); color: #27ae60; border-radius: 20px; font-size: 0.9rem;">● Active Session</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dashboard Overview Section -->
-            <div id="section-overview" class="content-section active">
-                <!-- Session Info -->
-                <div id="sessionInfo" class="session-info" style="display: none;">
-                    <strong>Session Active:</strong> <span id="sessionTime">-</span><br>
-                    <strong>Last Activity:</strong> <span id="lastActivity">-</span>
-                </div>
-
-                <!-- Statistics Grid -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">👨‍⚕️</div>
-                        <div class="stat-number" id="totalDoctors">0</div>
-                        <div class="stat-label">Total Doctors</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">👥</div>
-                        <div class="stat-number" id="totalUsers">0</div>
-                        <div class="stat-label">Healthcare Staff</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📅</div>
-                        <div class="stat-number" id="totalAppointments">127</div>
-                        <div class="stat-label">Active Appointments</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">💰</div>
-                        <div class="stat-number" id="monthlyRevenue">$45.2K</div>
-                        <div class="stat-label">Monthly Revenue</div>
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="section-card">
-                    <h2 class="section-title">Quick Actions</h2>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <button class="btn btn-primary" onclick="showSection('doctors')">
-                            <i>👨‍⚕️</i> Manage Doctors
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<main class="main-content">
+<!-- Content Header -->
+<div class="content-header">
+<h1 id="pageTitle">Dashboard Overview</h1>
+<div class="breadcrumb">
+<span id="breadcrumbPath">Home › Dashboard</span>
+<div style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
+<span id="userWelcome">Welcome, Professional</span>
+<span id="sessionStatus" style="padding: 0.5rem 1rem; background: rgba(39, 174, 96, 0.1); color: #27ae60; border-radius: 20px; font-size: 0.9rem;">● Active Session</span>
+</div>
+</div>
+</div>
+<!-- Dashboard Overview Section -->
+<div class="content-section active" id="section-overview">
+<!-- Session Info -->
+<div class="session-info" id="sessionInfo" style="display: none;">
+<strong>Session Active:</strong> <span id="sessionTime">-</span><br/>
+<strong>Last Activity:</strong> <span id="lastActivity">-</span>
+</div>
+<!-- Statistics Grid -->
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-icon"><i class="fas fa-user-md"></i></div>
+<div class="stat-number" id="totalDoctors">0</div>
+<div class="stat-label">Total Doctors</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon"><i class="fas fa-users"></i></div>
+<div class="stat-number" id="totalUsers">0</div>
+<div class="stat-label">Healthcare Staff</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+<div class="stat-number" id="totalAppointments">127</div>
+<div class="stat-label">Active Appointments</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+<div class="stat-number" id="monthlyRevenue">$45.2K</div>
+<div class="stat-label">Monthly Revenue</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="section-card">
+<h2 class="section-title">Quick Actions</h2>
+<div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+<button class="btn btn-primary" onclick="showSection('doctors')">
+<i class="fas fa-user-md"></i> Manage Doctors
                         </button>
-                        <button class="btn btn-success" onclick="showSection('scheduling')">
-                            <i>📅</i> Schedule Management
+<button class="btn btn-success" onclick="showSection('scheduling')">
+<i class="fas fa-calendar-check"></i> Schedule Management
                         </button>
-                        <button class="btn btn-warning" onclick="showSection('analytics')">
-                            <i>📈</i> View Analytics
+<button class="btn btn-warning" onclick="showSection('analytics')">
+<i class="fas fa-chart-line"></i> View Analytics
                         </button>
-                        <button class="btn btn-danger" onclick="openModal('emergencyModal')">
-                            <i>🚨</i> Emergency Protocol
+<button class="btn btn-danger" onclick="openModal('emergencyModal')">
+<i class="fas fa-exclamation-triangle"></i> Emergency Protocol
                         </button>
-                    </div>
-                </div>
-
-                <!-- User Information -->
-                <div class="section-card">
-                    <h2 class="section-title">User Information</h2>
-                    <div class="user-info">
-                        <p><strong>Name:</strong> <span id="userName">-</span></p>
-                        <p><strong>Email:</strong> <span id="userEmail">-</span></p>
-                        <p><strong>Role:</strong> <span id="userRole">-</span></p>
-                        <p><strong>Department:</strong> <span id="userDepartment">-</span></p>
-                        <p><strong>Status:</strong> <span id="userStatus">-</span></p>
-                        <p><strong>Session:</strong> <span id="sessionStatusInfo">Active</span></p>
-                    </div>
-                    <button class="btn btn-success" onclick="editProfile()">Edit Profile</button>
-                    <button class="btn btn-danger" onclick="logout()">Logout</button>
-                </div>
-
-                <!-- Admin Panel -->
-                <div id="adminPanel" class="section-card" style="display: none;">
-                    <h2 class="section-title">Admin Panel</h2>
-                    <button class="btn btn-primary" onclick="viewAllUsers()">View All Users</button>
-                    <button class="btn btn-success" onclick="exportUsers()">Export Users</button>
-                    <div id="userStats" style="margin-top: 1rem;">
-                        <p><strong>Total Users:</strong> <span id="totalUsersAdmin">0</span></p>
-                        <p><strong>Verified Users:</strong> <span id="verifiedUsers">0</span></p>
-                        <p><strong>Admin Users:</strong> <span id="adminUsers">0</span></p>
-                    </div>
-                </div>
-
-                <!-- Session Management -->
-                <div class="section-card">
-                    <h2 class="section-title">Session Management</h2>
-                    <div class="session-info">
-                        <p><strong>Login Time:</strong> <span id="loginTime">-</span></p>
-                        <p><strong>Session Duration:</strong> <span id="sessionDuration">-</span></p>
-                        <p><strong>Auto-logout:</strong> <span id="autoLogoutTime">30 minutes</span></p>
-                    </div>
-                    <button class="btn btn-primary" onclick="extendSession()">Extend Session</button>
-                    <button class="btn btn-danger" onclick="endSession()">End Session</button>
-                </div>
-
-                <!-- Authentication Flows -->
-                <div class="section-card">
-                    <h2 class="section-title">Authentication Flows</h2>
-                    <button class="btn btn-primary" onclick="changePassword()">Change Password</button>
-                    <button class="btn btn-warning" onclick="resetPassword()">Reset Password</button>
-                    <button class="btn btn-success" onclick="resendVerification()">Resend Verification</button>
-                    <button class="btn btn-primary" onclick="viewLoginHistory()">Login History</button>
-                </div>
-
-                <!-- Feature Lists Based on Role -->
-                <div id="adminFeatures" class="admin-features" style="display: none;">
-                    <h3>Admin Features</h3>
-                    <ul class="feature-list">
-                        <li onclick="manageUsers()">Manage Users</li>
-                        <li onclick="viewAnalytics()">View Analytics</li>
-                        <li onclick="systemSettings()">System Settings</li>
-                        <li onclick="manageOperations()">Manage Operations</li>
-                        <li onclick="scheduleManagement()">Schedule Management</li>
-                        <li onclick="auditLogs()">Audit Logs</li>
-                    </ul>
-                </div>
-                
-                <div id="userFeatures" class="user-features">
-                    <h3>User Features</h3>
-                    <ul class="feature-list">
-                        <li onclick="viewSchedule()">View Schedule</li>
-                        <li onclick="profileSettings()">Profile Settings</li>
-                        <li onclick="contactSupport()">Contact Support</li>
-                        <li onclick="viewAssignments()">View Assignments</li>
-                        <li onclick="updateAvailability()">Update Availability</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Doctor Management Section -->
-            <div id="section-doctors" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Doctor Management</h2>
-                        <div>
-                            <button class="btn btn-primary" onclick="openDoctorModal()">
-                                <i>+</i> Add New Doctor
+</div>
+</div>
+<!-- User Information -->
+<div class="section-card">
+<h2 class="section-title">User Information</h2>
+<div class="user-info">
+<p><strong>Name:</strong> <span id="userName">-</span></p>
+<p><strong>Email:</strong> <span id="userEmail">-</span></p>
+<p><strong>Role:</strong> <span id="userRole">-</span></p>
+<p><strong>Department:</strong> <span id="userDepartment">-</span></p>
+<p><strong>Status:</strong> <span id="userStatus">-</span></p>
+<p><strong>Session:</strong> <span id="sessionStatusInfo">Active</span></p>
+</div>
+<button class="btn btn-success" onclick="editProfile()">Edit Profile</button>
+<button class="btn btn-danger" onclick="logout()">Logout</button>
+</div>
+<!-- Admin Panel -->
+<div class="section-card" id="adminPanel" style="display: none;">
+<h2 class="section-title">Admin Panel</h2>
+<button class="btn btn-primary" onclick="viewAllUsers()">View All Users</button>
+<button class="btn btn-success" onclick="exportUsers()">Export Users</button>
+<div id="userStats" style="margin-top: 1rem;">
+<p><strong>Total Users:</strong> <span id="totalUsersAdmin">0</span></p>
+<p><strong>Verified Users:</strong> <span id="verifiedUsers">0</span></p>
+<p><strong>Admin Users:</strong> <span id="adminUsers">0</span></p>
+</div>
+</div>
+<!-- Session Management -->
+<div class="section-card">
+<h2 class="section-title">Session Management</h2>
+<div class="session-info">
+<p><strong>Login Time:</strong> <span id="loginTime">-</span></p>
+<p><strong>Session Duration:</strong> <span id="sessionDuration">-</span></p>
+<p><strong>Auto-logout:</strong> <span id="autoLogoutTime">30 minutes</span></p>
+</div>
+<button class="btn btn-primary" onclick="extendSession()">Extend Session</button>
+<button class="btn btn-danger" onclick="endSession()">End Session</button>
+</div>
+<!-- Authentication Flows -->
+<div class="section-card">
+<h2 class="section-title">Authentication Flows</h2>
+<button class="btn btn-primary" onclick="changePassword()">Change Password</button>
+<button class="btn btn-warning" onclick="resetPassword()">Reset Password</button>
+<button class="btn btn-success" onclick="resendVerification()">Resend Verification</button>
+<button class="btn btn-primary" onclick="viewLoginHistory()">Login History</button>
+</div>
+<!-- Feature Lists Based on Role -->
+<div class="admin-features" id="adminFeatures" style="display: none;">
+<h3>Admin Features</h3>
+<ul class="feature-list">
+<li onclick="manageUsers()">Manage Users</li>
+<li onclick="viewAnalytics()">View Analytics</li>
+<li onclick="systemSettings()">System Settings</li>
+<li onclick="manageOperations()">Manage Operations</li>
+<li onclick="scheduleManagement()">Schedule Management</li>
+<li onclick="auditLogs()">Audit Logs</li>
+</ul>
+</div>
+<div class="user-features" id="userFeatures">
+<h3>User Features</h3>
+<ul class="feature-list">
+<li onclick="viewSchedule()">View Schedule</li>
+<li onclick="profileSettings()">Profile Settings</li>
+<li onclick="contactSupport()">Contact Support</li>
+<li onclick="viewAssignments()">View Assignments</li>
+<li onclick="updateAvailability()">Update Availability</li>
+</ul>
+</div>
+</div>
+<!-- Doctor Management Section -->
+<div class="content-section" id="section-doctors">
+<div class="section-card">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<h2 class="section-title">Doctor Management</h2>
+<div>
+<button class="btn btn-primary" onclick="openDoctorModal()">
++ Add New Doctor
                             </button>
-                            <button class="btn btn-success" onclick="exportDoctors()">
-                                <i>📊</i> Export Data
+<button class="btn btn-success" onclick="exportDoctors()">
+<i class="fas fa-chart-pie"></i> Export Data
                             </button>
-                        </div>
-                    </div>
-
-                    <!-- Search and Filter -->
-                    <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
-                        <input type="text" id="doctorSearch" style="flex: 1; min-width: 250px; padding: 12px 15px; border: 2px solid #e1e8ed; border-radius: 10px; font-size: 16px;" placeholder="Search doctors..." onkeyup="searchDoctors()">
-                        <select id="specializationFilter" style="padding: 12px 15px; border: 2px solid #e1e8ed; border-radius: 10px; background: white;" onchange="filterDoctors()">
-                            <option value="">All Specializations</option>
-                            <option value="cardiology">Cardiology</option>
-                            <option value="neurology">Neurology</option>
-                            <option value="pediatrics">Pediatrics</option>
-                            <option value="orthopedics">Orthopedics</option>
-                            <option value="emergency">Emergency Medicine</option>
-                        </select>
-                        <select id="statusFilter" style="padding: 12px 15px; border: 2px solid #e1e8ed; border-radius: 10px; background: white;" onchange="filterDoctors()">
-                            <option value="">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
-
-                    <!-- Doctors Grid -->
-                    <div id="doctorsContainer" class="cards-grid"></div>
-                </div>
-            </div>
-
-            <!-- User Management Section -->
-            <div id="section-users" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title">Healthcare Staff Management</h2>
-                    <div id="usersContainer">
-                        <!-- Users will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Patient Management Section -->
-            <div id="section-patients" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Patient Management</h2>
-                        <div>
-                            <button class="btn btn-primary" onclick="openPatientModal()">
-                                <i>+</i> Add New Patient
+</div>
+</div>
+<!-- Search and Filter -->
+<div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+<input id="doctorSearch" onkeyup="searchDoctors()" placeholder="Search doctors..." style="flex: 1; min-width: 250px; padding: 12px 15px; border: 2px solid #e1e8ed; border-radius: 10px; font-size: 16px;" type="text"/>
+<select id="specializationFilter" onchange="filterDoctors()" style="padding: 12px 15px; border: 2px solid #e1e8ed; border-radius: 10px; background: white;">
+<option value="">All Specializations</option>
+<option value="cardiology">Cardiology</option>
+<option value="neurology">Neurology</option>
+<option value="pediatrics">Pediatrics</option>
+<option value="orthopedics">Orthopedics</option>
+<option value="emergency">Emergency Medicine</option>
+</select>
+<select id="statusFilter" onchange="filterDoctors()" style="padding: 12px 15px; border: 2px solid #e1e8ed; border-radius: 10px; background: white;">
+<option value="">All Status</option>
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+</div>
+<!-- Doctors Grid -->
+<div class="cards-grid" id="doctorsContainer"></div>
+</div>
+</div>
+<!-- User Management Section -->
+<div class="content-section" id="section-users">
+<div class="section-card">
+<h2 class="section-title">Healthcare Staff Management</h2>
+<div id="usersContainer">
+<!-- Users will be loaded here -->
+</div>
+</div>
+</div>
+<!-- Patient Management Section -->
+<div class="content-section" id="section-patients">
+<div class="section-card">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<h2 class="section-title">Patient Management</h2>
+<div>
+<button class="btn btn-primary" onclick="openPatientModal()">
++ Add New Patient
                             </button>
-                            <button class="btn btn-success" onclick="exportPatients()">
-                                <i>📊</i> Export Patients
+<button class="btn btn-success" onclick="exportPatients()">
+<i class="fas fa-chart-pie"></i> Export Patients
                             </button>
-                        </div>
-                    </div>
-
-                    <!-- Search and Filter -->
-                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-                        <input type="text" id="patientSearch" class="form-input" placeholder="Search patients..." style="flex: 1; min-width: 200px;" onkeyup="searchPatients()">
-                        <select id="genderFilter" class="form-input" onchange="filterPatients()">
-                            <option value="">All Genders</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <select id="ageFilter" class="form-input" onchange="filterPatients()">
-                            <option value="">All Ages</option>
-                            <option value="child">Child (0-17)</option>
-                            <option value="adult">Adult (18-59)</option>
-                            <option value="senior">Senior (60+)</option>
-                        </select>
-                    </div>
-
-                    <!-- Patients Statistics -->
-                    <div class="stats-grid" style="margin-bottom: 2rem;">
-                        <div class="stat-card">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-number" id="totalPatients">0</div>
-                            <div class="stat-label">Total Patients</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">📅</div>
-                            <div class="stat-number" id="todayAdmissions">0</div>
-                            <div class="stat-label">Today's Admissions</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🏥</div>
-                            <div class="stat-number" id="currentInpatients">0</div>
-                            <div class="stat-label">Current Inpatients</div>
-                        </div>
-                    </div>
-
-                    <!-- Patients Grid -->
-                    <div id="patientsContainer" class="cards-grid"></div>
-                </div>
-            </div>
-
-            <!-- Operation Theater Rooms Section -->
-            <div id="section-ot-rooms" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Operation Theater Rooms</h2>
-                        <button class="btn btn-primary" onclick="openOTRoomModal()">
-                            <i>+</i> Add New OT Room
+</div>
+</div>
+<!-- Search and Filter -->
+<div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+<input class="form-input" id="patientSearch" onkeyup="searchPatients()" placeholder="Search patients..." style="flex: 1; min-width: 200px;" type="text"/>
+<select class="form-input" id="genderFilter" onchange="filterPatients()">
+<option value="">All Genders</option>
+<option value="male">Male</option>
+<option value="female">Female</option>
+<option value="other">Other</option>
+</select>
+<select class="form-input" id="ageFilter" onchange="filterPatients()">
+<option value="">All Ages</option>
+<option value="child">Child (0-17)</option>
+<option value="adult">Adult (18-59)</option>
+<option value="senior">Senior (60+)</option>
+</select>
+</div>
+<!-- Patients Statistics -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+<div class="stat-card">
+<div class="stat-icon"><i class="fas fa-users"></i></div>
+<div class="stat-number" id="totalPatients">0</div>
+<div class="stat-label">Total Patients</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+<div class="stat-number" id="todayAdmissions">0</div>
+<div class="stat-label">Today's Admissions</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon"><i class="fas fa-procedures"></i></div>
+<div class="stat-number" id="currentInpatients">0</div>
+<div class="stat-label">Current Inpatients</div>
+</div>
+</div>
+<!-- Patients Grid -->
+<div class="cards-grid" id="patientsContainer"></div>
+</div>
+</div>
+<!-- Operation Theater Rooms Section -->
+<div class="content-section" id="section-ot-rooms">
+<div class="section-card">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<h2 class="section-title">Operation Theater Rooms</h2>
+<button class="btn btn-primary" onclick="openOTRoomModal()">
++ Add New OT Room
                         </button>
-                    </div>
-
-                    <div id="otRoomsContainer" class="cards-grid"></div>
-                </div>
-            </div>
-
-            <!-- Operation Theater Scheduling Section -->
-            <div id="section-ot-schedule" class="content-section">
-                <div class="section-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h2 class="section-title">Operation Theater Scheduling</h2>
-                        <button class="btn btn-primary" onclick="openOTScheduleModal()">
-                            <i>+</i> Schedule Operation
+</div>
+<div class="cards-grid" id="otRoomsContainer"></div>
+</div>
+</div>
+<!-- Operation Theater Scheduling Section -->
+<div class="content-section" id="section-ot-schedule">
+<div class="section-card">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<h2 class="section-title">Operation Theater Scheduling</h2>
+<button class="btn btn-primary" onclick="openOTScheduleModal()">
++ Schedule Operation
                         </button>
-                    </div>
-
-                    <!-- Date Navigation -->
-                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
-                        <button class="btn" onclick="changeOTDate(-1)">← Previous Day</button>
-                        <input type="date" id="otScheduleDate" class="form-input" onchange="loadOTSchedule()" style="width: auto;">
-                        <button class="btn" onclick="changeOTDate(1)">Next Day →</button>
-                    </div>
-
-                    <!-- OT Schedule Calendar -->
-                    <div id="otScheduleContainer">
-                        <div id="otScheduleList" class="cards-grid"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Analytics Section -->
-            <div id="section-analytics" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title">Analytics Dashboard</h2>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">📈</div>
-                            <div class="stat-number">94%</div>
-                            <div class="stat-label">Patient Satisfaction</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">⏱️</div>
-                            <div class="stat-number">12.5</div>
-                            <div class="stat-label">Avg. Wait Time (min)</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🏥</div>
-                            <div class="stat-number">87%</div>
-                            <div class="stat-label">Bed Occupancy</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">💊</div>
-                            <div class="stat-number">156</div>
-                            <div class="stat-label">Prescriptions Today</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Operations Management Section -->
-            <div id="section-operations" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title">Operations Management</h2>
-                    <div class="form-grid">
-                        <div class="stat-card">
-                            <h3>Equipment Status</h3>
-                            <p>All critical equipment operational</p>
-                            <button class="btn btn-primary btn-sm">View Details</button>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Supply Inventory</h3>
-                            <p>Stock levels: Normal</p>
-                            <button class="btn btn-warning btn-sm">Manage Inventory</button>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Staff Scheduling</h3>
-                            <p>All shifts covered</p>
-                            <button class="btn btn-success btn-sm">View Schedule</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Scheduling Section -->
-            <div id="section-scheduling" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title">Scheduling System</h2>
-                    <div class="schedule-grid">
-                        <div class="schedule-day active">
-                            <h4>Mon</h4>
-                            <p>8 appointments</p>
-                        </div>
-                        <div class="schedule-day">
-                            <h4>Tue</h4>
-                            <p>12 appointments</p>
-                        </div>
-                        <div class="schedule-day">
-                            <h4>Wed</h4>
-                            <p>10 appointments</p>
-                        </div>
-                        <div class="schedule-day">
-                            <h4>Thu</h4>
-                            <p>15 appointments</p>
-                        </div>
-                        <div class="schedule-day">
-                            <h4>Fri</h4>
-                            <p>9 appointments</p>
-                        </div>
-                        <div class="schedule-day">
-                            <h4>Sat</h4>
-                            <p>6 appointments</p>
-                        </div>
-                        <div class="schedule-day">
-                            <h4>Sun</h4>
-                            <p>3 appointments</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Profile Section -->
-            <div id="section-profile" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title">Profile Settings</h2>
-                    <form id="profileForm">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label" for="editFullName">Full Name</label>
-                                <input type="text" id="editFullName" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="editEmail">Email</label>
-                                <input type="email" id="editEmail" class="form-input" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="editPhone">Phone Number</label>
-                                <input type="tel" id="editPhone" class="form-input">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="editDepartment">Department</label>
-                                <select id="editDepartment" class="form-input">
-                                    <option value="emergency">Emergency Medicine</option>
-                                    <option value="cardiology">Cardiology</option>
-                                    <option value="neurology">Neurology</option>
-                                    <option value="pediatrics">Pediatrics</option>
-                                    <option value="orthopedics">Orthopedics</option>
-                                    <option value="administration">Administration</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="bio">Bio</label>
-                            <textarea id="bio" class="form-input" rows="4" placeholder="Tell us about yourself"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-success">Update Profile</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Assignments Section -->
-            <div id="section-assignments" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title">Current Assignments</h2>
-                    <div id="assignmentsList" class="cards-grid">
-                        <div class="item-card">
-                            <div class="item-header">
-                                <div>
-                                    <div class="item-title">Emergency Department Coverage</div>
-                                    <div class="item-subtitle">Monday - Wednesday, 8:00 AM - 4:00 PM</div>
-                                </div>
-                                <span style="padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; background: #d4edda; color: #155724;">Active</span>
-                            </div>
-                        </div>
-                        <div class="item-card">
-                            <div class="item-header">
-                                <div>
-                                    <div class="item-title">Patient Consultation - Cardiology</div>
-                                    <div class="item-subtitle">Thursday - Friday, 10:00 AM - 6:00 PM</div>
-                                </div>
-                                <span style="padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; background: #f8d7da; color: #721c24;">Pending</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Availability Section -->
-            <div id="section-availability" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title">Update Availability</h2>
-                    <form id="availabilityForm">
-                        <div style="border: 2px solid #e1e8ed; border-radius: 10px; padding: 20px; margin-top: 10px;">
-                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                                <input type="checkbox" id="monday" value="monday">
-                                <label style="min-width: 100px; margin-bottom: 0;">Monday</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="time" id="mondayStart" style="width: 120px; padding: 8px 12px;" value="09:00">
-                                    <span>to</span>
-                                    <input type="time" id="mondayEnd" style="width: 120px; padding: 8px 12px;" value="17:00">
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                                <input type="checkbox" id="tuesday" value="tuesday">
-                                <label style="min-width: 100px; margin-bottom: 0;">Tuesday</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="time" id="tuesdayStart" style="width: 120px; padding: 8px 12px;" value="09:00">
-                                    <span>to</span>
-                                    <input type="time" id="tuesdayEnd" style="width: 120px; padding: 8px 12px;" value="17:00">
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                                <input type="checkbox" id="wednesday" value="wednesday">
-                                <label style="min-width: 100px; margin-bottom: 0;">Wednesday</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="time" id="wednesdayStart" style="width: 120px; padding: 8px 12px;" value="09:00">
-                                    <span>to</span>
-                                    <input type="time" id="wednesdayEnd" style="width: 120px; padding: 8px 12px;" value="17:00">
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                                <input type="checkbox" id="thursday" value="thursday">
-                                <label style="min-width: 100px; margin-bottom: 0;">Thursday</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="time" id="thursdayStart" style="width: 120px; padding: 8px 12px;" value="09:00">
-                                    <span>to</span>
-                                    <input type="time" id="thursdayEnd" style="width: 120px; padding: 8px 12px;" value="17:00">
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                                <input type="checkbox" id="friday" value="friday">
-                                <label style="min-width: 100px; margin-bottom: 0;">Friday</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="time" id="fridayStart" style="width: 120px; padding: 8px 12px;" value="09:00">
-                                    <span>to</span>
-                                    <input type="time" id="fridayEnd" style="width: 120px; padding: 8px 12px;" value="17:00">
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                                <input type="checkbox" id="saturday" value="saturday">
-                                <label style="min-width: 100px; margin-bottom: 0;">Saturday</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="time" id="saturdayStart" style="width: 120px; padding: 8px 12px;" value="09:00">
-                                    <span>to</span>
-                                    <input type="time" id="saturdayEnd" style="width: 120px; padding: 8px 12px;" value="17:00">
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                                <input type="checkbox" id="sunday" value="sunday">
-                                <label style="min-width: 100px; margin-bottom: 0;">Sunday</label>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="time" id="sundayStart" style="width: 120px; padding: 8px 12px;" value="09:00">
-                                    <span>to</span>
-                                    <input type="time" id="sundayEnd" style="width: 120px; padding: 8px 12px;" value="17:00">
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="margin-top: 2rem;">Update Availability</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Audit Logs Section -->
-            <div id="section-logs" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title">System Audit Logs</h2>
-                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #f1f2f6; border-radius: 10px; padding: 15px;" id="activityLog">
-                        <!-- Audit logs will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Doctor Modal -->
-    <div id="doctorModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="doctorModalTitle">Add New Doctor</h2>
-                <button class="close" onclick="closeDoctorModal()">&times;</button>
-            </div>
-            <form id="doctorForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="doctorName">Full Name *</label>
-                        <input type="text" id="doctorName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="specialization">Specialization *</label>
-                        <input type="text" id="specialization" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="doctorPhone">Phone</label>
-                        <input type="tel" id="doctorPhone" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="doctorEmail">Email</label>
-                        <input type="email" id="doctorEmail" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="doctorStatus">Status</label>
-                        <select id="doctorStatus" class="form-input">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-success">Save Doctor</button>
-                <button type="button" class="btn btn-danger" onclick="closeDoctorModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Patient Modal -->
-    <div id="patientModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="patientModalTitle">Add New Patient</h2>
-                <button class="close" onclick="closePatientModal()">&times;</button>
-            </div>
-            <form id="patientForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="patientName">Full Name *</label>
-                        <input type="text" id="patientName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientAge">Age *</label>
-                        <input type="number" id="patientAge" class="form-input" min="0" max="150" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientGender">Gender *</label>
-                        <select id="patientGender" class="form-input" required>
-                            <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientPhone">Phone Number *</label>
-                        <input type="tel" id="patientPhone" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientEmail">Email</label>
-                        <input type="email" id="patientEmail" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientBloodGroup">Blood Group</label>
-                        <select id="patientBloodGroup" class="form-input">
-                            <option value="">Select Blood Group</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="emergencyContact">Emergency Contact</label>
-                        <input type="tel" id="emergencyContact" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="patientStatus">Status</label>
-                        <select id="patientStatus" class="form-input">
-                            <option value="outpatient">Outpatient</option>
-                            <option value="inpatient">Inpatient</option>
-                            <option value="emergency">Emergency</option>
-                            <option value="discharged">Discharged</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="patientAddress">Address</label>
-                    <textarea id="patientAddress" class="form-input" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="medicalHistory">Medical History</label>
-                    <textarea id="medicalHistory" class="form-input" rows="4" placeholder="Any allergies, chronic conditions, medications, etc."></textarea>
-                </div>
-                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
-                    <button type="button" class="btn" onclick="closePatientModal()">Cancel</button>
-                    <button type="submit" class="btn btn-success">
-                        <span id="patientSubmitText">Save Patient</span>
-                        <span id="patientSubmitSpinner" class="spinner" style="display: none;"></span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- OT Room Modal -->
-    <div id="otRoomModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Add New OT Room</h2>
-                <button class="close" onclick="closeOTRoomModal()">&times;</button>
-            </div>
-            <form id="otRoomForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="roomId">Room ID *</label>
-                        <input type="text" id="roomId" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="roomType">Room Type</label>
-                        <input type="text" id="roomType" class="form-input" placeholder="e.g., General, Cardiac, Neuro">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="capacity">Capacity</label>
-                        <input type="number" id="capacity" class="form-input">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-success">Save Room</button>
-                <button type="button" class="btn btn-danger" onclick="closeOTRoomModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- OT Schedule Modal -->
-    <div id="otScheduleModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Schedule Operation</h2>
-                <button class="close" onclick="closeOTScheduleModal()">&times;</button>
-            </div>
-            <form id="otScheduleForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="surgeryDate">Date & Time *</label>
-                        <input type="datetime-local" id="surgeryDate" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="otRoom">OT Room ID *</label>
-                        <input type="text" id="otRoom" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="anesthesia">Type of Anesthesia</label>
-                        <input type="text" id="anesthesia" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="anesthesiologist">Anesthesiologist</label>
-                        <input type="text" id="anesthesiologist" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="surgeon">Surgeon</label>
-                        <input type="text" id="surgeon" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="assistants">Assistant Surgeons</label>
-                        <input type="text" id="assistants" class="form-input" placeholder="Comma-separated">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="nurses">Nurses</label>
-                        <input type="text" id="nurses" class="form-input" placeholder="Comma-separated">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="prePost">Pre/Post-Operative Notes</label>
-                        <textarea id="prePost" class="form-input" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="surgicalReports">Surgical Reports</label>
-                        <input type="file" id="surgicalReports" class="form-input" multiple>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="remarks">Remarks</label>
-                        <textarea id="remarks" class="form-input" rows="2"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="resources">Drugs/Instruments/Materials</label>
-                        <textarea id="resources" class="form-input" rows="2"></textarea>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-success" style="margin-top: 1rem;">Save Schedule</button>
-                <button type="button" class="btn btn-danger" onclick="closeOTScheduleModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
+</div>
+<!-- Date Navigation -->
+<div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+<button class="btn" onclick="changeOTDate(-1)">← Previous Day</button>
+<input class="form-input" id="otScheduleDate" onchange="loadOTSchedule()" style="width: auto;" type="date"/>
+<button class="btn" onclick="changeOTDate(1)">Next Day →</button>
+</div>
+<!-- OT Schedule Calendar -->
+<div id="otScheduleContainer">
+<div class="cards-grid" id="otScheduleList"></div>
+</div>
+</div>
+</div>
+<!-- Analytics Section -->
+<div class="content-section" id="section-analytics">
+<div class="section-card">
+<h2 class="section-title">Analytics Dashboard</h2>
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+<div class="stat-number">94%</div>
+<div class="stat-label">Patient Satisfaction</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon">⏱️</div>
+<div class="stat-number">12.5</div>
+<div class="stat-label">Avg. Wait Time (min)</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon"><i class="fas fa-procedures"></i></div>
+<div class="stat-number">87%</div>
+<div class="stat-label">Bed Occupancy</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon">💊</div>
+<div class="stat-number">156</div>
+<div class="stat-label">Prescriptions Today</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Operations Management Section -->
+<div class="content-section" id="section-operations">
+<div class="section-card">
+<h2 class="section-title">Operations Management</h2>
+<div class="form-grid">
+<div class="stat-card">
+<h3>Equipment Status</h3>
+<p>All critical equipment operational</p>
+<button class="btn btn-primary btn-sm">View Details</button>
+</div>
+<div class="stat-card">
+<h3>Supply Inventory</h3>
+<p>Stock levels: Normal</p>
+<button class="btn btn-warning btn-sm">Manage Inventory</button>
+</div>
+<div class="stat-card">
+<h3>Staff Scheduling</h3>
+<p>All shifts covered</p>
+<button class="btn btn-success btn-sm">View Schedule</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Scheduling Section -->
+<div class="content-section" id="section-scheduling">
+<div class="section-card">
+<h2 class="section-title">Scheduling System</h2>
+<div class="schedule-grid">
+<div class="schedule-day active">
+<h4>Mon</h4>
+<p>8 appointments</p>
+</div>
+<div class="schedule-day">
+<h4>Tue</h4>
+<p>12 appointments</p>
+</div>
+<div class="schedule-day">
+<h4>Wed</h4>
+<p>10 appointments</p>
+</div>
+<div class="schedule-day">
+<h4>Thu</h4>
+<p>15 appointments</p>
+</div>
+<div class="schedule-day">
+<h4>Fri</h4>
+<p>9 appointments</p>
+</div>
+<div class="schedule-day">
+<h4>Sat</h4>
+<p>6 appointments</p>
+</div>
+<div class="schedule-day">
+<h4>Sun</h4>
+<p>3 appointments</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Profile Section -->
+<div class="content-section" id="section-profile">
+<div class="section-card">
+<h2 class="section-title">Profile Settings</h2>
+<form id="profileForm">
+<div class="form-grid">
+<div class="form-group">
+<label class="form-label" for="editFullName">Full Name</label>
+<input class="form-input" id="editFullName" required="" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="editEmail">Email</label>
+<input class="form-input" id="editEmail" readonly="" type="email"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="editPhone">Phone Number</label>
+<input class="form-input" id="editPhone" type="tel"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="editDepartment">Department</label>
+<select class="form-input" id="editDepartment">
+<option value="emergency">Emergency Medicine</option>
+<option value="cardiology">Cardiology</option>
+<option value="neurology">Neurology</option>
+<option value="pediatrics">Pediatrics</option>
+<option value="orthopedics">Orthopedics</option>
+<option value="administration">Administration</option>
+</select>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="bio">Bio</label>
+<textarea class="form-input" id="bio" placeholder="Tell us about yourself" rows="4"></textarea>
+</div>
+<button class="btn btn-success" type="submit">Update Profile</button>
+</form>
+</div>
+</div>
+<!-- Assignments Section -->
+<div class="content-section" id="section-assignments">
+<div class="section-card">
+<h2 class="section-title">Current Assignments</h2>
+<div class="cards-grid" id="assignmentsList">
+<div class="item-card">
+<div class="item-header">
+<div>
+<div class="item-title">Emergency Department Coverage</div>
+<div class="item-subtitle">Monday - Wednesday, 8:00 AM - 4:00 PM</div>
+</div>
+<span style="padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; background: #d4edda; color: #155724;">Active</span>
+</div>
+</div>
+<div class="item-card">
+<div class="item-header">
+<div>
+<div class="item-title">Patient Consultation - Cardiology</div>
+<div class="item-subtitle">Thursday - Friday, 10:00 AM - 6:00 PM</div>
+</div>
+<span style="padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; background: #f8d7da; color: #721c24;">Pending</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Availability Section -->
+<div class="content-section" id="section-availability">
+<div class="section-card">
+<h2 class="section-title">Update Availability</h2>
+<form id="availabilityForm">
+<div style="border: 2px solid #e1e8ed; border-radius: 10px; padding: 20px; margin-top: 10px;">
+<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+<input id="monday" type="checkbox" value="monday"/>
+<label style="min-width: 100px; margin-bottom: 0;">Monday</label>
+<div style="display: flex; align-items: center; gap: 10px;">
+<input id="mondayStart" style="width: 120px; padding: 8px 12px;" type="time" value="09:00"/>
+<span>to</span>
+<input id="mondayEnd" style="width: 120px; padding: 8px 12px;" type="time" value="17:00"/>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+<input id="tuesday" type="checkbox" value="tuesday"/>
+<label style="min-width: 100px; margin-bottom: 0;">Tuesday</label>
+<div style="display: flex; align-items: center; gap: 10px;">
+<input id="tuesdayStart" style="width: 120px; padding: 8px 12px;" type="time" value="09:00"/>
+<span>to</span>
+<input id="tuesdayEnd" style="width: 120px; padding: 8px 12px;" type="time" value="17:00"/>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+<input id="wednesday" type="checkbox" value="wednesday"/>
+<label style="min-width: 100px; margin-bottom: 0;">Wednesday</label>
+<div style="display: flex; align-items: center; gap: 10px;">
+<input id="wednesdayStart" style="width: 120px; padding: 8px 12px;" type="time" value="09:00"/>
+<span>to</span>
+<input id="wednesdayEnd" style="width: 120px; padding: 8px 12px;" type="time" value="17:00"/>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+<input id="thursday" type="checkbox" value="thursday"/>
+<label style="min-width: 100px; margin-bottom: 0;">Thursday</label>
+<div style="display: flex; align-items: center; gap: 10px;">
+<input id="thursdayStart" style="width: 120px; padding: 8px 12px;" type="time" value="09:00"/>
+<span>to</span>
+<input id="thursdayEnd" style="width: 120px; padding: 8px 12px;" type="time" value="17:00"/>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+<input id="friday" type="checkbox" value="friday"/>
+<label style="min-width: 100px; margin-bottom: 0;">Friday</label>
+<div style="display: flex; align-items: center; gap: 10px;">
+<input id="fridayStart" style="width: 120px; padding: 8px 12px;" type="time" value="09:00"/>
+<span>to</span>
+<input id="fridayEnd" style="width: 120px; padding: 8px 12px;" type="time" value="17:00"/>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+<input id="saturday" type="checkbox" value="saturday"/>
+<label style="min-width: 100px; margin-bottom: 0;">Saturday</label>
+<div style="display: flex; align-items: center; gap: 10px;">
+<input id="saturdayStart" style="width: 120px; padding: 8px 12px;" type="time" value="09:00"/>
+<span>to</span>
+<input id="saturdayEnd" style="width: 120px; padding: 8px 12px;" type="time" value="17:00"/>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+<input id="sunday" type="checkbox" value="sunday"/>
+<label style="min-width: 100px; margin-bottom: 0;">Sunday</label>
+<div style="display: flex; align-items: center; gap: 10px;">
+<input id="sundayStart" style="width: 120px; padding: 8px 12px;" type="time" value="09:00"/>
+<span>to</span>
+<input id="sundayEnd" style="width: 120px; padding: 8px 12px;" type="time" value="17:00"/>
+</div>
+</div>
+</div>
+<button class="btn btn-primary" style="margin-top: 2rem;" type="submit">Update Availability</button>
+</form>
+</div>
+</div>
+<!-- Audit Logs Section -->
+<div class="content-section" id="section-logs">
+<div class="section-card">
+<h2 class="section-title">System Audit Logs</h2>
+<div id="activityLog" style="max-height: 400px; overflow-y: auto; border: 1px solid #f1f2f6; border-radius: 10px; padding: 15px;">
+<!-- Audit logs will be loaded here -->
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Doctor Modal -->
+<div class="modal" id="doctorModal">
+<div class="modal-content">
+<div class="modal-header">
+<h2 class="modal-title" id="doctorModalTitle">Add New Doctor</h2>
+<button class="close" onclick="closeDoctorModal()">×</button>
+</div>
+<form id="doctorForm">
+<div class="form-grid">
+<div class="form-group">
+<label class="form-label" for="doctorName">Full Name *</label>
+<input class="form-input" id="doctorName" required="" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="specialization">Specialization *</label>
+<input class="form-input" id="specialization" required="" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="doctorPhone">Phone</label>
+<input class="form-input" id="doctorPhone" type="tel"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="doctorEmail">Email</label>
+<input class="form-input" id="doctorEmail" type="email"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="doctorStatus">Status</label>
+<select class="form-input" id="doctorStatus">
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+</div>
+</div>
+<button class="btn btn-success" type="submit">Save Doctor</button>
+<button class="btn btn-danger" onclick="closeDoctorModal()" type="button">Cancel</button>
+</form>
+</div>
+</div>
+<!-- Patient Modal -->
+<div class="modal" id="patientModal">
+<div class="modal-content">
+<div class="modal-header">
+<h2 class="modal-title" id="patientModalTitle">Add New Patient</h2>
+<button class="close" onclick="closePatientModal()">×</button>
+</div>
+<form id="patientForm">
+<div class="form-grid">
+<div class="form-group">
+<label class="form-label" for="patientName">Full Name *</label>
+<input class="form-input" id="patientName" required="" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patientAge">Age *</label>
+<input class="form-input" id="patientAge" max="150" min="0" required="" type="number"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patientGender">Gender *</label>
+<select class="form-input" id="patientGender" required="">
+<option value="">Select Gender</option>
+<option value="male">Male</option>
+<option value="female">Female</option>
+<option value="other">Other</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" for="patientPhone">Phone Number *</label>
+<input class="form-input" id="patientPhone" required="" type="tel"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patientEmail">Email</label>
+<input class="form-input" id="patientEmail" type="email"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patientBloodGroup">Blood Group</label>
+<select class="form-input" id="patientBloodGroup">
+<option value="">Select Blood Group</option>
+<option value="A+">A+</option>
+<option value="A-">A-</option>
+<option value="B+">B+</option>
+<option value="B-">B-</option>
+<option value="O+">O+</option>
+<option value="O-">O-</option>
+<option value="AB+">AB+</option>
+<option value="AB-">AB-</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" for="emergencyContact">Emergency Contact</label>
+<input class="form-input" id="emergencyContact" type="tel"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patientStatus">Status</label>
+<select class="form-input" id="patientStatus">
+<option value="outpatient">Outpatient</option>
+<option value="inpatient">Inpatient</option>
+<option value="emergency">Emergency</option>
+<option value="discharged">Discharged</option>
+</select>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="patientAddress">Address</label>
+<textarea class="form-input" id="patientAddress" rows="3"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" for="medicalHistory">Medical History</label>
+<textarea class="form-input" id="medicalHistory" placeholder="Any allergies, chronic conditions, medications, etc." rows="4"></textarea>
+</div>
+<div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+<button class="btn" onclick="closePatientModal()" type="button">Cancel</button>
+<button class="btn btn-success" type="submit">
+<span id="patientSubmitText">Save Patient</span>
+<span class="spinner" id="patientSubmitSpinner" style="display: none;"></span>
+</button>
+</div>
+</form>
+</div>
+</div>
+<!-- OT Room Modal -->
+<div class="modal" id="otRoomModal">
+<div class="modal-content">
+<div class="modal-header">
+<h2 class="modal-title">Add New OT Room</h2>
+<button class="close" onclick="closeOTRoomModal()">×</button>
+</div>
+<form id="otRoomForm">
+<div class="form-grid">
+<div class="form-group">
+<label class="form-label" for="roomId">Room ID *</label>
+<input class="form-input" id="roomId" required="" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="roomType">Room Type</label>
+<input class="form-input" id="roomType" placeholder="e.g., General, Cardiac, Neuro" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="capacity">Capacity</label>
+<input class="form-input" id="capacity" type="number"/>
+</div>
+</div>
+<button class="btn btn-success" type="submit">Save Room</button>
+<button class="btn btn-danger" onclick="closeOTRoomModal()" type="button">Cancel</button>
+</form>
+</div>
+</div>
+<!-- OT Schedule Modal -->
+<div class="modal" id="otScheduleModal">
+<div class="modal-content">
+<div class="modal-header">
+<h2 class="modal-title">Schedule Operation</h2>
+<button class="close" onclick="closeOTScheduleModal()">×</button>
+</div>
+<form id="otScheduleForm">
+<div class="form-grid">
+<div class="form-group">
+<label class="form-label" for="surgeryDate">Date &amp; Time *</label>
+<input class="form-input" id="surgeryDate" required="" type="datetime-local"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="otRoom">OT Room ID *</label>
+<input class="form-input" id="otRoom" required="" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="anesthesia">Type of Anesthesia</label>
+<input class="form-input" id="anesthesia" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="anesthesiologist">Anesthesiologist</label>
+<input class="form-input" id="anesthesiologist" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="surgeon">Surgeon</label>
+<input class="form-input" id="surgeon" required="" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="assistants">Assistant Surgeons</label>
+<input class="form-input" id="assistants" placeholder="Comma-separated" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="nurses">Nurses</label>
+<input class="form-input" id="nurses" placeholder="Comma-separated" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="prePost">Pre/Post-Operative Notes</label>
+<textarea class="form-input" id="prePost" rows="3"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" for="surgicalReports">Surgical Reports</label>
+<input class="form-input" id="surgicalReports" multiple="" type="file"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="remarks">Remarks</label>
+<textarea class="form-input" id="remarks" rows="2"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" for="resources">Drugs/Instruments/Materials</label>
+<textarea class="form-input" id="resources" rows="2"></textarea>
+</div>
+</div>
+<button class="btn btn-success" style="margin-top: 1rem;" type="submit">Save Schedule</button>
+<button class="btn btn-danger" onclick="closeOTScheduleModal()" type="button">Cancel</button>
+</form>
+</div>
+</div>
+<script>
         let doctors = [];
         let patients = [];
         let otRooms = [];
@@ -1253,13 +1206,11 @@
             document.getElementById('sidebarToggleBtn').style.display = 'none';
         }
     </script>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-    <script src="firebase-config.js"></script>
-    <script src="assets/js/index.js"></script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="assets/js/index.js"></script>
 </body>
 </html>
