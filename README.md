@@ -532,8 +532,7 @@ npm install firebase firebase-admin
 ## 📞 Support & Contact
 
 For technical support or questions about this project:
-- **Email:** [your-email@domain.com]
-- **GitHub Issues:** [Repository Issues Page]
+- **Email:** [sreesaivardhans@gmail.com]
 - **Documentation:** This README file
 
 ---
