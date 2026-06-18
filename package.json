@@ -1,4 +1,12 @@
 {
+  "name": "hospital-operation-scheduler",
+  "version": "1.0.0",
+  "description": "Hospital Operation Theater Scheduling System",
+  "scripts": {
+    "start": "npx http-server src -p 8080 -o",
+    "serve": "firebase serve",
+    "deploy": "firebase deploy --only hosting"
+  },
   "dependencies": {
     "dotenv": "^17.2.1",
     "firebase": "^12.0.0",
