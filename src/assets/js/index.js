@@ -174,7 +174,7 @@
                     const fullName = document.getElementById('fullName').value.trim();
                     const phone = document.getElementById('phone').value.trim();
                     const department = document.getElementById('department').value;
-                    const role = document.getElementById('role').value;
+                    const role = 'user'; // Always 'user' — admin must be set manually in Firestore
                     
                     if (!fullName || !department) {
                         showAuthMessage('error', 'Please fill in all required fields');
@@ -2643,31 +2643,6 @@ Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
             }
         }
 
-        // Initialize OT schedule date to today (NEW ADDITION)
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            const otDateInput = document.getElementById('otScheduleDate');
-            if (otDateInput) {
-                otDateInput.value = today;
-            }
-
-            // Add event listeners for new forms
-            const patientForm = document.getElementById('patientForm');
-            const otRoomForm = document.getElementById('otRoomForm');
-            const otScheduleForm = document.getElementById('otScheduleForm');
-            
-            if (patientForm) {
-                patientForm.addEventListener('submit', handlePatientSubmit);
-            }
-            
-            if (otRoomForm) {
-                otRoomForm.addEventListener('submit', handleOTRoomSubmit);
-            }
-            
-            if (otScheduleForm) {
-                otScheduleForm.addEventListener('submit', handleOTScheduleSubmit);
-            }
-        });
 
         // Global variables for advanced scheduling
 window.allAnesthesiologists = window.allAnesthesiologists || [];
@@ -2997,117 +2972,4 @@ function getSurgeryTypeInfo(type) {
     return surgeryTypes[type] || surgeryTypes['general'];
 }
 
-function openOTScheduleModal() {
-    document.getElementById("otScheduleModal").style.display = "block";
-}
-
-function closeOTScheduleModal() {
-    document.getElementById("otScheduleModal").style.display = "none";
-}
-
-// Example form handling (later will connect to Firebase)
-document.getElementById("otScheduleForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    
-    // Collect form data
-    const data = {
-        date: document.getElementById("surgeryDate").value,
-        otRoom: document.getElementById("otRoom").value,
-        anesthesia: document.getElementById("anesthesia").value,
-        anesthesiologist: document.getElementById("anesthesiologist").value,
-        surgeon: document.getElementById("surgeon").value,
-        assistants: document.getElementById("assistants").value,
-        nurses: document.getElementById("nurses").value,
-        prePost: document.getElementById("prePost").value,
-        surgicalReports: document.getElementById("surgicalReports").files.length,
-        remarks: document.getElementById("remarks").value,
-        resources: document.getElementById("resources").value,
-    };
-
-    console.log("New OT Schedule:", data);
-
-    alert("OT Schedule saved (to be connected with Firebase)");
-    closeOTScheduleModal();
-});
-
-
-// Doctor Modal
-function openDoctorModal() { document.getElementById("doctorModal").style.display = "block"; }
-function closeDoctorModal() { document.getElementById("doctorModal").style.display = "none"; }
-document.getElementById("doctorForm").addEventListener("submit", e => {
-  e.preventDefault();
-  console.log("Doctor Saved:", {
-    name: doctorName.value, specialization: specialization.value,
-    phone: doctorPhone.value, email: doctorEmail.value, status: doctorStatus.value
-  });
-  alert("Doctor saved (connect to Firebase later)");
-  closeDoctorModal();
-});
-
-// Patient Modal
-function openPatientModal() { document.getElementById("patientModal").style.display = "block"; }
-function closePatientModal() { document.getElementById("patientModal").style.display = "none"; }
-document.getElementById("patientForm").addEventListener("submit", e => {
-  e.preventDefault();
-  console.log("Patient Saved:", {
-    name: patientName.value, age: patientAge.value, gender: patientGender.value,
-    phone: patientPhone.value, email: patientEmail.value, blood: patientBloodGroup.value
-  });
-  alert("Patient saved (connect to Firebase later)");
-  closePatientModal();
-});
-
-// OT Room Modal
-function openOTRoomModal() { document.getElementById("otRoomModal").style.display = "block"; }
-function closeOTRoomModal() { document.getElementById("otRoomModal").style.display = "none"; }
-document.getElementById("otRoomForm").addEventListener("submit", e => {
-  e.preventDefault();
-  console.log("OT Room Saved:", {
-    roomId: roomId.value, type: roomType.value, capacity: capacity.value
-  });
-  alert("OT Room saved (connect to Firebase later)");
-  closeOTRoomModal();
-});
-
-function logAction(action, details) {
-  db.collection("logs").add({
-    user: auth.currentUser ? auth.currentUser.email : "unknown",
-    action: action,
-    details: details,
-    timestamp: new Date().toISOString()
-  });
-}
-
-function logAction(action, details) {
-  db.collection("logs").add({
-    user: auth.currentUser ? auth.currentUser.email : "unknown",
-    action: action,
-    details: details,
-    timestamp: new Date().toISOString()
-  }).catch(err => console.error("Log failed:", err));
-}
-
-function logAction(action, details) {
-  db.collection("logs").add({
-    user: auth.currentUser ? auth.currentUser.email : "unknown",
-    action: action,
-    details: details,
-    timestamp: new Date().toISOString()
-  }).catch(err => console.error("Log failed:", err));
-}
-
-// In your authentication success handler
-if (loginSuccessful) {
-    showDashboard();
-}
-
-document.getElementById("authContainer").style.display = "none";
-document.getElementById("dashboardContainer").style.display = "flex";
-
-// Mark dashboard as active (so CSS rule applies)
-document.getElementById("dashboardContainer").classList.add("active");
-
-document.getElementById("dashboardContainer").style.display = "none";
-document.getElementById("dashboardContainer").classList.remove("active");
-document.getElementById("authContainer").style.display = "flex";
-
+// End of index.js
