@@ -13,6 +13,54 @@
 <link href="assets/css/index.css" rel="stylesheet"/>
 </head>
 <body>
+<!-- Toast notification container -->
+<div id="toastContainer" style="position:fixed;top:1rem;right:1rem;z-index:20000;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;"></div>
+
+<!-- Confirm modal (replaces browser confirm) -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);z-index:15000;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--surface-card);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:2rem;width:100%;max-width:400px;box-shadow:var(--shadow-modal);animation:slideUp 0.2s ease;">
+    <h3 id="confirmTitle" style="font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">Confirm Action</h3>
+    <p id="confirmMessage" style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1.5rem;"></p>
+    <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+      <button id="confirmCancelBtn" class="btn btn-ghost" onclick="_confirmResolve(false)">Cancel</button>
+      <button id="confirmOkBtn" class="btn btn-danger" onclick="_confirmResolve(true)">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Patient details modal -->
+<div id="patientDetailModal" style="display:none;" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Patient Details</h2>
+      <button class="close" onclick="document.getElementById('patientDetailModal').style.display='none'">&#xd7;</button>
+    </div>
+    <div id="patientDetailBody" style="font-size:0.9rem;"></div>
+  </div>
+</div>
+
+<!-- OT Status update modal -->
+<div id="otStatusModal" style="display:none;" class="modal">
+  <div class="modal-content" style="max-width:380px;">
+    <div class="modal-header">
+      <h2 class="modal-title">Update Operation Status</h2>
+      <button class="close" onclick="document.getElementById('otStatusModal').style.display='none'">&#xd7;</button>
+    </div>
+    <div class="form-group" style="margin-top:0.5rem;">
+      <label class="form-label" for="otStatusSelect">New Status</label>
+      <select id="otStatusSelect" class="form-input">
+        <option value="scheduled">Scheduled</option>
+        <option value="in-progress">In Progress</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1rem;">
+      <button class="btn btn-ghost" onclick="document.getElementById('otStatusModal').style.display='none'">Cancel</button>
+      <button class="btn btn-primary" id="otStatusSaveBtn">Update Status</button>
+    </div>
+  </div>
+</div>
 <!-- Authentication Container -->
 <div class="auth-container" id="authContainer">
 <div class="auth-card">
@@ -102,6 +150,8 @@
 <p id="navSubtitle">Healthcare Management</p>
 </div>
 </div>
+<!-- Mobile close button (visible only on small screens) -->
+<button id="navCloseBtn" onclick="closeMobileNav()" aria-label="Close navigation" style="display:none;position:absolute;top:0.75rem;right:0.75rem;background:none;border:1px solid rgba(211,246,209,0.2);color:rgba(211,246,209,0.7);width:28px;height:28px;border-radius:6px;font-size:0.85rem;cursor:pointer;">&times;</button>
 </div>
 <ul class="nav-menu" id="navMenu">
 <li class="nav-item">
@@ -872,7 +922,7 @@
 
         // Modal open/close helpers (index.js Firestore handlers own all submit logic)
         function openDoctorModal() {
-            document.getElementById('doctorModal').style.display = 'flex';
+            document.getElementById('doctorModal').style.display = 'block';
         }
 
         function closeDoctorModal() {
@@ -881,7 +931,7 @@
         }
 
         function openPatientModal() {
-            document.getElementById('patientModal').style.display = 'flex';
+            document.getElementById('patientModal').style.display = 'block';
         }
 
         function closePatientModal() {
@@ -890,7 +940,7 @@
         }
 
         function openOTRoomModal() {
-            document.getElementById('otRoomModal').style.display = 'flex';
+            document.getElementById('otRoomModal').style.display = 'block';
         }
 
         function closeOTRoomModal() {
@@ -899,7 +949,7 @@
         }
 
         function openOTScheduleModal() {
-            document.getElementById('otScheduleModal').style.display = 'flex';
+            document.getElementById('otScheduleModal').style.display = 'block';
         }
 
         function closeOTScheduleModal() {
@@ -972,15 +1022,18 @@
             icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         }
 
-        // Mobile nav
         function openMobileNav() {
             document.getElementById('dashboardNav').classList.add('open');
             document.getElementById('navOverlay').classList.add('open');
+            const closeBtn = document.getElementById('navCloseBtn');
+            if (closeBtn) closeBtn.style.display = 'flex';
         }
 
         function closeMobileNav() {
             document.getElementById('dashboardNav').classList.remove('open');
             document.getElementById('navOverlay').classList.remove('open');
+            const closeBtn = document.getElementById('navCloseBtn');
+            if (closeBtn) closeBtn.style.display = 'none';
         }
 
         // Function to handle successful login

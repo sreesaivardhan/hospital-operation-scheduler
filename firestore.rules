@@ -18,10 +18,6 @@ service cloud.firestore {
     }
 
     // ── Users collection ────────────────────────────────────────────────────
-    // Any authenticated user can read their own document.
-    // Admins can read all user documents.
-    // Users can update their own profile (excluding role field).
-    // Only admins can create/delete user documents.
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isAdmin();
@@ -31,7 +27,6 @@ service cloud.firestore {
     }
 
     // ── Doctors collection ──────────────────────────────────────────────────
-    // Admins: full CRUD.  Authenticated staff: read-only.
     match /doctors/{doctorId} {
       allow read:   if isAuthenticated();
       allow create,
@@ -40,7 +35,6 @@ service cloud.firestore {
     }
 
     // ── Patients collection ─────────────────────────────────────────────────
-    // Admins: full CRUD.  Authenticated staff: read-only.
     match /patients/{patientId} {
       allow read:   if isAuthenticated();
       allow create,
@@ -56,8 +50,23 @@ service cloud.firestore {
             delete: if isAdmin();
     }
 
-    // ── OT Schedule collection ──────────────────────────────────────────────
-    match /ot_schedule/{scheduleId} {
+    // ── OT Schedules collection (JS uses 'ot_schedules') ───────────────────
+    match /ot_schedules/{scheduleId} {
+      allow read:   if isAuthenticated();
+      allow create,
+            update,
+            delete: if isAdmin();
+    }
+
+    // ── Staff support collections (read-only, may be empty) ────────────────
+    match /anesthesiologists/{docId} {
+      allow read:   if isAuthenticated();
+      allow create,
+            update,
+            delete: if isAdmin();
+    }
+
+    match /nurses/{docId} {
       allow read:   if isAuthenticated();
       allow create,
             update,
@@ -65,12 +74,11 @@ service cloud.firestore {
     }
 
     // ── Admin Logs ──────────────────────────────────────────────────────────
-    // Only admins can read.  Any authenticated user can create (for self-logging).
     match /adminLogs/{logId} {
       allow read:   if isAdmin();
       allow create: if isAuthenticated();
       allow update,
-            delete: if false;  // Logs are immutable
+            delete: if false;
     }
   }
 }

@@ -60,6 +60,7 @@
                         showDashboard(userData);
                         await loadInitialData();
                         startSessionManagement();
+                        loadStaffData(); // Safe to call here: user is authenticated
                         
                     } catch (error) {
                         console.error('Error loading user profile:', error);
@@ -72,7 +73,7 @@
                     showAuth();
                 }
 
-                loadStaffData();
+                // Note: loadStaffData requires auth - called after user confirmed
     
     // Set default values for new scheduling
     const today = new Date().toISOString().split('T')[0];
@@ -574,6 +575,7 @@
                 });
                 
                 const tableHTML = `
+                    <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -593,24 +595,27 @@
                                     <td>${capitalizeFirst(user.department || 'N/A')}</td>
                                     <td>${capitalizeFirst(user.role || 'user')}</td>
                                     <td>
-                                        <span style="padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; background: ${user.emailVerified ? 'rgba(39, 174, 96, 0.1); color: #27ae60' : 'rgba(231, 76, 60, 0.1); color: #e74c3c'};">
+                                        <span class="badge ${user.emailVerified ? 'badge-success' : 'badge-danger'}">
                                             ${user.emailVerified ? 'Verified' : 'Unverified'}
                                         </span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-warning btn-sm">Edit</button>
-                                        <button class="btn btn-danger btn-sm">Remove</button>
+                                        <button class="btn btn-ghost btn-sm" disabled title="User edit requires Firebase Admin SDK — not available in browser">Edit</button>
+                                        <button class="btn btn-ghost btn-sm" disabled title="User deletion requires Firebase Admin SDK — not available in browser">Remove</button>
                                     </td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
+                    </div>
+                    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.75rem;"><i class="fas fa-info-circle"></i> Add/edit/delete user accounts requires Firebase Admin SDK and is managed through the Firebase Console.</p>
                 `;
                 
                 document.getElementById('usersContainer').innerHTML = tableHTML;
                 
             } catch (error) {
                 console.error('Error loading users:', error);
+                showToast('error', 'Error loading users');
             }
         }
 
@@ -822,9 +827,8 @@ async function addSampleOTRoom() {
         }
 
         async function deleteDoctor(doctorId, doctorName) {
-            if (!confirm(`Are you sure you want to delete Dr. ${doctorName}? This action cannot be undone.`)) {
-                return;
-            }
+            const confirmed = await showConfirm(`Delete Dr. ${doctorName}?`, 'This action cannot be undone.');
+            if (!confirmed) return;
             
             try {
                 await db.collection('doctors').doc(doctorId).delete();
@@ -1220,9 +1224,8 @@ async function addSampleOTRoom() {
         }
 
         async function deletePatient(patientId, patientName) {
-            if (!confirm(`Are you sure you want to delete ${patientName}? This action cannot be undone.`)) {
-                return;
-            }
+            const confirmed = await showConfirm(`Delete patient ${patientName}?`, 'This action cannot be undone.');
+            if (!confirmed) return;
             
             try {
                 await db.collection('patients').doc(patientId).delete();
@@ -1238,20 +1241,22 @@ async function addSampleOTRoom() {
 
         function viewPatientDetails(patientId) {
             const patient = allPatients.find(p => p.id === patientId);
-            if (patient) {
-                alert(`Patient Details:
-                
-Name: ${patient.name}
-Age: ${patient.age} years
-Gender: ${capitalizeFirst(patient.gender)}
-Phone: ${patient.phone}
-Email: ${patient.email || 'Not provided'}
-Blood Group: ${patient.bloodGroup || 'Unknown'}
-Status: ${capitalizeFirst(patient.status || 'outpatient')}
-Emergency Contact: ${patient.emergencyContact || 'Not provided'}
-Address: ${patient.address || 'Not provided'}
-Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
-            }
+            if (!patient) return;
+            const modal = document.getElementById('patientDetailModal');
+            const body  = document.getElementById('patientDetailBody');
+            if (!modal || !body) return;
+            body.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.875rem;"><tbody>
+              ${[['Name',patient.name],['Age',patient.age+' years'],['Gender',capitalizeFirst(patient.gender)],
+                 ['Phone',patient.phone],['Email',patient.email||'\u2014'],['Blood Group',patient.bloodGroup||'\u2014'],
+                 ['Status',capitalizeFirst(patient.status||'outpatient')],['Emergency Contact',patient.emergencyContact||'\u2014'],
+                 ['Address',patient.address||'\u2014']].map(([k,v])=>
+                `<tr><td style="padding:0.45rem 0;font-weight:600;color:var(--text-secondary);width:42%;border-bottom:1px solid var(--border-color);">${k}</td>
+                     <td style="padding:0.45rem 0;border-bottom:1px solid var(--border-color);">${v}</td></tr>`
+              ).join('')}
+              ${patient.medicalHistory?`<tr><td colspan="2" style="padding:0.5rem 0;"><strong>Medical History</strong><br>
+              <span style="color:var(--text-secondary);">${patient.medicalHistory}</span></td></tr>`:''}
+            </tbody></table>`;
+            modal.style.display = 'block';
         }
 
         async function exportPatients() {
@@ -1393,9 +1398,8 @@ Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
         }
 
         async function deleteOTRoom(roomId, roomNumber) {
-            if (!confirm(`Are you sure you want to delete OT Room ${roomNumber}? This action cannot be undone.`)) {
-                return;
-            }
+            const confirmed = await showConfirm(`Delete OT Room ${roomNumber}?`, 'This action cannot be undone.');
+            if (!confirmed) return;
             
             try {
                 await db.collection('ot_rooms').doc(roomId).delete();
@@ -1590,29 +1594,34 @@ Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
         }
 
         async function updateOTStatus(scheduleId) {
-            const newStatus = prompt('Update status to:\n1. scheduled\n2. in-progress\n3. completed\n4. cancelled\n\nEnter status:');
-            
-            if (newStatus && ['scheduled', 'in-progress', 'completed', 'cancelled'].includes(newStatus)) {
+        let _otStatusScheduleId = null;
+
+        async function updateOTStatus(scheduleId) {
+            _otStatusScheduleId = scheduleId;
+            const modal = document.getElementById('otStatusModal');
+            if (!modal) { showToast('error', 'Status modal not found'); return; }
+            modal.style.display = 'block';
+            const saveBtn = document.getElementById('otStatusSaveBtn');
+            saveBtn.onclick = async function() {
+                const newStatus = document.getElementById('otStatusSelect').value;
+                modal.style.display = 'none';
                 try {
-                    await db.collection('ot_schedules').doc(scheduleId).update({
+                    await db.collection('ot_schedules').doc(_otStatusScheduleId).update({
                         status: newStatus,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    
-                    showMessage('success', 'Operation status updated successfully!');
+                    showToast('success', 'Operation status updated!');
                     await loadOTSchedule();
-                    
                 } catch (error) {
                     console.error('Error updating operation status:', error);
-                    showMessage('error', 'Error updating status');
+                    showToast('error', 'Error updating status');
                 }
-            }
+            };
         }
 
         async function cancelOperation(scheduleId) {
-            if (!confirm('Are you sure you want to cancel this operation?')) {
-                return;
-            }
+            const confirmed = await showConfirm('Cancel this operation?', 'The operation will be marked as cancelled.');
+            if (!confirmed) return;
             
             try {
                 await db.collection('ot_schedules').doc(scheduleId).update({
@@ -1641,31 +1650,7 @@ Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
 
         // Authentication Flow Functions
         async function changePassword() {
-            const currentPassword = prompt('Enter your current password:');
-            const newPassword = prompt('Enter your new password (minimum 6 characters):');
-            
-            if (!currentPassword || !newPassword) return;
-            
-            if (newPassword.length < 6) {
-                showMessage('error', 'New password must be at least 6 characters');
-                return;
-            }
-            
-            try {
-                const credential = firebase.auth.EmailAuthProvider.credential(
-                    currentUser.email,
-                    currentPassword
-                );
-                
-                await currentUser.reauthenticateWithCredential(credential);
-                await currentUser.updatePassword(newPassword);
-                
-                await logAdminAction('Password Changed', 'User changed their password');
-                showMessage('success', 'Password changed successfully!');
-            } catch (error) {
-                console.error('Error changing password:', error);
-                showMessage('error', 'Error changing password. Check your current password.');
-            }
+            showToast('info', 'Use the "Reset Password" button to receive a reset link by email.');
         }
 
         async function resetPassword() {
@@ -1693,12 +1678,12 @@ Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
         }
 
         function viewLoginHistory() {
-            alert('Login history feature coming soon!');
+            showToast('info', 'Login history — coming soon.');
         }
 
         // Additional Functions
         function contactSupport() {
-            alert('Support Contact:\n\nEmail: support@hospital.com\nPhone: +1 (555) 123-4567\nHours: 24/7 Emergency Support');
+            showToast('info', 'Support: support@hospital.com | +1 (555) 123-4567 | 24/7');
         }
 
         function editProfile() {
@@ -1919,6 +1904,41 @@ document.addEventListener('keydown', function(e) {
                     }
                 }, 300);
             }, 4000);
+        }
+
+        // ── Toast + Confirm system (replaces browser dialogs) ─────────────────
+        function showToast(type, message, duration) {
+            duration = duration || 4000;
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle' };
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.innerHTML = `<i class="fas ${icons[type] || 'fa-bell'}"></i><span>${message}</span><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.28s ease forwards';
+                setTimeout(() => toast.remove(), 280);
+            }, duration);
+        }
+
+        // showMessage maps to showToast for compatibility
+        function showMessage(type, message) {
+            showToast(type === 'success' ? 'success' : 'error', message);
+        }
+
+        let _confirmResolve = null;
+        function showConfirm(title, message) {
+            return new Promise(resolve => {
+                const modal = document.getElementById('confirmModal');
+                document.getElementById('confirmTitle').textContent = title || 'Confirm';
+                document.getElementById('confirmMessage').textContent = message || '';
+                modal.style.display = 'flex';
+                window._confirmResolve = function(result) {
+                    modal.style.display = 'none';
+                    resolve(result);
+                };
+            });
         }
 
         // Logout
@@ -2185,9 +2205,8 @@ document.addEventListener('keydown', function(e) {
         }
 
         async function deletePatient(patientId, patientName) {
-            if (!confirm(`Are you sure you want to delete ${patientName}? This action cannot be undone.`)) {
-                return;
-            }
+            const confirmed = await showConfirm(`Delete patient ${patientName}?`, 'This action cannot be undone.');
+            if (!confirmed) return;
             
             try {
                 await db.collection('patients').doc(patientId).delete();
@@ -2202,21 +2221,18 @@ document.addEventListener('keydown', function(e) {
         }
 
         function viewPatientDetails(patientId) {
-            const patient = allPatients.find(p => p.id === patientId);
-            if (patient) {
-                alert(`Patient Details:
-                
-Name: ${patient.name}
-Age: ${patient.age} years
-Gender: ${capitalizeFirst(patient.gender)}
-Phone: ${patient.phone}
-Email: ${patient.email || 'Not provided'}
-Blood Group: ${patient.bloodGroup || 'Unknown'}
-Status: ${capitalizeFirst(patient.status || 'outpatient')}
-Emergency Contact: ${patient.emergencyContact || 'Not provided'}
-Address: ${patient.address || 'Not provided'}
-Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
-            }
+            const patient = (window.allPatients || allPatients || []).find(p => p.id === patientId);
+            if (!patient) return;
+            const modal = document.getElementById('patientDetailModal');
+            const body  = document.getElementById('patientDetailBody');
+            if (!modal || !body) return;
+            body.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.875rem;"><tbody>
+              ${[['Name',patient.name],['Age',patient.age+' years'],['Gender',capitalizeFirst(patient.gender)],['Phone',patient.phone],['Email',patient.email||'\u2014'],['Blood Group',patient.bloodGroup||'\u2014'],['Status',capitalizeFirst(patient.status||'outpatient')],['Emergency Contact',patient.emergencyContact||'\u2014'],['Address',patient.address||'\u2014']].map(([k,v])=>
+                `<tr><td style="padding:0.45rem 0;font-weight:600;color:var(--text-secondary);width:42%;border-bottom:1px solid var(--border-color);">${k}</td><td style="padding:0.45rem 0;border-bottom:1px solid var(--border-color);">${v}</td></tr>`
+              ).join('')}
+              ${patient.medicalHistory?`<tr><td colspan="2" style="padding:0.5rem 0;"><strong>Medical History</strong><br><span style="color:var(--text-secondary);">${patient.medicalHistory}</span></td></tr>`:''}
+            </tbody></table>`;
+            modal.style.display = 'block';
         }
 
         async function exportPatients() {
@@ -2358,7 +2374,8 @@ Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
         }
 
         async function deleteOTRoom(roomId, roomNumber) {
-            if (!confirm(`Are you sure you want to delete OT Room ${roomNumber}? This action cannot be undone.`)) {
+            const confirmed = await showConfirm(`Delete OT Room ${roomNumber}?`, 'This action cannot be undone.');
+            if (!confirmed) return;
                 return;
             }
             
@@ -2555,29 +2572,31 @@ Medical History: ${patient.medicalHistory || 'No medical history recorded'}`);
         }
 
         async function updateOTStatus(scheduleId) {
-            const newStatus = prompt('Update status to:\n1. scheduled\n2. in-progress\n3. completed\n4. cancelled\n\nEnter status:');
-            
-            if (newStatus && ['scheduled', 'in-progress', 'completed', 'cancelled'].includes(newStatus)) {
+            _otStatusScheduleId = scheduleId;
+            const modal = document.getElementById('otStatusModal');
+            if (!modal) { showToast('error', 'Status modal not found'); return; }
+            modal.style.display = 'block';
+            const saveBtn = document.getElementById('otStatusSaveBtn');
+            saveBtn.onclick = async function() {
+                const newStatus = document.getElementById('otStatusSelect').value;
+                modal.style.display = 'none';
                 try {
-                    await db.collection('ot_schedules').doc(scheduleId).update({
+                    await db.collection('ot_schedules').doc(_otStatusScheduleId).update({
                         status: newStatus,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    
-                    showMessage('success', 'Operation status updated successfully!');
+                    showToast('success', 'Operation status updated!');
                     await loadOTSchedule();
-                    
                 } catch (error) {
                     console.error('Error updating operation status:', error);
-                    showMessage('error', 'Error updating status');
+                    showToast('error', 'Error updating status');
                 }
-            }
+            };
         }
 
         async function cancelOperation(scheduleId) {
-            if (!confirm('Are you sure you want to cancel this operation?')) {
-                return;
-            }
+            const confirmed = await showConfirm('Cancel this operation?', 'The operation will be marked as cancelled.');
+            if (!confirmed) return;
             
             try {
                 await db.collection('ot_schedules').doc(scheduleId).update({
