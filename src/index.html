@@ -131,9 +131,9 @@
 <!-- Dashboard Container -->
 <div class="dashboard-container" id="dashboardContainer">
 <!-- Mobile overlay -->
-<div class="nav-overlay" id="navOverlay" onclick="closeMobileNav()"></div>
+<div class="nav-overlay" id="navOverlay"></div>
 <!-- Mobile menu button -->
-<button class="mobile-menu-btn" id="mobileMenuBtn" onclick="openMobileNav()" aria-label="Open navigation">
+<button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation">
 <i class="fas fa-bars"></i>
 </button>
 <!-- Sidebar toggle button -->
@@ -151,7 +151,7 @@
 </div>
 </div>
 <!-- Mobile close button (visible only on small screens) -->
-<button id="navCloseBtn" onclick="closeMobileNav()" aria-label="Close navigation" style="display:none;position:absolute;top:0.75rem;right:0.75rem;background:none;border:1px solid rgba(211,246,209,0.2);color:rgba(211,246,209,0.7);width:28px;height:28px;border-radius:6px;font-size:0.85rem;cursor:pointer;">&times;</button>
+<button id="navCloseBtn" aria-label="Close navigation" style="position:absolute;top:0.75rem;right:0.75rem;background:none;border:1px solid rgba(211,246,209,0.2);color:rgba(211,246,209,0.7);width:28px;height:28px;border-radius:6px;font-size:0.85rem;cursor:pointer;">&times;</button>
 </div>
 <ul class="nav-menu" id="navMenu">
 <li class="nav-item">
@@ -341,10 +341,8 @@
 <!-- Authentication Flows -->
 <div class="section-card">
 <h2 class="section-title">Authentication Flows</h2>
-<button class="btn btn-primary" onclick="changePassword()">Change Password</button>
 <button class="btn btn-warning" onclick="resetPassword()">Reset Password</button>
 <button class="btn btn-success" onclick="resendVerification()">Resend Verification</button>
-<button class="btn btn-primary" onclick="viewLoginHistory()">Login History</button>
 </div>
 <!-- Feature Lists Based on Role -->
 <div class="admin-features" id="adminFeatures" style="display: none;">
@@ -1029,9 +1027,9 @@
 
         if (mobileMenuBtn) {
             mobileMenuBtn.addEventListener('click', () => {
-                document.getElementById('dashboardNav').classList.toggle('open');
-                navOverlay.classList.toggle('open');
-                if (navCloseBtn) navCloseBtn.style.display = 'flex';
+                document.body.classList.add('mobile-nav-open');
+                document.getElementById('dashboardNav').classList.add('open');
+                navOverlay.classList.add('open');
             });
         }
 
@@ -1044,9 +1042,9 @@
         }
 
         function closeMobileNav() {
+            document.body.classList.remove('mobile-nav-open');
             document.getElementById('dashboardNav').classList.remove('open');
             document.getElementById('navOverlay').classList.remove('open');
-            if (navCloseBtn) navCloseBtn.style.display = 'none';
         }
     </script>
 <!-- Firebase SDKs -->

@@ -676,6 +676,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: none; border-radius: var(--radius-md);
   color: #fff; font-size: 0.9rem; cursor: pointer; box-shadow: var(--shadow-md);
 }
+#navCloseBtn { display: none; }
 .nav-overlay {
   display: none; position: fixed; inset: 0;
   background: rgba(0,0,0,0.38); z-index: 999;
@@ -709,9 +710,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   .dashboard-nav.open { transform: translateX(0); }
   .main-content { margin-left: 0 !important; }
   .sidebar-toggle-btn { display: none !important; }
-  .mobile-menu-btn { display: flex !important; }
+  .mobile-menu-btn { display: flex; }
+  body.mobile-nav-open .mobile-menu-btn { display: none; }
   .content-header { padding-left: 4rem; }
-  #navCloseBtn { display: flex !important; align-items: center; justify-content: center; }
+  body.mobile-nav-open #navCloseBtn { display: flex; align-items: center; justify-content: center; }
 }
 @media (max-width: 768px) {
   .stats-grid   { grid-template-columns: 1fr 1fr; }

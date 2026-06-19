@@ -350,14 +350,25 @@ function endSession()    { logout(); }
 async function loadInitialData() {
     try {
         if (currentUserData && currentUserData.role === 'admin') {
-            const [docSnap, usrSnap] = await Promise.all([
+            // Note: If you encounter a 403 Identity Toolkit error (getProjectConfig)
+            // this is often due to API key domain restrictions in Google Cloud Console
+            // (e.g. blocking 127.0.0.1 or localhost:8080) or Email/Password auth being disabled.
+            const [docSnap, usrSnap, otRoomsSnap, otSchedSnap] = await Promise.all([
                 db.collection('doctors').get(),
-                db.collection('users').get()
+                db.collection('users').get(),
+                db.collection('ot_rooms').get(),
+                db.collection('ot_schedules').get()
             ]);
             const td = document.getElementById('totalDoctors');
             const tu = document.getElementById('totalUsers');
+            const tr = document.getElementById('monthlyRevenue'); // OT Rooms
+            const ts = document.getElementById('totalAppointments'); // OT Schedules
+
             if (td) td.textContent = docSnap.size;
             if (tu) tu.textContent = usrSnap.size;
+            if (tr) tr.textContent = otRoomsSnap.size;
+            if (ts) ts.textContent = otSchedSnap.size;
+
             allDoctors = [];
             docSnap.forEach(d => allDoctors.push({ id: d.id, ...d.data() }));
         }
@@ -394,7 +405,7 @@ function displayDoctors(doctors) {
           <div class="item-header">
             <div>
               <div class="item-title">${d.name}</div>
-              <div class="item-subtitle">${capitalizeFirst(d.specialization)} • ${d.experience || 0} yrs</div>
+              <div class="item-subtitle">${capitalizeFirst(d.specialty || d.specialization || 'Unknown')} • ${d.experience || 0} yrs</div>
               <div style="margin-top:.5rem;font-size:.9rem;color:var(--text-secondary);">
                 <span style="display:block;">${d.email}</span>
                 <span style="display:block;">${d.phone}</span>
@@ -435,15 +446,11 @@ async function handleDoctorSubmit(e) {
     if (spinner)   spinner.style.display   = 'inline-block';
     try {
         const doctorData = {
-            name:            document.getElementById('doctorName').value.trim(),
-            email:           document.getElementById('doctorEmail').value.trim().toLowerCase(),
-            phone:           document.getElementById('doctorPhone').value.trim(),
-            specialization:  document.getElementById('doctorSpecialization').value,
-            licenseNumber:   document.getElementById('doctorLicense').value.trim(),
-            experience:      parseInt(document.getElementById('doctorExperience').value) || 0,
-            consultationFee: parseFloat(document.getElementById('doctorFee').value) || 0,
-            status:          document.getElementById('doctorStatus').value,
-            bio:             document.getElementById('doctorBio').value.trim()
+            name:            document.getElementById('doctorName') ? document.getElementById('doctorName').value.trim() : '',
+            email:           document.getElementById('doctorEmail') ? document.getElementById('doctorEmail').value.trim().toLowerCase() : '',
+            phone:           document.getElementById('doctorPhone') ? document.getElementById('doctorPhone').value.trim() : '',
+            specialty:       document.getElementById('specialization') ? document.getElementById('specialization').value.trim() : '',
+            experience:      document.getElementById('doctorExperience') ? (parseInt(document.getElementById('doctorExperience').value) || 0) : 0
         };
         if (isEditingDoctor && editingDoctorId) {
             await db.collection('doctors').doc(editingDoctorId).update({
@@ -485,12 +492,9 @@ async function editDoctor(doctorId) {
         set('doctorName',           d.name);
         set('doctorEmail',          d.email);
         set('doctorPhone',          d.phone);
-        set('doctorSpecialization', d.specialization);
-        set('doctorLicense',        d.licenseNumber);
+        set('specialization',       d.specialty || d.specialization); // Matches actual DOM id 'specialization'
         set('doctorExperience',     d.experience);
-        set('doctorFee',            d.consultationFee);
         set('doctorStatus',         d.status || 'active');
-        set('doctorBio',            d.bio);
         const modal = document.getElementById('doctorModal');
         if (modal) modal.style.display = 'block';
     } catch (err) {
@@ -1418,10 +1422,10 @@ function editProfile()        { showSection('profile'); }
 function viewAllUsers()       { showSection('users'); }
 function exportUsers()        { showToast('info', 'Users export coming soon.'); }
 function manageUsers()        { showSection('users'); }
-function viewAnalytics()      { showSection('analytics'); }
+function viewAnalytics()      { showToast('info', 'Analytics Dashboard coming soon.'); }
 function systemSettings()     { showToast('info', 'System settings coming soon.'); }
-function manageOperations()   { showSection('operations'); }
-function scheduleManagement() { showSection('scheduling'); }
+function manageOperations()   { showToast('info', 'Operations Management coming soon.'); }
+function scheduleManagement() { showToast('info', 'Scheduling System coming soon.'); }
 function auditLogs()          { showSection('logs'); }
 function viewSchedule()       { showSection('assignments'); }
 function profileSettings()    { showSection('profile'); }
