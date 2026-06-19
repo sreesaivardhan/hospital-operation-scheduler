@@ -1,7 +1,8 @@
 {
   "projects": {
     "default": "hospital-scheduler-2025",
-    "opscheduler": "hospital-scheduler-2025"
+    "opscheduler": "hospital-scheduler-2025",
+    "redeploy": "hospital-scheduler-2025"
   },
   "targets": {},
   "etags": {}

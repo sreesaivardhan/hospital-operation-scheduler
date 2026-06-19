@@ -1022,34 +1022,31 @@
             icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         }
 
-        function openMobileNav() {
-            document.getElementById('dashboardNav').classList.add('open');
-            document.getElementById('navOverlay').classList.add('open');
-            const closeBtn = document.getElementById('navCloseBtn');
-            if (closeBtn) closeBtn.style.display = 'flex';
+        // Mobile nav behavior
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navOverlay = document.getElementById('navOverlay');
+        const navCloseBtn = document.getElementById('navCloseBtn');
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                document.getElementById('dashboardNav').classList.toggle('open');
+                navOverlay.classList.toggle('open');
+                if (navCloseBtn) navCloseBtn.style.display = 'flex';
+            });
+        }
+
+        if (navOverlay) {
+            navOverlay.addEventListener('click', closeMobileNav);
+        }
+
+        if (navCloseBtn) {
+            navCloseBtn.addEventListener('click', closeMobileNav);
         }
 
         function closeMobileNav() {
             document.getElementById('dashboardNav').classList.remove('open');
             document.getElementById('navOverlay').classList.remove('open');
-            const closeBtn = document.getElementById('navCloseBtn');
-            if (closeBtn) closeBtn.style.display = 'none';
-        }
-
-        // Function to handle successful login
-        function showDashboard() {
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('dashboardContainer').style.display = 'block';
-            document.getElementById('dashboardContainer').classList.add('active');
-            document.getElementById('sidebarToggleBtn').style.display = 'flex';
-        }
-
-        // Function to logout and return to login page
-        function logout() {
-            document.getElementById('authContainer').style.display = 'flex';
-            document.getElementById('dashboardContainer').style.display = 'none';
-            document.getElementById('dashboardContainer').classList.remove('active');
-            document.getElementById('sidebarToggleBtn').style.display = 'none';
+            if (navCloseBtn) navCloseBtn.style.display = 'none';
         }
     </script>
 <!-- Firebase SDKs -->
