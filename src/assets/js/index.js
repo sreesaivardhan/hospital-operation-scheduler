@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const isGoogle = user.providerData && user.providerData.some(p => p.providerId === 'google.com');
                     if (isGoogle) {
                         userData = {
+                            uid: user.uid,
                             email: user.email,
                             fullName: user.displayName || 'Google User',
                             phone: user.phoneNumber || '',
@@ -240,7 +241,8 @@ async function handleAuth(e) {
             const cred = await auth.createUserWithEmailAndPassword(email, password);
             try {
                 await db.collection('users').doc(cred.user.uid).set({
-                    email, fullName, phone: phone || '', department, role: 'user', bio: '',
+                    uid: cred.user.uid, email, fullName, phone: phone || '', department, role: 'user', bio: '',
+                    isActive: true,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     emailVerified: false, lastLogin: null, loginHistory: []
@@ -1637,11 +1639,9 @@ async function resendVerification() {
         showMessage('success', 'Verification email sent!');
     } catch (err) { showMessage('error', 'Error sending verification email'); }
 }
-function viewLoginHistory()   { showToast('info', 'Login history — coming soon.'); }
 function contactSupport()     { showToast('info', 'Support: support@hospital.com | +1 (555) 123-4567'); }
 function editProfile()        { showSection('profile'); }
 function viewAllUsers()       { showSection('users'); }
-function exportUsers()        { showToast('info', 'Users export coming soon.'); }
 function manageUsers()        { showSection('users'); }
 async function loadAnalytics() {
     if (!currentUserData || currentUserData.role !== 'admin') return;
@@ -1796,7 +1796,6 @@ async function editSchedule(scheduleId) {
 }
 
 function viewAnalytics()      { loadAnalytics(); showSection('analytics'); }
-function systemSettings()     { showToast('info', 'System settings coming soon.'); }
 
 async function deleteOperation(scheduleId) {
     if (!currentUserData || currentUserData.role !== 'admin') return;
@@ -1959,8 +1958,7 @@ async function loadStaffData() {
         ]);
         // Populate any staff selects if they exist
         const anesCount  = anesSnap.size;
-        const nurseCount = nurseSnap.size;
-        console.log(`Staff loaded: ${anesCount} anesthesiologists, ${nurseCount} nurses`);
+        const nurseCount = allNurses.length;
     } catch (err) {
         console.warn('loadStaffData skipped (collections may be empty or missing rules):', err.code);
     }
@@ -2027,18 +2025,15 @@ window.changeOTDate       = changeOTDate;
 window.changePassword     = changePassword;
 window.resetPassword      = resetPassword;
 window.resendVerification = resendVerification;
-window.viewLoginHistory   = viewLoginHistory;
 window.contactSupport     = contactSupport;
 window.editProfile        = editProfile;
 window.extendSession      = extendSession;
 window.endSession         = endSession;
 window.viewAllUsers       = viewAllUsers;
-window.exportUsers        = exportUsers;
 window.manageUsers        = manageUsers;
 function manageOperations()   { showSection('operations'); }
 
 window.viewAnalytics      = viewAnalytics;
-window.systemSettings     = systemSettings;
 window.manageOperations   = manageOperations;
 window.scheduleManagement = scheduleManagement;
 window.auditLogs          = auditLogs;
