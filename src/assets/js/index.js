@@ -17,24 +17,24 @@
 
         // Role-based navigation menus
         const adminNavigation = [
-            { id: 'overview', icon: '📊', text: 'Dashboard Overview', active: true },
-            { id: 'doctors', icon: '👨‍⚕️', text: 'Doctor Management' },
-            { id: 'users', icon: '👥', text: 'User Management' },
-            { id: 'patients', icon: '🏥', text: 'Patient Management' },
-            { id: 'ot-rooms', icon: '🚪', text: 'OT Rooms' },
-            { id: 'ot-schedule', icon: '🗓️', text: 'OT Schedule' },
-            { id: 'analytics', icon: '📈', text: 'Analytics Dashboard' },
-            { id: 'operations', icon: '⚙️', text: 'Operations Management' },
-            { id: 'scheduling', icon: '📅', text: 'Scheduling System' },
-            { id: 'profile', icon: '👤', text: 'Profile Settings' },
-            { id: 'logs', icon: '📝', text: 'Audit Logs' }
+            { id: 'overview', icon: 'fas fa-chart-pie', text: 'Dashboard Overview', active: true },
+            { id: 'doctors', icon: 'fas fa-user-md', text: 'Doctor Management' },
+            { id: 'users', icon: 'fas fa-users', text: 'User Management' },
+            { id: 'patients', icon: 'fas fa-procedures', text: 'Patient Management' },
+            { id: 'ot-rooms', icon: 'fas fa-door-open', text: 'OT Rooms' },
+            { id: 'ot-schedule', icon: 'fas fa-calendar-alt', text: 'OT Schedule' },
+            { id: 'analytics', icon: 'fas fa-chart-line', text: 'Analytics Dashboard' },
+            { id: 'operations', icon: 'fas fa-cogs', text: 'Operations Management' },
+            { id: 'scheduling', icon: 'fas fa-calendar-check', text: 'Scheduling System' },
+            { id: 'profile', icon: 'fas fa-user-cog', text: 'Profile Settings' },
+            { id: 'logs', icon: 'fas fa-file-alt', text: 'Audit Logs' }
         ];
 
         const userNavigation = [
-            { id: 'overview', icon: '📊', text: 'Dashboard Overview', active: true },
-            { id: 'profile', icon: '👤', text: 'Profile Settings' },
-            { id: 'assignments', icon: '📋', text: 'View Assignments' },
-            { id: 'availability', icon: '🕒', text: 'Update Availability' }
+            { id: 'overview', icon: 'fas fa-chart-pie', text: 'Dashboard Overview', active: true },
+            { id: 'profile', icon: 'fas fa-user-cog', text: 'Profile Settings' },
+            { id: 'assignments', icon: 'fas fa-tasks', text: 'View Assignments' },
+            { id: 'availability', icon: 'fas fa-clock', text: 'Update Availability' }
         ];
 
         // Initialize Application
@@ -46,14 +46,14 @@
                         const userDoc = await db.collection('users').doc(user.uid).get();
                         
                         if (!userDoc.exists) {
-                            console.error('❌ User profile missing in Firestore for UID:', user.uid);
+                            console.error(' User profile missing in Firestore for UID:', user.uid);
                             showAuthMessage('error', 'User profile not found. Please contact support or re-register.');
                             await auth.signOut();
                             return;
                         }
                         
                         const userData = userDoc.data();
-                        console.log('✅ User profile loaded:', userData);
+                        console.log(' User profile loaded:', userData);
                         
                         currentUser = user;
                         currentUserData = userData;
@@ -117,7 +117,7 @@
                 a.href = '#';
                 a.className = 'nav-link' + (item.active ? ' active' : '');
                 a.onclick = () => showSection(item.id);
-                a.innerHTML = `<i>${item.icon}</i> ${item.text}`;
+                a.innerHTML = `<i class="${item.icon}"></i> ${item.text}`;
                 
                 li.appendChild(a);
                 navMenu.appendChild(li);
@@ -135,7 +135,7 @@
             logoutA.className = 'nav-link';
             logoutA.style.color = '#ff6b6b';
             logoutA.onclick = logout;
-            logoutA.innerHTML = '<i>🚪</i> Secure Logout';
+            logoutA.innerHTML = '<i></i> Secure Logout';
             
             logoutLi.appendChild(logoutA);
             navMenu.appendChild(logoutLi);
@@ -211,7 +211,7 @@
                             loginHistory: []
                         });
                         
-                        console.log('✅ User profile created successfully in Firestore');
+                        console.log(' User profile created successfully in Firestore');
                         
                         // Send email verification
                         await user.sendEmailVerification();
@@ -220,7 +220,7 @@
                         toggleAuthMode(); // Switch to login mode
                         
                     } catch (firestoreError) {
-                        console.error('❌ Error creating user profile:', firestoreError);
+                        console.error(' Error creating user profile:', firestoreError);
                         
                         // Clean up: Delete the auth user if Firestore creation failed
                         await user.delete();
@@ -404,7 +404,8 @@
             };
             
             document.getElementById('pageTitle').textContent = titles[sectionName] || 'Dashboard';
-            document.getElementById('breadcrumbPath').textContent = `Home › ${titles[sectionName] || 'Dashboard'}`;
+            const crumb = document.getElementById('breadcrumbPath');
+            if (crumb) crumb.textContent = `Home › ${titles[sectionName] || 'Dashboard'}`;
             
             // Load section-specific data
             switch(sectionName) {
@@ -418,7 +419,7 @@
                     loadPatients();
                     break;
                 case 'ot-rooms':
-                    console.log('📋 Loading OT Rooms section');
+                    console.log(' Loading OT Rooms section');
                     loadOTRoomsWithDebug(); // Use debug version
                     break;
                 case 'ot-schedule':
@@ -547,10 +548,10 @@
                             <div class="item-title">${doctor.name}</div>
                             <div class="item-subtitle">${capitalizeFirst(doctor.specialization)} • ${doctor.experience || 0} years</div>
                             <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
-                                📧 ${doctor.email}<br>
-                                📞 ${doctor.phone}
-                                ${doctor.licenseNumber ? `<br>🏥 License: ${doctor.licenseNumber}` : ''}
-                                ${doctor.consultationFee ? `<br>💰 Fee: $${doctor.consultationFee}` : ''}
+                                <span style="display:block;">${doctor.email}</span>
+                                <span style="display:block;">${doctor.phone}</span>
+                                ${doctor.licenseNumber ? `<span style="display:block;">Lic: ${doctor.licenseNumber}</span>` : ''}
+                                ${doctor.consultationFee ? `<span style="display:block;">Fee: $${doctor.consultationFee}</span>` : ''}
                             </div>
                             ${doctor.bio ? `<div style="margin-top: 0.5rem; font-style: italic; color: var(--text-secondary);">${doctor.bio}</div>` : ''}
                         </div>
@@ -616,22 +617,22 @@
         // Enhanced OT Rooms loading with comprehensive debugging
 async function loadOTRoomsWithDebug() {
     try {
-        console.log('🔍 Starting to load OT rooms...');
-        console.log('🔗 Database connection:', db ? 'Connected' : 'Not connected');
+        console.log('� Starting to load OT rooms...');
+        console.log('� Database connection:', db ? 'Connected' : 'Not connected');
         
         // Check if container exists
         const container = document.getElementById('otRoomsContainer');
         if (!container) {
-            console.error('❌ OT Rooms container not found in DOM');
+            console.error(' OT Rooms container not found in DOM');
             return;
         }
-        console.log('✅ Container found:', container);
+        console.log(' Container found:', container);
 
         // Query Firestore
-        console.log('📡 Querying ot_rooms collection...');
+        console.log('� Querying ot_rooms collection...');
         const snapshot = await db.collection('ot_rooms').get();
         
-        console.log('📊 Query result - Empty:', snapshot.empty, 'Size:', snapshot.size);
+        console.log(' Query result - Empty:', snapshot.empty, 'Size:', snapshot.size);
         
         if (snapshot.empty) {
             container.innerHTML = `
@@ -641,7 +642,7 @@ async function loadOTRoomsWithDebug() {
                     <button onclick="addSampleOTRoom()" class="btn btn-primary">Add Sample Room</button>
                 </div>
             `;
-            console.log('📝 No OT rooms found, showing empty state');
+            console.log(' No OT rooms found, showing empty state');
             return;
         }
 
@@ -650,14 +651,14 @@ async function loadOTRoomsWithDebug() {
         snapshot.forEach(doc => {
             const roomData = { id: doc.id, ...doc.data() };
             allOTRooms.push(roomData);
-            console.log('🏥 Found OT Room:', roomData);
+            console.log(' Found OT Room:', roomData);
         });
 
-        console.log(`✅ Loaded ${allOTRooms.length} OT rooms total`);
+        console.log(` Loaded ${allOTRooms.length} OT rooms total`);
         displayOTRooms(allOTRooms);
         
     } catch (error) {
-        console.error('❌ Error loading OT rooms:', error);
+        console.error(' Error loading OT rooms:', error);
         showMessage('error', 'Error loading OT rooms: ' + error.message);
     }
 }
@@ -665,7 +666,7 @@ async function loadOTRoomsWithDebug() {
 // Add sample OT room for testing
 async function addSampleOTRoom() {
     try {
-        console.log('➕ Adding sample OT room...');
+        console.log(' Adding sample OT room...');
         await db.collection('ot_rooms').add({
             roomNumber: '101',
             type: 'general',
@@ -673,11 +674,11 @@ async function addSampleOTRoom() {
             equipment: 'Basic surgical equipment, monitors, ventilator',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        console.log('✅ Sample OT room added successfully');
+        console.log(' Sample OT room added successfully');
         showMessage('success', 'Sample OT room added!');
         loadOTRoomsWithDebug();
     } catch (error) {
-        console.error('❌ Error adding sample OT room:', error);
+        console.error(' Error adding sample OT room:', error);
         showMessage('error', 'Error adding sample room: ' + error.message);
     }
 }
@@ -691,11 +692,14 @@ async function addSampleOTRoom() {
                     .get();
                 
                 const logContainer = document.getElementById('activityLog');
+                const emptyState = document.getElementById('logsEmptyState');
                 
                 if (snapshot.empty) {
-                    logContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No audit logs found</p>';
+                    if (emptyState) emptyState.style.display = 'flex';
                     return;
                 }
+                
+                if (emptyState) emptyState.style.display = 'none';
                 
                 let html = '';
                 snapshot.forEach(doc => {
@@ -703,15 +707,16 @@ async function addSampleOTRoom() {
                     const timestamp = log.timestamp ? log.timestamp.toDate().toLocaleString() : 'Unknown time';
                     
                     html += `
-                        <div style="padding: 10px; border-left: 4px solid #667eea; background: #f8f9fa; margin-bottom: 10px; border-radius: 5px;">
-                            <div style="font-size: 12px; color: #6c757d; margin-bottom: 5px;">${timestamp}</div>
-                            <div style="font-weight: 500; color: #2c3e50;">${log.action}</div>
-                            <div style="font-size: 14px; color: #495057; margin-top: 5px;">${log.details}</div>
+                        <div class="audit-entry">
+                            <div class="audit-time">${timestamp}</div>
+                            <div class="audit-action">${log.action}</div>
+                            <div class="audit-detail">${log.details}</div>
                         </div>
                     `;
                 });
                 
-                logContainer.innerHTML = html;
+                logContainer.innerHTML = (emptyState ? emptyState.outerHTML : '') + html;
+                if (emptyState) logContainer.querySelector('#logsEmptyState').style.display = 'none';
                 
             } catch (error) {
                 console.error('Error loading activity log:', error);
@@ -1020,10 +1025,10 @@ async function addSampleOTRoom() {
                             <div class="item-title">${patient.name}</div>
                             <div class="item-subtitle">${patient.age} years • ${capitalizeFirst(patient.gender)}</div>
                             <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
-                                📞 ${patient.phone}<br>
-                                ${patient.email ? `📧 ${patient.email}<br>` : ''}
-                                🩸 ${patient.bloodGroup || 'Unknown'}<br>
-                                📍 ${patient.status ? capitalizeFirst(patient.status) : 'Outpatient'}
+                                <span style="display:block;">${patient.phone}</span>
+                                ${patient.email ? `<span style="display:block;">${patient.email}</span>` : ''}
+                                <span style="display:block;">Blood: ${patient.bloodGroup || 'Unknown'}</span>
+                                <span style="display:block;">${patient.status ? capitalizeFirst(patient.status) : 'Outpatient'}</span>
                             </div>
                             ${patient.medicalHistory ? `<div style="margin-top: 0.5rem; font-style: italic; color: var(--text-secondary);">Medical: ${patient.medicalHistory.substring(0, 100)}${patient.medicalHistory.length > 100 ? '...' : ''}</div>` : ''}
                         </div>
@@ -1074,7 +1079,7 @@ async function addSampleOTRoom() {
                 const btn = document.createElement('button');
                 btn.id = 'mobileMenuBtn';
                 btn.className = 'mobile-menu-btn';
-                btn.innerHTML = '☰';
+                btn.innerHTML = '';
                 btn.onclick = toggleNavigation;
                 document.body.appendChild(btn);
             } else if (window.innerWidth > 768) {
@@ -1800,7 +1805,7 @@ function createSidebarToggle() {
     
     // Add to body
     document.body.appendChild(toggleBtn);
-    console.log('✅ Sidebar toggle button created');
+    console.log(' Sidebar toggle button created');
 }
 
 // Initialize toggle button when DOM is loaded
@@ -1964,9 +1969,9 @@ document.addEventListener('keydown', function(e) {
             });
         }
 
-        console.log('🏥 Hospital Management System loaded successfully!');
-        console.log('📧 For support: support@hospital.com');
-        console.log('🔗 Version: 2.0.0 - Complete with Patient & OT Management');
+        console.log(' Hospital Management System loaded successfully!');
+        console.log('� For support: support@hospital.com');
+        console.log('� Version: 2.0.0 - Complete with Patient & OT Management');
 
                 // PATIENT MANAGEMENT FUNCTIONS (NEW ADDITION)
         let allPatients = [];
@@ -2011,10 +2016,10 @@ document.addEventListener('keydown', function(e) {
                             <div class="item-title">${patient.name}</div>
                             <div class="item-subtitle">${patient.age} years • ${capitalizeFirst(patient.gender)}</div>
                             <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
-                                📞 ${patient.phone}<br>
-                                ${patient.email ? `📧 ${patient.email}<br>` : ''}
+                                � ${patient.phone}<br>
+                                ${patient.email ? `� ${patient.email}<br>` : ''}
                                 🩸 ${patient.bloodGroup || 'Unknown'}<br>
-                                📍 ${patient.status ? capitalizeFirst(patient.status) : 'Outpatient'}
+                                � ${patient.status ? capitalizeFirst(patient.status) : 'Outpatient'}
                             </div>
                             ${patient.medicalHistory ? `<div style="margin-top: 0.5rem; font-style: italic; color: var(--text-secondary);">Medical: ${patient.medicalHistory.substring(0, 100)}${patient.medicalHistory.length > 100 ? '...' : ''}</div>` : ''}
                         </div>
@@ -2669,7 +2674,7 @@ async function loadStaffData() {
             window.allNurses.push({ id: doc.id, ...doc.data() });
         });
 
-        console.log('✅ Staff data loaded:', {
+        console.log(' Staff data loaded:', {
             anesthesiologists: window.allAnesthesiologists.length,
             nurses: window.allNurses.length
         });

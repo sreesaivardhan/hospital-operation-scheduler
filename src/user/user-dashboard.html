@@ -1,98 +1,198 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Dashboard</title>
-  <link rel="stylesheet" href="../shared/common.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
-</head>
-<body style="background:#f5f6fa; font-family:sans-serif;">
-  <div style="max-width:900px;margin:40px auto;background:white;padding:32px 24px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-    <h2 style="text-align:center;margin-bottom:20px;">User Dashboard</h2>
-    <div id="userContent">
-      <!-- User-specific content goes here -->
-      <p>Welcome, <span id="userName"></span> (<span id="userEmail"></span>)</p>
-      <p>Hospital ID: <span id="userHospitalId"></span></p>
-      <button id="logoutBtn" class="btn btn-secondary" style="margin-top:18px;">Logout</button>
-    </div>
-    <div id="userMessage" style="margin-top:14px;color:#e74c3c;text-align:center;"></div>
-  </div>
+  <title>Staff Dashboard — MediCore OT Scheduler</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="../assets/css/index.css" rel="stylesheet">
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="../firebase-config.js"></script>
   <script>
-    // Auth state observer for security
+    if (!firebase.apps.length) { firebase.initializeApp(window.firebaseConfig); }
+  </script>
+
+  <style>
+    body { min-height: 100vh; background: var(--surface-bg); padding: 2rem; }
+    .user-wrapper { max-width: 960px; margin: 0 auto; }
+    .user-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);
+    }
+    .user-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .user-brand-icon {
+      width: 32px; height: 32px; background: var(--status-info);
+      border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
+    }
+    .user-brand-icon svg { width: 16px; height: 16px; fill: #fff; }
+    .user-brand h1 { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+    .user-brand span { font-size: 0.75rem; color: var(--text-muted); display: block; }
+    .user-info-section { display: flex; align-items: center; gap: 0.75rem; }
+    .user-info-text { text-align: right; }
+    .user-info-text strong { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); display: block; }
+    .user-info-text em { font-size: 0.75rem; color: var(--text-muted); font-style: normal; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; }
+    .info-item { background: var(--surface-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.875rem 1rem; }
+    .info-item label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 0.25rem; }
+    .info-item span { font-size: 0.9375rem; font-weight: 500; color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="user-wrapper">
+    <!-- Top bar -->
+    <div class="user-topbar">
+      <div class="user-brand">
+        <div class="user-brand-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c.55 0 1 .45 1 1v3h3c.55 0 1 .45 1 1s-.45 1-1 1h-3v3c0 .55-.45 1-1 1s-1-.45-1-1v-3H8c-.55 0-1-.45-1-1s.45-1 1-1h3V7c0-.55.45-1 1-1z"/></svg>
+        </div>
+        <div>
+          <h1>MediCore</h1>
+          <span>Staff Portal</span>
+        </div>
+      </div>
+      <div class="user-info-section">
+        <div class="user-info-text">
+          <strong id="userName">Loading…</strong>
+          <em id="userEmail"></em>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost btn-sm">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Access denied message -->
+    <div class="message error" id="userMessage" style="display:none;"></div>
+
+    <!-- User content -->
+    <div id="userContent" style="display:none;">
+      <div class="card" style="margin-bottom:1.25rem;">
+        <div class="card-title">
+          <i class="fas fa-user-circle" style="color:var(--status-info);margin-right:0.5rem;"></i>
+          My Profile Overview
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Full Name</label>
+            <span id="userNameDetail">—</span>
+          </div>
+          <div class="info-item">
+            <label>Email</label>
+            <span id="userEmailDetail">—</span>
+          </div>
+          <div class="info-item">
+            <label>Hospital ID</label>
+            <span id="userHospitalId">—</span>
+          </div>
+          <div class="info-item">
+            <label>Role</label>
+            <span><span class="badge badge-success">Staff Member</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.25rem;">
+        <div class="card-title">
+          <i class="fas fa-arrow-right" style="color:var(--status-info);margin-right:0.5rem;"></i>
+          Go to Operations Dashboard
+        </div>
+        <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1rem;">
+          Access the main Hospital OT Scheduler application.
+        </p>
+        <a href="../index.html" class="btn btn-primary">
+          <i class="fas fa-th-large"></i> Open Dashboard
+        </a>
+      </div>
+
+      <div class="card" id="profileUpdateSection">
+        <div class="card-title">
+          <i class="fas fa-cog" style="color:var(--status-info);margin-right:0.5rem;"></i>
+          Update Profile Details
+        </div>
+        <form id="profileForm" style="max-width:400px;">
+          <div class="form-group">
+            <label class="form-label" for="profileDisplayName">Display Name</label>
+            <input type="text" id="profileDisplayName" class="form-input" placeholder="e.g. Dr. Sarah Connor">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="profileHospitalId">Hospital ID</label>
+            <input type="text" id="profileHospitalId" class="form-input" placeholder="e.g. HSP001">
+          </div>
+          <button type="submit" class="btn btn-outline">Save Profile Changes</button>
+        </form>
+        <div class="message" id="profileMessage" style="margin-top:1rem;display:none;"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
     firebase.auth().onAuthStateChanged(async function(user) {
-      if (!user) {
-        window.location.href = '../auth/login.html';
-        return;
-      }
-      // Fetch user profile from Firestore
+      if (!user) { window.location.href = '../auth/login.html'; return; }
       const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
       const userData = userDoc.data();
       if (!userData || userData.role !== 'user') {
-        document.getElementById('userMessage').textContent = 'Access denied: Users only.';
-        setTimeout(() => firebase.auth().signOut(), 2000);
+        const msg = document.getElementById('userMessage');
+        msg.textContent = 'Access denied: Staff privileges required.';
+        msg.style.display = 'block';
+        setTimeout(() => firebase.auth().signOut().then(() => window.location.href = '../auth/login.html'), 2500);
         return;
       }
-      document.getElementById('userName').textContent = user.displayName || 'User';
+      
+      const name = user.displayName || userData.fullName || 'Staff Member';
+      document.getElementById('userName').textContent = name;
       document.getElementById('userEmail').textContent = user.email;
-      document.getElementById('userHospitalId').textContent = userData.hospitalId || '';
-    });
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-      firebase.auth().signOut().then(() => {
-        window.location.href = '../auth/login.html';
-      });
+      
+      document.getElementById('userNameDetail').textContent = name;
+      document.getElementById('userEmailDetail').textContent = user.email;
+      document.getElementById('userHospitalId').textContent = userData.hospitalId || '—';
+      
+      document.getElementById('profileDisplayName').value = user.displayName || '';
+      document.getElementById('profileHospitalId').value = userData.hospitalId || '';
+      
+      document.getElementById('userContent').style.display = 'block';
     });
 
-    // --- Profile Update UI & Logic ---
-    const userContent = document.getElementById('userContent');
-    const profileUpdateSection = document.createElement('div');
-    profileUpdateSection.innerHTML = `
-      <hr style="margin:30px 0;">
-      <h3>Update Profile</h3>
-      <form id="profileForm">
-        <div style="margin-bottom:12px;">
-          <label>Display Name</label><br>
-          <input type="text" id="profileDisplayName" style="width:100%;padding:7px;">
-        </div>
-        <div style="margin-bottom:12px;">
-          <label>Hospital ID</label><br>
-          <input type="text" id="profileHospitalId" style="width:100%;padding:7px;">
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:10px;">Update Profile</button>
-      </form>
-      <div id="profileMessage" style="margin-top:10px;color:#e67e22;"></div>
-    `;
-    userContent.appendChild(profileUpdateSection);
-    firebase.auth().onAuthStateChanged(async function(user) {
-      if (user) {
-        document.getElementById('profileDisplayName').value = user.displayName || '';
-        // Fetch hospitalId from Firestore
-        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-        document.getElementById('profileHospitalId').value = userDoc.data()?.hospitalId || '';
-      }
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      firebase.auth().signOut().then(() => window.location.href = '../auth/login.html');
     });
+
     document.getElementById('profileForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const displayName = document.getElementById('profileDisplayName').value.trim();
       const hospitalId = document.getElementById('profileHospitalId').value.trim();
-      const profileMessage = document.getElementById('profileMessage');
-      if (!displayName) { profileMessage.textContent = 'Display name required.'; return; }
-      if (!/^HSP\d{3}$/.test(hospitalId)) { profileMessage.textContent = 'Hospital ID must be like HSP001'; return; }
+      const msg = document.getElementById('profileMessage');
+      
+      if (!displayName) { 
+        msg.textContent = 'Display name required.'; 
+        msg.className = 'message error'; msg.style.display = 'block'; return; 
+      }
+      if (!/^HSP\d{3}$/.test(hospitalId)) { 
+        msg.textContent = 'Hospital ID must be like HSP001'; 
+        msg.className = 'message error'; msg.style.display = 'block'; return; 
+      }
+      
       try {
-        // Update Firebase Auth profile
         await firebase.auth().currentUser.updateProfile({ displayName });
-        // Update Firestore
         await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).update({ hospitalId });
-        profileMessage.style.color = '#27ae60';
-        profileMessage.textContent = 'Profile updated successfully!';
+        
+        msg.textContent = 'Profile updated successfully!';
+        msg.className = 'message success'; msg.style.display = 'block';
+        
         document.getElementById('userName').textContent = displayName;
+        document.getElementById('userNameDetail').textContent = displayName;
         document.getElementById('userHospitalId').textContent = hospitalId;
       } catch (err) {
-        profileMessage.style.color = '#e74c3c';
-        profileMessage.textContent = err.message;
+        msg.textContent = err.message;
+        msg.className = 'message error'; msg.style.display = 'block';
       }
     });
   </script>

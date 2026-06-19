@@ -1,49 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="../shared/common.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
-</head>
-<body style="background:#f5f6fa; font-family:sans-serif;">
-  <div style="max-width:900px;margin:40px auto;background:white;padding:32px 24px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);">
-    <h2 style="text-align:center;margin-bottom:20px;">Admin Dashboard</h2>
-    <div id="adminContent">
-      <!-- Admin-specific content goes here -->
-      <p>Welcome, <span id="adminName"></span> (<span id="adminEmail"></span>)</p>
-      <p>Hospital ID: <span id="adminHospitalId"></span></p>
-      <button id="logoutBtn" class="btn btn-secondary" style="margin-top:18px;">Logout</button>
-    </div>
-    <div id="adminMessage" style="margin-top:14px;color:#e74c3c;text-align:center;"></div>
-  </div>
+  <title>Admin Dashboard — MediCore OT Scheduler</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="../assets/css/index.css" rel="stylesheet">
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="../firebase-config.js"></script>
   <script>
-    // Auth state observer for security
+    if (!firebase.apps.length) { firebase.initializeApp(window.firebaseConfig); }
+  </script>
+
+  <style>
+    body { min-height: 100vh; background: var(--surface-bg); padding: 2rem; }
+    .admin-wrapper { max-width: 960px; margin: 0 auto; }
+    .admin-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface-card); border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg); padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);
+    }
+    .admin-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .admin-brand-icon {
+      width: 32px; height: 32px; background: var(--brand-primary);
+      border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
+    }
+    .admin-brand-icon svg { width: 16px; height: 16px; fill: #fff; }
+    .admin-brand h1 { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+    .admin-brand span { font-size: 0.75rem; color: var(--text-muted); display: block; }
+    .admin-user { display: flex; align-items: center; gap: 0.75rem; }
+    .admin-user-info { text-align: right; }
+    .admin-user-info strong { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); display: block; }
+    .admin-user-info em { font-size: 0.75rem; color: var(--text-muted); font-style: normal; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; }
+    .info-item { background: var(--surface-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.875rem 1rem; }
+    .info-item label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 0.25rem; }
+    .info-item span { font-size: 0.9375rem; font-weight: 500; color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="admin-wrapper">
+    <!-- Top bar -->
+    <div class="admin-topbar">
+      <div class="admin-brand">
+        <div class="admin-brand-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c.55 0 1 .45 1 1v3h3c.55 0 1 .45 1 1s-.45 1-1 1h-3v3c0 .55-.45 1-1 1s-1-.45-1-1v-3H8c-.55 0-1-.45-1-1s.45-1 1-1h3V7c0-.55.45-1 1-1z"/></svg>
+        </div>
+        <div>
+          <h1>MediCore</h1>
+          <span>Admin Console</span>
+        </div>
+      </div>
+      <div class="admin-user">
+        <div class="admin-user-info">
+          <strong id="adminName">Loading…</strong>
+          <em id="adminEmail"></em>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost btn-sm">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Access denied message -->
+    <div class="message error" id="adminMessage" style="display:none;"></div>
+
+    <!-- Admin content -->
+    <div id="adminContent" style="display:none;">
+      <div class="card" style="margin-bottom:1.25rem;">
+        <div class="card-title">
+          <i class="fas fa-shield-alt" style="color:var(--brand-primary);margin-right:0.5rem;"></i>
+          Administrator Profile
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Full Name</label>
+            <span id="adminNameDetail">—</span>
+          </div>
+          <div class="info-item">
+            <label>Email</label>
+            <span id="adminEmailDetail">—</span>
+          </div>
+          <div class="info-item">
+            <label>Hospital ID</label>
+            <span id="adminHospitalId">—</span>
+          </div>
+          <div class="info-item">
+            <label>Role</label>
+            <span><span class="badge badge-primary">Administrator</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-arrow-right" style="color:var(--brand-primary);margin-right:0.5rem;"></i>
+          Go to Full Dashboard
+        </div>
+        <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1rem;">
+          The main Hospital OT Scheduler application is available at the dashboard.
+        </p>
+        <a href="../index.html" class="btn btn-primary">
+          <i class="fas fa-th-large"></i> Open Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
     firebase.auth().onAuthStateChanged(async function(user) {
-      if (!user) {
-        window.location.href = '../auth/login.html';
-        return;
-      }
-      // Fetch user profile from Firestore
+      if (!user) { window.location.href = '../auth/login.html'; return; }
       const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
       const userData = userDoc.data();
       if (!userData || userData.role !== 'admin') {
-        document.getElementById('adminMessage').textContent = 'Access denied: Admins only.';
-        setTimeout(() => firebase.auth().signOut(), 2000);
+        const msg = document.getElementById('adminMessage');
+        msg.textContent = 'Access denied: Administrator privileges required.';
+        msg.style.display = 'block';
+        setTimeout(() => firebase.auth().signOut().then(() => window.location.href = '../auth/login.html'), 2500);
         return;
       }
-      document.getElementById('adminName').textContent = user.displayName || 'Admin';
+      const name = user.displayName || userData.fullName || 'Administrator';
+      document.getElementById('adminName').textContent = name;
       document.getElementById('adminEmail').textContent = user.email;
-      document.getElementById('adminHospitalId').textContent = userData.hospitalId;
+      document.getElementById('adminNameDetail').textContent = name;
+      document.getElementById('adminEmailDetail').textContent = user.email;
+      document.getElementById('adminHospitalId').textContent = userData.hospitalId || '—';
+      document.getElementById('adminContent').style.display = 'block';
     });
-    // Logout
+
     document.getElementById('logoutBtn').addEventListener('click', function() {
-      firebase.auth().signOut().then(() => {
-        window.location.href = '../auth/login.html';
-      });
+      firebase.auth().signOut().then(() => window.location.href = '../auth/login.html');
     });
   </script>
 </body>
