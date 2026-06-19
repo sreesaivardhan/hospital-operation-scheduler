@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 <link href="assets/css/index.css" rel="stylesheet"/>
+<link rel="icon" href="data:,">
 </head>
 <body>
 <!-- Toast notification container -->
@@ -40,27 +41,75 @@
 </div>
 
 <!-- OT Status update modal -->
-<div id="otStatusModal" style="display:none;" class="modal">
-  <div class="modal-content" style="max-width:380px;">
-    <div class="modal-header">
-      <h2 class="modal-title">Update Operation Status</h2>
-      <button class="close" onclick="document.getElementById('otStatusModal').style.display='none'">&#xd7;</button>
-    </div>
-    <div class="form-group" style="margin-top:0.5rem;">
-      <label class="form-label" for="otStatusSelect">New Status</label>
-      <select id="otStatusSelect" class="form-input">
-        <option value="scheduled">Scheduled</option>
-        <option value="in-progress">In Progress</option>
-        <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1rem;">
-      <button class="btn btn-ghost" onclick="document.getElementById('otStatusModal').style.display='none'">Cancel</button>
-      <button class="btn btn-primary" id="otStatusSaveBtn">Update Status</button>
-    </div>
-  </div>
+<div class="modal" id="otStatusModal">
+<div class="modal-content" style="max-width: 400px;">
+<div class="modal-header">
+<h2 class="modal-title">Update Operation Status</h2>
+<button class="close" onclick="document.getElementById('otStatusModal').style.display='none'">×</button>
 </div>
+<div class="form-group" style="margin-bottom: 1.5rem;">
+<label class="form-label" for="otStatusSelect">Status</label>
+<select class="form-input" id="otStatusSelect">
+<option value="scheduled">Scheduled</option>
+<option value="in-progress">In Progress</option>
+<option value="completed">Completed</option>
+<option value="cancelled">Cancelled</option>
+</select>
+</div>
+<div class="form-actions">
+<button class="btn btn-primary" id="otStatusSaveBtn">Save Status</button>
+<button class="btn btn-secondary" onclick="document.getElementById('otStatusModal').style.display='none'">Cancel</button>
+</div>
+</div>
+</div>
+
+<!-- Emergency Protocol Modal -->
+<div class="modal" id="emergencyModal">
+<div class="modal-content">
+<div class="modal-header">
+<h2 class="modal-title" style="color: #e74c3c;"><i class="fas fa-ambulance"></i> Emergency Protocol</h2>
+<button class="close" onclick="closeEmergencyModal()">×</button>
+</div>
+<form id="emergencyForm">
+<div class="form-grid">
+<div class="form-group">
+<label class="form-label" for="emPatient">Patient *</label>
+<select class="form-input" id="emPatient" required></select>
+</div>
+<div class="form-group">
+<label class="form-label" for="emSurgeon">Surgeon (if known)</label>
+<select class="form-input" id="emSurgeon"></select>
+</div>
+<div class="form-group">
+<label class="form-label" for="emProcedure">Procedure Type *</label>
+<input class="form-input" id="emProcedure" placeholder="e.g. Emergency Appendectomy" required type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="emPriority">Emergency Priority *</label>
+<select class="form-input" id="emPriority" required>
+<option value="emergency">Emergency (Immediate)</option>
+<option value="urgent">Urgent (Within 24h)</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" for="emOTRoom">Requested OT Room *</label>
+<select class="form-input" id="emOTRoom" required></select>
+</div>
+<div class="form-group">
+<label class="form-label" for="emNotes">Emergency Notes</label>
+<textarea class="form-input" id="emNotes" rows="2" placeholder="Trauma details, requirements, etc."></textarea>
+</div>
+</div>
+<div class="form-actions" style="margin-top: 1.5rem;">
+<button class="btn btn-danger" type="submit">
+<span id="emSubmitText">Save Emergency Case</span>
+</button>
+<button class="btn btn-secondary" onclick="closeEmergencyModal()" type="button">Cancel</button>
+</div>
+</form>
+</div>
+</div>
+
 <!-- Authentication Container -->
 <div class="auth-container" id="authContainer">
 <div class="auth-card">
@@ -297,7 +346,7 @@
 <button class="btn btn-warning" onclick="showSection('analytics')">
 <i class="fas fa-chart-line"></i> View Analytics
                         </button>
-<button class="btn btn-danger" onclick="openModal('emergencyModal')">
+<button class="btn btn-danger" onclick="showSection('operations'); openEmergencyModal();">
 <i class="fas fa-exclamation-triangle"></i> Emergency Protocol
                         </button>
 </div>
@@ -544,14 +593,18 @@
 <!-- Operations Management Section -->
 <div class="content-section" id="section-operations">
 <div class="section-card">
-<div class="section-header">
+<div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+<div>
 <h2>Operations Management</h2>
 </div>
-<div class="placeholder-module">
-<i class="fas fa-cogs"></i>
-<h3>Operations Management — Coming Soon</h3>
-<p>This module will cover equipment status tracking, supply inventory management, and staff shift scheduling once integration is complete.</p>
-<span class="badge badge-warning">Module not yet active</span>
+<div style="display: flex; gap: 0.5rem;">
+<button class="btn btn-danger" onclick="showSection('operations'); openEmergencyModal();">
+<i class="fas fa-ambulance"></i> Declare Emergency
+</button>
+</div>
+</div>
+<div id="operationsContainer">
+    <!-- Operations Table will be loaded here -->
 </div>
 </div>
 </div>
@@ -989,7 +1042,23 @@
 </div>
 <div class="form-group">
 <label class="form-label" for="scheduleNotes">Notes</label>
-<textarea class="form-input" id="scheduleNotes" rows="3"></textarea>
+<textarea class="form-input" id="scheduleNotes" placeholder="Any special requirements..." rows="2"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" for="scheduleAnesthesiologist">Anesthesiologist</label>
+<input class="form-input" id="scheduleAnesthesiologist" placeholder="Name (Optional)" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="scheduleNurses">Support Staff / Nurses</label>
+<input class="form-input" id="scheduleNurses" placeholder="Names (Optional)" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="schedulePriority">Priority</label>
+<select class="form-input" id="schedulePriority">
+<option value="normal">Normal</option>
+<option value="urgent">Urgent</option>
+<option value="emergency">Emergency</option>
+</select>
 </div>
 </div>
 <div style="display:flex; gap:0.5rem; margin-top:1rem;">

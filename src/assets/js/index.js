@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
     safe('patientForm',      'submit', handlePatientSubmit);
     safe('otRoomForm',       'submit', handleOTRoomSubmit);
     safe('otScheduleForm',   'submit', handleOTScheduleSubmit);
+    safe('emergencyForm',    'submit', handleEmergencySubmit);
     safe('userForm',         'submit', handleUserSubmit);
 
     // OT schedule date default
@@ -174,6 +175,7 @@ function showSection(sectionName) {
         case 'ot-rooms':    loadOTRooms();     break;
         case 'ot-schedule': loadOTSchedule();  break;
         case 'analytics':   loadAnalytics();   break;
+        case 'operations':  loadOperationsManagement(); break;
         case 'scheduling':  loadAdvancedSchedules(); break;
         case 'logs':        loadActivityLog(); break;
     }
@@ -352,7 +354,7 @@ function updateSessionStatus() {
     if (!sessionStartTime) return;
     const secs = Math.floor((new Date() - sessionStartTime) / 1000);
     const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60);
-    let txt = '● Active Session';
+    let txt = 'Active Session';
     if (h > 0) txt += ` (${h}h ${m}m)`; else if (m > 0) txt += ` (${m}m)`;
     const ss = document.getElementById('sessionStatus');
     const lt = document.getElementById('loginTime');
@@ -659,7 +661,7 @@ async function handleUserSubmit(e) {
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         await db.collection('users').doc(editingUserId).update(updates);
-        await logAdminAction('User Updated', `Admin updated user profile: ${updates.fullName}`);
+        await logAdminAction('user_updated', `Admin updated user profile: ${updates.fullName}`, 'users', editingUserId);
         showToast('success', 'User updated successfully');
         closeUserModal();
         
@@ -687,7 +689,7 @@ async function deactivateUser(userId, userName, deactivate) {
             isActive: !deactivate,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        await logAdminAction(`User ${capitalizeFirst(actionText)}d`, `Admin ${actionText}d user: ${userName}`);
+        await logAdminAction(deactivate ? 'user_deactivated' : 'user_reactivated', `Admin ${actionText}d user: ${userName}`, 'users', userId);
         showToast('success', `User ${actionText}d successfully`);
         loadUsers();
     } catch (err) {
@@ -1128,7 +1130,10 @@ async function handleOTScheduleSubmit(e) {
             startTime: document.getElementById('scheduleStartTime').value,
             endTime:   document.getElementById('scheduleEndTime').value,
             procedure: document.getElementById('scheduleProcedure').value.trim(),
-            notes:     document.getElementById('scheduleNotes').value.trim()
+            notes:     document.getElementById('scheduleNotes').value.trim(),
+            anesthesiologist: document.getElementById('scheduleAnesthesiologist').value.trim(),
+            nurses:    document.getElementById('scheduleNurses').value.trim(),
+            priority:  document.getElementById('schedulePriority').value
         };
         
         const roomConflict = await checkOTConflict(scheduleData.otRoomId, scheduleData.date, scheduleData.startTime, scheduleData.endTime, editId);
@@ -1140,19 +1145,22 @@ async function handleOTScheduleSubmit(e) {
         if (editId) {
             scheduleData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
             await db.collection('ot_schedules').doc(editId).update(scheduleData);
-            await logAdminAction('Operation Updated', `Updated schedule: ${scheduleData.procedure}`);
+            await logAdminAction('operation_updated', `Updated schedule: ${scheduleData.procedure}`, 'ot_schedules', editId);
             showMessage('success', 'Operation updated successfully!');
         } else {
             scheduleData.status = 'scheduled';
             scheduleData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-            await db.collection('ot_schedules').add(scheduleData);
-            await logAdminAction('Operation Scheduled', `Scheduled: ${scheduleData.procedure}`);
+            const docRef = await db.collection('ot_schedules').add(scheduleData);
+            await logAdminAction('operation_created', `Scheduled: ${scheduleData.procedure}`, 'ot_schedules', docRef.id);
             showMessage('success', 'Operation scheduled successfully!');
         }
         closeOTScheduleModal();
         await loadOTSchedule();
         if (document.getElementById('section-scheduling').classList.contains('active')) {
             loadAdvancedSchedules();
+        }
+        if (document.getElementById('section-operations').classList.contains('active')) {
+            loadOperationsManagement();
         }
     } catch (err) {
         console.error('Error scheduling operation:', err);
@@ -1214,12 +1222,13 @@ function displayOTSchedule() {
         const roomName = room ? room.roomNumber : (s.otRoomId ? 'ID:'+s.otRoomId.slice(0,4) : 'Unknown');
         const patName = patient ? patient.name : 'Unknown Patient';
         const docName = surgeon ? surgeon.name : 'Unknown Surgeon';
+        const emergencyMarker = s.priority === 'emergency' ? ' <span class="badge badge-danger">Emergency</span>' : '';
         html += `<tr>
             <td>${s.startTime || '?'} - ${s.endTime || '?'}</td>
             <td>OT ${roomName}</td>
             <td>${patName}</td>
             <td>${docName}</td>
-            <td>${s.procedure || '-'}</td>
+            <td>${s.procedure || '-'}${emergencyMarker}</td>
             <td><span style="padding:.25rem .75rem;border-radius:15px;font-size:.8rem;background:${getScheduleStatusColor(s.status)};">
                 ${capitalizeFirst(s.status)}</span></td>
             <td>
@@ -1262,6 +1271,7 @@ async function updateOTStatus(scheduleId) {
                 await db.collection('ot_schedules').doc(_otStatusScheduleId).update({
                     status: newStatus, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                await logAdminAction('operation_status_updated', `Status to ${newStatus}`, 'ot_schedules', _otStatusScheduleId);
                 showToast('success', 'Operation status updated!');
                 await loadOTSchedule();
                 if (document.getElementById('section-scheduling').classList.contains('active')) {
@@ -1283,7 +1293,7 @@ async function cancelOperation(scheduleId) {
         await db.collection('ot_schedules').doc(scheduleId).update({
             status: 'cancelled', updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        await logAdminAction('Operation Cancelled', 'Cancelled scheduled operation');
+        await logAdminAction('schedule_cancelled', 'Cancelled scheduled operation', 'ot_schedules', scheduleId);
         showMessage('success', 'Operation cancelled.');
         await loadOTSchedule();
         if (document.getElementById('section-scheduling').classList.contains('active')) {
@@ -1307,9 +1317,13 @@ async function loadActivityLog() {
         snap.forEach(doc => {
             const log = doc.data();
             const ts  = log.timestamp ? log.timestamp.toDate().toLocaleString() : 'Unknown time';
+            const actionStr = (log.action || 'Action').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const userStr = log.userEmail ? `<span style="color:var(--text-secondary); margin-left:0.5rem;"><i class="fas fa-user" style="font-size:0.75rem;"></i> ${log.userEmail}</span>` : '';
+            const targetAttr = (log.entityType && log.entityId) ? ` title="Target: ${log.entityType}:${log.entityId}" style="cursor:help;"` : '';
+            
             html += `<div class="audit-entry">
-                <div class="audit-time">${ts}</div>
-                <div class="audit-action">${log.action}</div>
+                <div class="audit-time">${ts}${userStr}</div>
+                <div class="audit-action"><span${targetAttr}>${actionStr}</span></div>
                 <div class="audit-detail">${log.details}</div></div>`;
         });
         if (logC) logC.innerHTML = (empty ? empty.outerHTML : '') + html;
@@ -1463,15 +1477,19 @@ function showMessage(type, message) {
     showToast(type === 'success' ? 'success' : 'error', message);
 }
 
-async function logAdminAction(action, details) {
+async function logAdminAction(action, details, entityType = null, entityId = null) {
     try {
         if (!currentUser) return;
-        await db.collection('adminLogs').add({
+        const logData = {
             userId:    currentUser.uid,
             userEmail: currentUser.email,
             action, details,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        };
+        if (entityType) logData.entityType = entityType;
+        if (entityId) logData.entityId = entityId;
+        
+        await db.collection('adminLogs').add(logData);
     } catch (err) {
         console.error('Error logging admin action:', err);
     }
@@ -1676,6 +1694,7 @@ async function loadAdvancedSchedules() {
             const roomName = room ? room.roomNumber : (s.otRoomId ? 'ID:'+s.otRoomId.slice(0,4) : 'Unknown');
             const patName = patient ? patient.name : 'Unknown Patient';
             const docName = surgeon ? surgeon.name : 'Unknown Surgeon';
+            const emergencyMarker = s.priority === 'emergency' ? ' <span class="badge badge-danger">Emergency</span>' : '';
             
             html += `<tr>
                 <td>${s.date || 'No Date'}</td>
@@ -1683,7 +1702,7 @@ async function loadAdvancedSchedules() {
                 <td>OT ${roomName}</td>
                 <td>${patName}</td>
                 <td>${docName}</td>
-                <td>${s.procedure || '-'}</td>
+                <td>${s.procedure || '-'}${emergencyMarker}</td>
                 <td><span style="padding:.25rem .75rem;border-radius:15px;font-size:.8rem;background:${getScheduleStatusColor(s.status)};">
                     ${capitalizeFirst(s.status)}</span></td>
                 <td>
@@ -1723,6 +1742,9 @@ async function editSchedule(scheduleId) {
         document.getElementById('scheduleEndTime').value = s.endTime;
         document.getElementById('scheduleProcedure').value = s.procedure;
         document.getElementById('scheduleNotes').value = s.notes || '';
+        document.getElementById('scheduleAnesthesiologist').value = s.anesthesiologist || '';
+        document.getElementById('scheduleNurses').value = s.nurses || '';
+        document.getElementById('schedulePriority').value = s.priority || 'normal';
         
         document.getElementById('otScheduleForm').dataset.editId = scheduleId;
         document.getElementById('otScheduleModalTitle').textContent = 'Edit Operation';
@@ -1737,7 +1759,152 @@ async function editSchedule(scheduleId) {
 
 function viewAnalytics()      { loadAnalytics(); showSection('analytics'); }
 function systemSettings()     { showToast('info', 'System settings coming soon.'); }
-function manageOperations()   { showToast('info', 'Operations Management coming soon.'); }
+
+async function deleteOperation(scheduleId) {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    const confirmed = await showConfirm('Delete Operation', 'This will permanently delete this operation. Are you sure?');
+    if (!confirmed) return;
+    try {
+        await db.collection('ot_schedules').doc(scheduleId).delete();
+        await logAdminAction('operation_deleted', 'Admin deleted operation record', 'ot_schedules', scheduleId);
+        showMessage('success', 'Operation deleted successfully.');
+        if (document.getElementById('section-operations').classList.contains('active')) loadOperationsManagement();
+        if (document.getElementById('section-scheduling').classList.contains('active')) loadAdvancedSchedules();
+        loadOTSchedule();
+        loadAnalytics();
+    } catch(err) {
+        console.error('Error deleting operation:', err);
+        showMessage('error', 'Error deleting operation.');
+    }
+}
+
+async function loadOperationsManagement() {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    try {
+        const snap = await db.collection('ot_schedules').orderBy('startTime').get();
+        let schedules = [];
+        snap.forEach(d => schedules.push({ id: d.id, ...d.data() }));
+        
+        let html = `<div style="overflow-x:auto;"><table class="data-table">
+            <thead><tr><th>Date & Time</th><th>Patient</th><th>Surgeon</th><th>Procedure</th><th>Anesthesia/Nurses</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>`;
+        schedules.forEach(s => {
+            const patient = allPatients.find(p => p.id === s.patientId);
+            const surgeon = allDoctors.find(d => d.id === s.surgeonId);
+            const patName = patient ? patient.name : 'Unknown Patient';
+            const docName = surgeon ? surgeon.name : 'Unknown Surgeon';
+            
+            const staffStr = [s.anesthesiologist, s.nurses].filter(Boolean).join(' / ') || 'Unassigned';
+            const priorityBadge = s.priority === 'emergency' ? '<span class="badge badge-danger">Emergency</span>' : 
+                                  (s.priority === 'urgent' ? '<span class="badge badge-warning">Urgent</span>' : 'Normal');
+
+            html += `<tr>
+                <td>${s.date || 'No Date'}<br><small>${s.startTime || '?'} - ${s.endTime || '?'}</small></td>
+                <td>${patName}</td>
+                <td>${docName}</td>
+                <td>${s.procedure || '-'}</td>
+                <td>${staffStr}</td>
+                <td>${priorityBadge}</td>
+                <td><span style="padding:.25rem .75rem;border-radius:15px;font-size:.8rem;background:${getScheduleStatusColor(s.status)};">${capitalizeFirst(s.status)}</span></td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editSchedule('${s.id}')">Edit</button>
+                    <button class="btn btn-ghost btn-sm" onclick="cancelOperation('${s.id}')">Cancel</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteOperation('${s.id}')">Delete</button>
+                </td>
+            </tr>`;
+        });
+        html += '</tbody></table></div>';
+        const container = document.getElementById('operationsContainer');
+        if (container) container.innerHTML = html;
+    } catch(err) {
+        console.error('Error loading operations:', err);
+        showToast('error', 'Error loading operations');
+    }
+}
+
+function openEmergencyModal() {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    
+    // Populate dropdowns
+    const patientSel = document.getElementById('emPatient');
+    const surgeonSel = document.getElementById('emSurgeon');
+    const roomSel = document.getElementById('emOTRoom');
+    
+    if (patientSel) {
+        patientSel.innerHTML = '<option value="">Select Patient</option>';
+        allPatients.forEach(p => patientSel.innerHTML += `<option value="${p.id}">${p.name}</option>`);
+    }
+    if (surgeonSel) {
+        surgeonSel.innerHTML = '<option value="">Unknown / TBA</option>';
+        allDoctors.forEach(d => surgeonSel.innerHTML += `<option value="${d.id}">${d.name}</option>`);
+    }
+    if (roomSel) {
+        roomSel.innerHTML = '<option value="">Select OT Room</option>';
+        allOTRooms.forEach(r => roomSel.innerHTML += `<option value="${r.id}">OT Room ${r.roomNumber}</option>`);
+    }
+    
+    const form = document.getElementById('emergencyForm');
+    if (form) form.reset();
+    
+    const modal = document.getElementById('emergencyModal');
+    if (modal) modal.style.display = 'block';
+}
+
+function closeEmergencyModal() {
+    const modal = document.getElementById('emergencyModal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function handleEmergencySubmit(e) {
+    e.preventDefault();
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    try {
+        const scheduleData = {
+            otRoomId:  document.getElementById('emOTRoom').value,
+            patientId: document.getElementById('emPatient').value,
+            surgeonId: document.getElementById('emSurgeon').value || null,
+            date:      new Date().toISOString().split('T')[0],
+            startTime: new Date().toTimeString().split(' ')[0].slice(0, 5), // Current time HH:MM
+            endTime:   '23:59', // Block rest of day roughly
+            procedure: document.getElementById('emProcedure').value.trim(),
+            notes:     document.getElementById('emNotes').value.trim(),
+            priority:  document.getElementById('emPriority').value,
+            status:    'scheduled',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        // Attempt room conflict validation
+        const roomConflict = await checkOTConflict(scheduleData.otRoomId, scheduleData.date, scheduleData.startTime, scheduleData.endTime);
+        if (roomConflict) { 
+            const confirmed = await showConfirm('Room Conflict Detected', 'The selected OT room is already booked. Proceed with emergency override?');
+            if (!confirmed) return;
+        }
+        
+        if (scheduleData.surgeonId) {
+            const docConflict = await checkDoctorConflict(scheduleData.surgeonId, scheduleData.date, scheduleData.startTime, scheduleData.endTime);
+            if (docConflict) {
+                const confirmed = await showConfirm('Surgeon Conflict Detected', 'The selected surgeon is already booked. Proceed with emergency override?');
+                if (!confirmed) return;
+            }
+        }
+
+        const docRef = await db.collection('ot_schedules').add(scheduleData);
+        await logAdminAction('emergency_case_created', `Emergency: ${scheduleData.procedure}`, 'ot_schedules', docRef.id);
+        showMessage('success', 'Emergency case created successfully!');
+        
+        closeEmergencyModal();
+        if (document.getElementById('section-operations').classList.contains('active')) {
+            loadOperationsManagement();
+        }
+        if (document.getElementById('section-scheduling').classList.contains('active')) {
+            loadAdvancedSchedules();
+        }
+    } catch (err) {
+        console.error('Error creating emergency case:', err);
+        showMessage('error', 'Error creating emergency case');
+    }
+}
+
 function scheduleManagement() { loadAdvancedSchedules(); showSection('scheduling'); }
 function auditLogs()          { showSection('logs'); }
 function viewSchedule()       { showSection('assignments'); }
@@ -1830,6 +1997,8 @@ window.endSession         = endSession;
 window.viewAllUsers       = viewAllUsers;
 window.exportUsers        = exportUsers;
 window.manageUsers        = manageUsers;
+function manageOperations()   { showSection('operations'); }
+
 window.viewAnalytics      = viewAnalytics;
 window.systemSettings     = systemSettings;
 window.manageOperations   = manageOperations;
@@ -1840,11 +2009,16 @@ window.profileSettings    = profileSettings;
 window.viewAssignments    = viewAssignments;
 window.updateAvailability = updateAvailability;
 window.loadAnalytics          = loadAnalytics;
+window.loadOperationsManagement = loadOperationsManagement;
 window.loadAdvancedSchedules  = loadAdvancedSchedules;
 window.clearSchedFilters      = clearSchedFilters;
 window.editSchedule           = editSchedule;
 window.handleOTScheduleSubmit = handleOTScheduleSubmit;
 window.loadOTSchedule         = loadOTSchedule;
+window.openEmergencyModal     = openEmergencyModal;
+window.closeEmergencyModal    = closeEmergencyModal;
+window.handleEmergencySubmit  = handleEmergencySubmit;
+window.deleteOperation        = deleteOperation;
 
 // User Management
 window.editUser           = editUser;
