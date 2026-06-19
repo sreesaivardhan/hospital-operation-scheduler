@@ -54,12 +54,31 @@ document.addEventListener('DOMContentLoaded', function () {
         if (user && user.emailVerified) {
             try {
                 const userDoc = await db.collection('users').doc(user.uid).get();
+                let userData;
                 if (!userDoc.exists) {
-                    showAuthMessage('error', 'User profile not found. Please contact support.');
-                    await auth.signOut();
-                    return;
+                    const isGoogle = user.providerData && user.providerData.some(p => p.providerId === 'google.com');
+                    if (isGoogle) {
+                        userData = {
+                            email: user.email,
+                            fullName: user.displayName || 'Google User',
+                            phone: user.phoneNumber || '',
+                            department: 'General',
+                            role: 'user',
+                            isActive: true,
+                            bio: '',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        };
+                        await db.collection('users').doc(user.uid).set(userData);
+                        await logAdminAction('google_sign_in_new', `New Google user: ${user.email}`, 'users', user.uid);
+                    } else {
+                        showAuthMessage('error', 'Your account is not set up in the system. Please contact an administrator.');
+                        await auth.signOut();
+                        return;
+                    }
+                } else {
+                    userData = userDoc.data();
                 }
-                const userData = userDoc.data();
                 if (userData.isActive === false) {
                     pendingAuthMessage = { type: 'error', text: 'Your account has been deactivated. Please contact an administrator.' };
                     await auth.signOut();
@@ -73,7 +92,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 loadStaffData();
             } catch (err) {
                 console.error('Error loading profile:', err);
-                showAuthMessage('error', 'Error loading profile: ' + err.message);
+                await auth.signOut();
+                if (err.code === 'permission-denied' || err.message.includes('insufficient permissions')) {
+                    showAuthMessage('error', 'Your account is not set up in the system. Please contact an administrator.');
+                } else {
+                    showAuthMessage('error', 'A network or system error occurred while loading your profile.');
+                }
             }
         } else if (user && !user.emailVerified) {
             showAuthMessage('error', 'Please verify your email before accessing the dashboard.');
@@ -258,6 +282,20 @@ async function handleForgotPassword(e) {
     } catch (err) {
         const msgs = { 'auth/user-not-found': 'No account with this email', 'auth/invalid-email': 'Invalid email' };
         showAuthMessage('error', msgs[err.code] || 'Error sending reset email');
+    }
+}
+
+async function signInWithGoogle() {
+    try {
+        setAuthLoading(true);
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await auth.signInWithPopup(provider);
+        await logAdminAction('user_login', `Google user logged in: ${result.user.email}`);
+        // onAuthStateChanged will handle the rest
+    } catch (err) {
+        setAuthLoading(false);
+        console.error('Google Sign-In Error:', err);
+        showAuthMessage('error', err.message || 'Google Sign-In failed');
     }
 }
 
@@ -2024,6 +2062,7 @@ window.deleteOperation        = deleteOperation;
 window.editUser           = editUser;
 window.closeUserModal     = closeUserModal;
 window.deactivateUser     = deactivateUser;
+window.signInWithGoogle   = signInWithGoogle;
 
 // ── Logout ─────────────────────────────────────────────────────
 async function logout() {
