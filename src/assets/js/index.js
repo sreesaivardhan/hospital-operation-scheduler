@@ -15,6 +15,7 @@ let currentUserData = null;
 let isLoginMode     = true;
 let sessionStartTime = null;
 let sessionTimer    = null;
+let pendingAuthMessage = null;
 let allDoctors      = [];
 let allPatients     = [];
 let allOTRooms      = [];
@@ -59,6 +60,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 const userData = userDoc.data();
+                if (userData.isActive === false) {
+                    pendingAuthMessage = { type: 'error', text: 'Your account has been deactivated. Please contact an administrator.' };
+                    await auth.signOut();
+                    return;
+                }
                 currentUser     = user;
                 currentUserData = userData;
                 showDashboard(userData);
@@ -91,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
     safe('patientForm',      'submit', handlePatientSubmit);
     safe('otRoomForm',       'submit', handleOTRoomSubmit);
     safe('otScheduleForm',   'submit', handleOTScheduleSubmit);
+    safe('userForm',         'submit', handleUserSubmit);
 
     // OT schedule date default
     const otDateInput = document.getElementById('otScheduleDate');
@@ -166,6 +173,8 @@ function showSection(sectionName) {
         case 'patients':    loadPatients();    break;
         case 'ot-rooms':    loadOTRooms();     break;
         case 'ot-schedule': loadOTSchedule();  break;
+        case 'analytics':   loadAnalytics();   break;
+        case 'scheduling':  loadAdvancedSchedules(); break;
         case 'logs':        loadActivityLog(); break;
     }
 }
@@ -183,6 +192,11 @@ async function handleAuth(e) {
             if (!cred.user.emailVerified) {
                 showAuthMessage('error', 'Please verify your email before logging in.');
                 await auth.signOut();
+                return;
+            }
+            const userDoc = await db.collection('users').doc(cred.user.uid).get();
+            if (!userDoc.exists || userDoc.data().isActive === false) {
+                // Let onAuthStateChanged handle the rejection/sign-out and messaging handoff
                 return;
             }
             await logAdminAction('User Login', `User ${email} logged in`);
@@ -278,6 +292,11 @@ function showAuth() {
     if (a) a.style.display = 'flex';
     if (d) d.style.display = 'none';
     hideAuthMessages();
+    
+    if (pendingAuthMessage) {
+        showAuthMessage(pendingAuthMessage.type, pendingAuthMessage.text);
+        pendingAuthMessage = null;
+    }
 }
 
 function showDashboard(userData) {
@@ -353,11 +372,12 @@ async function loadInitialData() {
             // Note: If you encounter a 403 Identity Toolkit error (getProjectConfig)
             // this is often due to API key domain restrictions in Google Cloud Console
             // (e.g. blocking 127.0.0.1 or localhost:8080) or Email/Password auth being disabled.
-            const [docSnap, usrSnap, otRoomsSnap, otSchedSnap] = await Promise.all([
+            const [docSnap, usrSnap, otRoomsSnap, otSchedSnap, patSnap] = await Promise.all([
                 db.collection('doctors').get(),
                 db.collection('users').get(),
                 db.collection('ot_rooms').get(),
-                db.collection('ot_schedules').get()
+                db.collection('ot_schedules').get(),
+                db.collection('patients').get()
             ]);
             const td = document.getElementById('totalDoctors');
             const tu = document.getElementById('totalUsers');
@@ -369,6 +389,13 @@ async function loadInitialData() {
             if (tr) tr.textContent = otRoomsSnap.size;
             if (ts) ts.textContent = otSchedSnap.size;
 
+            allOTRooms = [];
+            otRoomsSnap.forEach(d => allOTRooms.push({ id: d.id, ...d.data() }));
+            
+            allPatients = [];
+            patSnap.forEach(d => allPatients.push({ id: d.id, ...d.data() }));
+
+            allOTSchedules = [];
             allDoctors = [];
             docSnap.forEach(d => allDoctors.push({ id: d.id, ...d.data() }));
         }
@@ -550,27 +577,37 @@ async function loadUsers() {
               <th>Name</th><th>Email</th><th>Department</th><th>Role</th><th>Status</th><th>Actions</th>
             </tr></thead>
             <tbody>
-              ${users.map(u => `
-              <tr>
-                <td>${u.fullName || 'N/A'}</td>
-                <td>${u.email}</td>
-                <td>${capitalizeFirst(u.department || 'N/A')}</td>
-                <td>${capitalizeFirst(u.role || 'user')}</td>
-                <td><span class="badge ${u.emailVerified ? 'badge-success' : 'badge-danger'}">
-                  ${u.emailVerified ? 'Verified' : 'Unverified'}</span></td>
-                <td>
-                  <button class="btn btn-ghost btn-sm" disabled
-                    title="Requires Firebase Admin SDK">Edit</button>
-                  <button class="btn btn-ghost btn-sm" disabled
-                    title="Requires Firebase Admin SDK">Remove</button>
-                </td>
-              </tr>`).join('')}
+              ${users.map(u => {
+                const isDeactivated = u.isActive === false;
+                const statusBadge = isDeactivated 
+                  ? '<span class="badge" style="background:rgba(231,76,60,.1);color:#e74c3c;">Deactivated</span>'
+                  : (u.emailVerified 
+                      ? '<span class="badge" style="background:rgba(39,174,96,.1);color:#27ae60;">Verified</span>' 
+                      : '<span class="badge" style="background:rgba(255,193,7,.1);color:#b45309;">Unverified</span>');
+                
+                const isAdmin = currentUserData && currentUserData.role === 'admin';
+                const actions = isAdmin 
+                  ? `<button class="btn btn-warning btn-sm" onclick="editUser('${u.id}')">Edit</button>
+                     <button class="btn btn-danger btn-sm" onclick="deactivateUser('${u.id}','${(u.fullName || '').replace(/'/g,"\\\\'")}', ${!isDeactivated})">
+                       ${isDeactivated ? 'Reactivate' : 'Deactivate'}
+                     </button>`
+                  : `<button class="btn btn-ghost btn-sm" disabled title="Admin only">Read Only</button>`;
+
+                return `<tr>
+                 <td>${u.fullName || 'N/A'}</td>
+                 <td>${u.email}</td>
+                 <td>${capitalizeFirst(u.department || 'N/A')}</td>
+                 <td>${capitalizeFirst(u.role || 'user')}</td>
+                 <td>${statusBadge}</td>
+                 <td>${actions}</td>
+                </tr>`;
+              }).join('')}
             </tbody>
           </table>
         </div>
         <p style="font-size:.8rem;color:var(--text-muted);margin-top:.75rem;">
           <i class="fas fa-info-circle"></i>
-          Add/edit/delete user accounts requires Firebase Admin SDK — managed via Firebase Console.
+          Note: Creating or hard-deleting Auth Users requires Firebase Admin SDK / Cloud Functions. We use soft-deactivate here.
         </p>`;
 
         const c = document.getElementById('usersContainer');
@@ -578,6 +615,84 @@ async function loadUsers() {
     } catch (err) {
         console.error('Error loading users:', err);
         showToast('error', 'Error loading users');
+    }
+}
+
+// ── User Management Functions ─────────────────────────────────
+let isEditingUser = false;
+let editingUserId = null;
+
+async function editUser(userId) {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    try {
+        const doc = await db.collection('users').doc(userId).get();
+        if (!doc.exists) return showToast('error', 'User not found');
+        const u = doc.data();
+        isEditingUser = true;
+        editingUserId = userId;
+        document.getElementById('manageUserFullName').value = u.fullName || '';
+        document.getElementById('manageUserDepartment').value = u.department || '';
+        document.getElementById('manageUserPhone').value = u.phone || '';
+        document.getElementById('manageUserRole').value = (u.role || 'user').toLowerCase();
+        document.getElementById('manageUserIsActive').value = u.isActive === false ? 'false' : 'true';
+        openModal('userModal');
+    } catch (err) {
+        console.error('Error fetching user:', err);
+        showToast('error', 'Error fetching user');
+    }
+}
+
+function closeUserModal() {
+    closeModal('userModal');
+}
+
+async function handleUserSubmit(e) {
+    e.preventDefault();
+    if (!isEditingUser || !editingUserId || !currentUserData || currentUserData.role !== 'admin') return;
+    try {
+        const updates = {
+            fullName: document.getElementById('manageUserFullName').value.trim(),
+            department: document.getElementById('manageUserDepartment').value.trim(),
+            phone: document.getElementById('manageUserPhone').value.trim(),
+            role: document.getElementById('manageUserRole').value.toLowerCase(),
+            isActive: document.getElementById('manageUserIsActive').value === 'true',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        await db.collection('users').doc(editingUserId).update(updates);
+        await logAdminAction('User Updated', `Admin updated user profile: ${updates.fullName}`);
+        showToast('success', 'User updated successfully');
+        closeUserModal();
+        
+        if (currentUser && editingUserId === currentUser.uid) {
+            currentUserData = { ...currentUserData, ...updates };
+            showDashboard(currentUserData);
+        }
+        loadUsers();
+    } catch (err) {
+        console.error('Error updating user:', err);
+        showToast('error', 'Error updating user');
+    }
+}
+
+async function deactivateUser(userId, userName, deactivate) {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    const actionText = deactivate ? 'deactivate' : 'reactivate';
+    const confirmed = await showConfirm(`Confirm ${capitalizeFirst(actionText)}`, `Are you sure you want to ${actionText} ${userName || 'this user'}?`);
+    if (!confirmed) return;
+    
+    try {
+        // Firebase Admin SDK/Cloud Functions note:
+        // A true production app would call a Cloud Function here to disable the Auth user via admin.auth().updateUser(uid, { disabled: true })
+        await db.collection('users').doc(userId).update({
+            isActive: !deactivate,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        await logAdminAction(`User ${capitalizeFirst(actionText)}d`, `Admin ${actionText}d user: ${userName}`);
+        showToast('success', `User ${actionText}d successfully`);
+        loadUsers();
+    } catch (err) {
+        console.error(`Error trying to ${actionText} user:`, err);
+        showToast('error', `Error trying to ${actionText} user`);
     }
 }
 
@@ -949,7 +1064,13 @@ async function addSampleOTRoom() {
 function openOTScheduleModal() {
     populateScheduleSelects();
     const form = document.getElementById('otScheduleForm');
-    if (form) form.reset();
+    if (form) {
+        form.reset();
+        delete form.dataset.editId;
+    }
+    const title = document.getElementById('otScheduleModalTitle');
+    if (title) title.textContent = 'Schedule Operation';
+    
     const dateEl = document.getElementById('scheduleDate');
     if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
     const modal = document.getElementById('otScheduleModal');
@@ -983,7 +1104,9 @@ function populateScheduleSelects() {
     if (surgeonSelect) {
         surgeonSelect.innerHTML = '<option value="">Select Surgeon</option>';
         allDoctors.forEach(d => {
-            surgeonSelect.innerHTML += `<option value="${d.id}">${d.name} (${capitalizeFirst(d.specialization)})</option>`;
+            const spec = d.specialization || d.specialty || '';
+            const specText = spec ? ` (${capitalizeFirst(spec)})` : '';
+            surgeonSelect.innerHTML += `<option value="${d.id}">${d.name || 'Unknown Doctor'}${specText}</option>`;
         });
     }
 }
@@ -992,7 +1115,11 @@ function populateOTRoomSelects() { populateScheduleSelects(); }
 
 async function handleOTScheduleSubmit(e) {
     e.preventDefault();
+    if (!currentUserData || currentUserData.role !== 'admin') return;
     try {
+        const form = document.getElementById('otScheduleForm');
+        const editId = form.dataset.editId;
+        
         const scheduleData = {
             otRoomId:  document.getElementById('scheduleOTRoom').value,
             patientId: document.getElementById('schedulePatient').value,
@@ -1001,28 +1128,55 @@ async function handleOTScheduleSubmit(e) {
             startTime: document.getElementById('scheduleStartTime').value,
             endTime:   document.getElementById('scheduleEndTime').value,
             procedure: document.getElementById('scheduleProcedure').value.trim(),
-            notes:     document.getElementById('scheduleNotes').value.trim(),
-            status:    'scheduled',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            notes:     document.getElementById('scheduleNotes').value.trim()
         };
-        const conflict = await checkOTConflict(scheduleData.otRoomId, scheduleData.date, scheduleData.startTime, scheduleData.endTime);
-        if (conflict) { showMessage('error', 'Time conflict! OT room already booked for this time.'); return; }
-        await db.collection('ot_schedules').add(scheduleData);
-        await logAdminAction('Operation Scheduled', `Scheduled: ${scheduleData.procedure}`);
-        showMessage('success', 'Operation scheduled successfully!');
+        
+        const roomConflict = await checkOTConflict(scheduleData.otRoomId, scheduleData.date, scheduleData.startTime, scheduleData.endTime, editId);
+        if (roomConflict) { showMessage('error', 'Time conflict! OT room already booked for this time.'); return; }
+        
+        const doctorConflict = await checkDoctorConflict(scheduleData.surgeonId, scheduleData.date, scheduleData.startTime, scheduleData.endTime, editId);
+        if (doctorConflict) { showMessage('error', 'Time conflict! Surgeon is already booked for this time.'); return; }
+
+        if (editId) {
+            scheduleData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('ot_schedules').doc(editId).update(scheduleData);
+            await logAdminAction('Operation Updated', `Updated schedule: ${scheduleData.procedure}`);
+            showMessage('success', 'Operation updated successfully!');
+        } else {
+            scheduleData.status = 'scheduled';
+            scheduleData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('ot_schedules').add(scheduleData);
+            await logAdminAction('Operation Scheduled', `Scheduled: ${scheduleData.procedure}`);
+            showMessage('success', 'Operation scheduled successfully!');
+        }
         closeOTScheduleModal();
         await loadOTSchedule();
+        if (document.getElementById('section-scheduling').classList.contains('active')) {
+            loadAdvancedSchedules();
+        }
     } catch (err) {
         console.error('Error scheduling operation:', err);
         showMessage('error', 'Error scheduling operation. Please try again.');
     }
 }
 
-async function checkOTConflict(roomId, date, startTime, endTime) {
+async function checkOTConflict(roomId, date, startTime, endTime, excludeId = null) {
     try {
         const snap = await db.collection('ot_schedules')
             .where('otRoomId', '==', roomId).where('date', '==', date).get();
-        return snap.docs.map(d => d.data()).some(s => startTime < s.endTime && endTime > s.startTime);
+        return snap.docs.map(d => ({id: d.id, ...d.data()}))
+            .filter(s => s.id !== excludeId && s.status !== 'cancelled')
+            .some(s => startTime < s.endTime && endTime > s.startTime);
+    } catch (err) { return false; }
+}
+
+async function checkDoctorConflict(surgeonId, date, startTime, endTime, excludeId = null) {
+    try {
+        const snap = await db.collection('ot_schedules')
+            .where('surgeonId', '==', surgeonId).where('date', '==', date).get();
+        return snap.docs.map(d => ({id: d.id, ...d.data()}))
+            .filter(s => s.id !== excludeId && s.status !== 'cancelled')
+            .some(s => startTime < s.endTime && endTime > s.startTime);
     } catch (err) { return false; }
 }
 
@@ -1057,12 +1211,15 @@ function displayOTSchedule() {
         const room    = allOTRooms.find(r => r.id === s.otRoomId);
         const patient = allPatients.find(p => p.id === s.patientId);
         const surgeon = allDoctors.find(d => d.id === s.surgeonId);
+        const roomName = room ? room.roomNumber : (s.otRoomId ? 'ID:'+s.otRoomId.slice(0,4) : 'Unknown');
+        const patName = patient ? patient.name : 'Unknown Patient';
+        const docName = surgeon ? surgeon.name : 'Unknown Surgeon';
         html += `<tr>
-            <td>${s.startTime} - ${s.endTime}</td>
-            <td>OT ${room ? room.roomNumber : 'Unknown'}</td>
-            <td>${patient ? patient.name : 'Unknown Patient'}</td>
-            <td>${surgeon ? surgeon.name : 'Unknown Surgeon'}</td>
-            <td>${s.procedure}</td>
+            <td>${s.startTime || '?'} - ${s.endTime || '?'}</td>
+            <td>OT ${roomName}</td>
+            <td>${patName}</td>
+            <td>${docName}</td>
+            <td>${s.procedure || '-'}</td>
             <td><span style="padding:.25rem .75rem;border-radius:15px;font-size:.8rem;background:${getScheduleStatusColor(s.status)};">
                 ${capitalizeFirst(s.status)}</span></td>
             <td>
@@ -1091,6 +1248,7 @@ function changeOTDate(days) {
 }
 
 async function updateOTStatus(scheduleId) {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
     _otStatusScheduleId = scheduleId;
     const modal = document.getElementById('otStatusModal');
     if (!modal) { showToast('error', 'Status modal not found'); return; }
@@ -1106,6 +1264,9 @@ async function updateOTStatus(scheduleId) {
                 });
                 showToast('success', 'Operation status updated!');
                 await loadOTSchedule();
+                if (document.getElementById('section-scheduling').classList.contains('active')) {
+                    loadAdvancedSchedules();
+                }
             } catch (err) {
                 console.error('Error updating status:', err);
                 showToast('error', 'Error updating status');
@@ -1115,6 +1276,7 @@ async function updateOTStatus(scheduleId) {
 }
 
 async function cancelOperation(scheduleId) {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
     const confirmed = await showConfirm('Cancel this operation?', 'It will be marked as cancelled.');
     if (!confirmed) return;
     try {
@@ -1124,6 +1286,9 @@ async function cancelOperation(scheduleId) {
         await logAdminAction('Operation Cancelled', 'Cancelled scheduled operation');
         showMessage('success', 'Operation cancelled.');
         await loadOTSchedule();
+        if (document.getElementById('section-scheduling').classList.contains('active')) {
+            loadAdvancedSchedules();
+        }
     } catch (err) {
         console.error('Error cancelling operation:', err);
         showMessage('error', 'Error cancelling operation');
@@ -1422,10 +1587,158 @@ function editProfile()        { showSection('profile'); }
 function viewAllUsers()       { showSection('users'); }
 function exportUsers()        { showToast('info', 'Users export coming soon.'); }
 function manageUsers()        { showSection('users'); }
-function viewAnalytics()      { showToast('info', 'Analytics Dashboard coming soon.'); }
+async function loadAnalytics() {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    try {
+        const stats = { docs: allDoctors.length, pats: allPatients.length, rooms: allOTRooms.length };
+        const schedSnap = await db.collection('ot_schedules').get();
+        let totalScheds = 0;
+        const roomCount = {};
+        const statusCount = {};
+
+        const txt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        
+        const todayStr = new Date().toISOString().split('T')[0];
+        let todayCount = 0;
+        let upcomingCount = 0;
+
+        schedSnap.forEach(d => {
+            const s = d.data();
+            totalScheds++;
+            if (s.date === todayStr) todayCount++;
+            if (s.date > todayStr) upcomingCount++;
+            
+            const room = allOTRooms.find(r => r.id === s.otRoomId);
+            const roomName = room ? 'OT ' + room.roomNumber : 'Unknown';
+            roomCount[roomName] = (roomCount[roomName] || 0) + 1;
+            statusCount[s.status] = (statusCount[s.status] || 0) + 1;
+        });
+
+        txt('analyticsTotalDoctors', stats.docs);
+        txt('analyticsTotalPatients', stats.pats);
+        txt('analyticsTotalRooms', stats.rooms);
+        txt('analyticsTotalSchedules', totalScheds);
+        txt('analyticsTodaySchedules', todayCount);
+        txt('analyticsUpcomingSchedules', upcomingCount);
+
+        let roomHtml = '<table class="data-table"><thead><tr><th>Room</th><th>Total Operations</th></tr></thead><tbody>';
+        Object.entries(roomCount).sort((a,b)=>b[1]-a[1]).forEach(([r, c]) => {
+            roomHtml += `<tr><td>${r}</td><td>${c}</td></tr>`;
+        });
+        roomHtml += '</tbody></table>';
+        document.getElementById('analyticsRoomStats').innerHTML = roomHtml;
+
+        let statusHtml = '<table class="data-table"><thead><tr><th>Status</th><th>Count</th></tr></thead><tbody>';
+        Object.entries(statusCount).forEach(([s, c]) => {
+            statusHtml += `<tr><td>${capitalizeFirst(s)}</td><td>${c}</td></tr>`;
+        });
+        statusHtml += '</tbody></table>';
+        document.getElementById('analyticsStatusStats').innerHTML = statusHtml;
+    } catch(err) {
+        console.error('Error loading analytics:', err);
+        showToast('error', 'Error loading analytics');
+    }
+}
+
+async function loadAdvancedSchedules() {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    try {
+        const dateFilter = document.getElementById('schedFilterDate').value;
+        const statusFilter = document.getElementById('schedFilterStatus').value;
+        const roomFilter = document.getElementById('schedFilterRoom').value;
+
+        const roomSelect = document.getElementById('schedFilterRoom');
+        if (roomSelect && roomSelect.options.length <= 1) {
+            allOTRooms.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.id;
+                opt.textContent = `OT Room ${r.roomNumber}`;
+                roomSelect.appendChild(opt);
+            });
+        }
+
+        const snap = await db.collection('ot_schedules').orderBy('startTime').get();
+        let schedules = [];
+        snap.forEach(d => schedules.push({ id: d.id, ...d.data() }));
+
+        if (dateFilter) schedules = schedules.filter(s => s.date === dateFilter);
+        if (roomFilter) schedules = schedules.filter(s => s.otRoomId === roomFilter);
+        if (statusFilter) schedules = schedules.filter(s => s.status === statusFilter);
+
+        let html = `<div style="overflow-x:auto;"><table class="data-table">
+            <thead><tr><th>Date</th><th>Time</th><th>Room</th><th>Patient</th><th>Surgeon</th><th>Procedure</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>`;
+        schedules.forEach(s => {
+            const room = allOTRooms.find(r => r.id === s.otRoomId);
+            const patient = allPatients.find(p => p.id === s.patientId);
+            const surgeon = allDoctors.find(d => d.id === s.surgeonId);
+            
+            const roomName = room ? room.roomNumber : (s.otRoomId ? 'ID:'+s.otRoomId.slice(0,4) : 'Unknown');
+            const patName = patient ? patient.name : 'Unknown Patient';
+            const docName = surgeon ? surgeon.name : 'Unknown Surgeon';
+            
+            html += `<tr>
+                <td>${s.date || 'No Date'}</td>
+                <td>${s.startTime || '?'} - ${s.endTime || '?'}</td>
+                <td>OT ${roomName}</td>
+                <td>${patName}</td>
+                <td>${docName}</td>
+                <td>${s.procedure || '-'}</td>
+                <td><span style="padding:.25rem .75rem;border-radius:15px;font-size:.8rem;background:${getScheduleStatusColor(s.status)};">
+                    ${capitalizeFirst(s.status)}</span></td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editSchedule('${s.id}')">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="cancelOperation('${s.id}')">Cancel</button>
+                </td>
+            </tr>`;
+        });
+        html += '</tbody></table></div>';
+        const container = document.getElementById('advancedSchedulesContainer');
+        if (container) container.innerHTML = html;
+    } catch(err) {
+        console.error('Error loading schedules:', err);
+        showToast('error', 'Error loading schedules');
+    }
+}
+
+function clearSchedFilters() {
+    document.getElementById('schedFilterDate').value = '';
+    document.getElementById('schedFilterStatus').value = '';
+    document.getElementById('schedFilterRoom').value = '';
+    loadAdvancedSchedules();
+}
+
+async function editSchedule(scheduleId) {
+    if (!currentUserData || currentUserData.role !== 'admin') return;
+    populateScheduleSelects();
+    try {
+        const doc = await db.collection('ot_schedules').doc(scheduleId).get();
+        if (!doc.exists) return;
+        const s = doc.data();
+        document.getElementById('scheduleOTRoom').value = s.otRoomId;
+        document.getElementById('schedulePatient').value = s.patientId;
+        document.getElementById('scheduleSurgeon').value = s.surgeonId;
+        document.getElementById('scheduleDate').value = s.date;
+        document.getElementById('scheduleStartTime').value = s.startTime;
+        document.getElementById('scheduleEndTime').value = s.endTime;
+        document.getElementById('scheduleProcedure').value = s.procedure;
+        document.getElementById('scheduleNotes').value = s.notes || '';
+        
+        document.getElementById('otScheduleForm').dataset.editId = scheduleId;
+        document.getElementById('otScheduleModalTitle').textContent = 'Edit Operation';
+        
+        const modal = document.getElementById('otScheduleModal');
+        if (modal) modal.style.display = 'block';
+    } catch(err) {
+        console.error('Error fetching schedule:', err);
+        showToast('error', 'Error fetching schedule');
+    }
+}
+
+function viewAnalytics()      { loadAnalytics(); showSection('analytics'); }
 function systemSettings()     { showToast('info', 'System settings coming soon.'); }
 function manageOperations()   { showToast('info', 'Operations Management coming soon.'); }
-function scheduleManagement() { showToast('info', 'Scheduling System coming soon.'); }
+function scheduleManagement() { loadAdvancedSchedules(); showSection('scheduling'); }
 function auditLogs()          { showSection('logs'); }
 function viewSchedule()       { showSection('assignments'); }
 function profileSettings()    { showSection('profile'); }
@@ -1526,6 +1839,17 @@ window.viewSchedule       = viewSchedule;
 window.profileSettings    = profileSettings;
 window.viewAssignments    = viewAssignments;
 window.updateAvailability = updateAvailability;
+window.loadAnalytics          = loadAnalytics;
+window.loadAdvancedSchedules  = loadAdvancedSchedules;
+window.clearSchedFilters      = clearSchedFilters;
+window.editSchedule           = editSchedule;
+window.handleOTScheduleSubmit = handleOTScheduleSubmit;
+window.loadOTSchedule         = loadOTSchedule;
+
+// User Management
+window.editUser           = editUser;
+window.closeUserModal     = closeUserModal;
+window.deactivateUser     = deactivateUser;
 
 // ── Logout ─────────────────────────────────────────────────────
 async function logout() {
