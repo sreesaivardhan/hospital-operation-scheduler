@@ -42,10 +42,17 @@ const adminNavigation = [
 ];
 
 const userNavigation = [
-    { id: 'overview',      icon: 'fas fa-chart-pie',     text: 'Dashboard Overview', active: true },
+    { id: 'staff-dashboard', icon: 'fas fa-chart-pie',     text: 'Staff Dashboard', active: true },
     { id: 'profile',       icon: 'fas fa-user-cog',      text: 'Profile Settings' },
     { id: 'assignments',   icon: 'fas fa-tasks',         text: 'View Assignments' },
     { id: 'availability',  icon: 'fas fa-clock',         text: 'Update Availability' }
+];
+
+const patientNavigation = [
+    { id: 'patient-dashboard', icon: 'fas fa-heartbeat',     text: 'Dashboard', active: true },
+    { id: 'find-doctors',      icon: 'fas fa-search',        text: 'Find Doctors' },
+    { id: 'my-appointments',   icon: 'fas fa-calendar-check',text: 'My Appointments' },
+    { id: 'patient-profile',   icon: 'fas fa-user',          text: 'My Profile' }
 ];
 
 // ── Bootstrap ──────────────────────────────────────────────────
@@ -113,6 +120,29 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
+                if (userData.role === 'patient') {
+                    const patientRef = db.collection('patients').doc(user.uid);
+                    const patientDoc = await patientRef.get();
+                    if (!patientDoc.exists) {
+                        await patientRef.set({
+                            uid: user.uid,
+                            name: userData.fullName || '',
+                            email: userData.email || user.email || '',
+                            phone: userData.phone || '',
+                            gender: '',
+                            age: null,
+                            bloodGroup: '',
+                            address: '',
+                            emergencyContact: '',
+                            medicalHistory: '',
+                            status: 'active',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                        console.log("TRACE: Existing patient migrated to patients collection.");
+                    }
+                }
+
                 currentUser     = user;
                 currentUserData = userData;
                 showDashboard(userData);
@@ -146,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
     safe('forgotPasswordLink','click', handleForgotPassword);
     safe('doctorForm',       'submit', handleDoctorSubmit);
     safe('profileForm',      'submit', handleProfileUpdate);
+    safe('patientProfileForm','submit', handlePatientProfileUpdate);
     safe('availabilityForm', 'submit', handleAvailabilityUpdate);
     safe('patientForm',      'submit', handlePatientSubmit);
     safe('otRoomForm',       'submit', handleOTRoomSubmit);
@@ -164,7 +195,11 @@ function setupNavigation(items, userRole) {
     if (!navMenu) return;
     navMenu.innerHTML = '';
     const sub = document.getElementById('navSubtitle');
-    if (sub) sub.textContent = userRole === 'admin' ? 'Admin Dashboard' : 'Staff Dashboard';
+    if (sub) {
+        if (userRole === 'admin') sub.textContent = 'Admin Dashboard';
+        else if (userRole === 'patient') sub.textContent = 'Patient Portal';
+        else sub.textContent = 'Staff Dashboard';
+    }
 
     items.forEach(item => {
         const li = document.createElement('li');
@@ -214,7 +249,12 @@ function showSection(sectionName) {
         analytics: 'Analytics Dashboard', operations: 'Operations Management',
         scheduling: 'Scheduling System', profile: 'Profile Settings',
         assignments: 'View Assignments', availability: 'Update Availability',
-        logs: 'Audit Logs'
+        logs: 'Audit Logs',
+        'patient-dashboard': 'Patient Dashboard',
+        'find-doctors': 'Find Doctors',
+        'my-appointments': 'My Appointments',
+        'patient-profile': 'My Profile',
+        'staff-dashboard': 'Staff Dashboard'
     };
     const el = document.getElementById('pageTitle');
     if (el) el.textContent = titles[sectionName] || 'Dashboard';
@@ -231,6 +271,10 @@ function showSection(sectionName) {
         case 'operations':  loadOperationsManagement(); break;
         case 'scheduling':  loadAdvancedSchedules(); break;
         case 'logs':        loadActivityLog(); break;
+        case 'find-doctors':loadPatientDoctors(); break;
+        case 'patient-profile': loadPatientProfile(); break;
+        case 'staff-dashboard': loadStaffDashboard(); break;
+        case 'assignments': loadUserAssignments(); break;
     }
 }
 
@@ -291,6 +335,27 @@ async function handleAuth(e) {
                 };
                 console.log("TRACE: Attempting Firestore write with payload:", payload);
                 await db.collection('users').doc(cred.user.uid).set(payload);
+                
+                if (isPatient) {
+                    const patientPayload = {
+                        uid: cred.user.uid,
+                        name: fullName,
+                        email: email,
+                        phone: phone || '',
+                        gender: '',
+                        age: null,
+                        bloodGroup: '',
+                        address: '',
+                        emergencyContact: '',
+                        medicalHistory: '',
+                        status: 'active',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    await db.collection('patients').doc(cred.user.uid).set(patientPayload, { merge: true });
+                    console.log("TRACE: Patient profile document created successfully!");
+                }
+                
                 console.log("TRACE: Firestore write succeeded!");
                 await cred.user.sendEmailVerification();
                 
@@ -404,19 +469,23 @@ function showDashboard(userData) {
     if (d) d.style.display = 'block';
     const welcome = document.getElementById('userWelcome');
     if (welcome) welcome.textContent = `Welcome, ${userData.fullName || 'User'}`;
+    
     if (userData.role === 'admin') {
         setupNavigation(adminNavigation, 'admin');
         showSection('overview');
-        // Load profile fields
+        loadProfileFields(userData);
+    } else if (userData.role === 'patient') {
+        setupNavigation(patientNavigation, 'patient');
+        showSection('patient-dashboard');
         loadProfileFields(userData);
     } else {
         setupNavigation(userNavigation, 'user');
-        showSection('overview');
+        showSection('staff-dashboard');
         loadProfileFields(userData);
     }
 }
 
-function loadProfileFields(userData) {
+async function loadProfileFields(userData) {
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
     const txt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || ''; };
     txt('userName',       userData.fullName);
@@ -429,6 +498,32 @@ function loadProfileFields(userData) {
     set('editPhone',      userData.phone);
     set('editDepartment', userData.department);
     set('bio',            userData.bio);
+
+    if (userData.role === 'patient') {
+        txt('patientWelcomeName', userData.fullName || 'Patient');
+        txt('patientWelcomeEmail', userData.email || (currentUser && currentUser.email));
+        txt('patientSummaryName', userData.fullName || 'N/A');
+        txt('patientSummaryEmail', userData.email || (currentUser && currentUser.email));
+        txt('patientSummaryPhone', userData.phone || 'N/A');
+
+        try {
+            const pDoc = await db.collection('patients').doc(currentUser.uid).get();
+            if (pDoc.exists) {
+                const p = pDoc.data();
+                set('patProfileName', p.name || userData.fullName);
+                set('patProfileEmail', p.email || userData.email || (currentUser && currentUser.email));
+                set('patProfilePhone', p.phone || userData.phone);
+                set('patProfileGender', p.gender);
+                set('patProfileAge', p.age);
+                set('patProfileBlood', p.bloodGroup);
+                set('patProfileAddress', p.address);
+                set('patProfileEmergency', p.emergencyContact);
+                set('patProfileHistory', p.medicalHistory);
+            }
+        } catch (e) {
+            console.error('Failed to load patient profile:', e);
+        }
+    }
 }
 
 // ── Session ────────────────────────────────────────────────────
@@ -2004,7 +2099,6 @@ async function handleEmergencySubmit(e) {
 
 function scheduleManagement() { loadAdvancedSchedules(); showSection('scheduling'); }
 function auditLogs()          { showSection('logs'); }
-function viewSchedule()       { showSection('assignments'); }
 function profileSettings()    { showSection('profile'); }
 function viewAssignments()    { showSection('assignments'); }
 function updateAvailability() { showSection('availability'); }
@@ -2097,7 +2191,6 @@ window.viewAnalytics      = viewAnalytics;
 window.manageOperations   = manageOperations;
 window.scheduleManagement = scheduleManagement;
 window.auditLogs          = auditLogs;
-window.viewSchedule       = viewSchedule;
 window.profileSettings    = profileSettings;
 window.viewAssignments    = viewAssignments;
 window.updateAvailability = updateAvailability;
@@ -2136,6 +2229,221 @@ async function logout() {
 }
 // Re-export logout after definition
 window.logout = logout;
+
+// ── Patient Portal Functions ──────────────────────────────────────────
+async function loadPatientProfile() {
+    // Already populated by loadProfileFields
+}
+window.loadPatientProfile = loadPatientProfile;
+
+async function handlePatientProfileUpdate(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const origText = btn.textContent;
+    btn.textContent = 'Saving...'; btn.disabled = true;
+    try {
+        const updatedName = document.getElementById('patProfileName').value.trim();
+        const payload = {
+            name: updatedName,
+            phone: document.getElementById('patProfilePhone').value.trim(),
+            gender: document.getElementById('patProfileGender').value,
+            age: document.getElementById('patProfileAge').value ? parseInt(document.getElementById('patProfileAge').value, 10) : null,
+            bloodGroup: document.getElementById('patProfileBlood').value,
+            address: document.getElementById('patProfileAddress').value.trim(),
+            emergencyContact: document.getElementById('patProfileEmergency').value.trim(),
+            medicalHistory: document.getElementById('patProfileHistory').value.trim(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        await db.collection('patients').doc(currentUser.uid).update(payload);
+        
+        // Sync with users collection
+        await db.collection('users').doc(currentUser.uid).update({
+            fullName: updatedName,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Update local session
+        currentUserData.fullName = updatedName;
+        
+        showMessage('success', 'Profile updated successfully!');
+        
+        // Update dashboard snapshot UI
+        const pDoc = await db.collection('patients').doc(currentUser.uid).get();
+        if(pDoc.exists) {
+            const p = pDoc.data();
+            document.getElementById('patientSummaryName').textContent = p.name || 'N/A';
+            document.getElementById('patientSummaryPhone').textContent = p.phone || 'N/A';
+            document.getElementById('patientWelcomeName').textContent = p.name || 'Patient';
+        }
+    } catch(err) {
+        console.error('Error updating patient profile:', err);
+        showMessage('error', 'Failed to update profile.');
+    } finally {
+        btn.textContent = origText; btn.disabled = false;
+    }
+}
+window.handlePatientProfileUpdate = handlePatientProfileUpdate;
+
+async function loadPatientDoctors() {
+    const container = document.getElementById('patientDoctorsList');
+    if (!container) return;
+    try {
+        const snap = await db.collection('doctors').orderBy('name').get();
+        if (snap.empty) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-user-md"></i><h3>No Doctors Available</h3><p>Check back later.</p></div>';
+            return;
+        }
+        let html = '';
+        snap.forEach(doc => {
+            const d = doc.data();
+            if(d.status === 'inactive') return; // Hide inactive doctors from patients
+            const fee = d.consultationFee ? `₹${d.consultationFee}` : '₹500';
+            const exp = d.experience ? `${d.experience} years exp.` : 'Experience not specified';
+            const spec = d.specialty || d.specialization || 'General Medicine';
+            const statusLabel = d.status ? (d.status.charAt(0).toUpperCase() + d.status.slice(1)) : 'Active';
+            html += `
+            <div class="item-card">
+                <div class="item-header">
+                    <div>
+                        <div class="item-title">${d.name}</div>
+                        <div class="item-subtitle">${spec} • ${exp}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="badge" style="background: rgba(41,128,185,0.1); color: #2980b9; margin-bottom: 5px; display: inline-block;">${fee}</span><br>
+                        <span class="badge" style="background: rgba(39,174,96,0.1); color: #27ae60; display: inline-block;">${statusLabel}</span>
+                    </div>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    } catch(err) {
+        console.error('Error loading patient doctors:', err);
+        container.innerHTML = '<p style="padding:1rem;color:red;">Error loading doctors.</p>';
+    }
+}
+window.loadPatientDoctors = loadPatientDoctors;
+// ── Staff Portal Functions ──────────────────────────────────────────────
+async function loadStaffDashboard() {
+    if(!currentUser || !currentUserData || currentUserData.role !== 'user') return;
+    
+    document.getElementById('staffWelcomeName').textContent = currentUserData.fullName || 'Staff Member';
+    
+    try {
+        const todayStr = new Date().toISOString().split('T')[0];
+        
+        // Load assignments where staff is involved (either as surgeon or nurse/anesthesiologist by name)
+        // Since firestore doesn't natively support this complex OR without indexing, we fetch and filter
+        const snap = await db.collection('ot_schedules').orderBy('date', 'desc').get();
+        let myAssignmentsCount = 0;
+        let todayCasesCount = 0;
+        let completedCasesCount = 0;
+        let recentAssignmentsHTML = '';
+        let counter = 0;
+        
+        snap.forEach(doc => {
+            const data = doc.data();
+            const staffNameLower = (currentUserData.fullName || '').toLowerCase();
+            const isInvolved = (data.surgeonId === currentUser.uid) || 
+                               (data.nurses && data.nurses.toLowerCase().includes(staffNameLower)) ||
+                               (data.anesthesiologist && data.anesthesiologist.toLowerCase().includes(staffNameLower));
+            
+            if (isInvolved) {
+                myAssignmentsCount++;
+                if (data.date === todayStr) todayCasesCount++;
+                if (data.status === 'completed') completedCasesCount++;
+                
+                // Add to recent assignments (limit 5)
+                if (counter < 5) {
+                    const statusColors = {
+                        scheduled: '#007bff',
+                        'in-progress': '#f39c12',
+                        completed: '#28a745',
+                        cancelled: '#dc3545'
+                    };
+                    const color = statusColors[data.status] || '#6c757d';
+                    recentAssignmentsHTML += `
+                    <div class="item-card" style="margin-bottom: 10px;">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-title">${data.procedure}</div>
+                                <div class="item-subtitle">${data.date} | ${data.startTime} - ${data.endTime}</div>
+                            </div>
+                            <span class="badge" style="background: ${color}20; color: ${color};">${data.status.toUpperCase()}</span>
+                        </div>
+                    </div>`;
+                    counter++;
+                }
+            }
+        });
+        
+        document.getElementById('staffAssignmentsCount').textContent = myAssignmentsCount;
+        document.getElementById('staffTodayCases').textContent = todayCasesCount;
+        document.getElementById('staffCompletedCases').textContent = completedCasesCount;
+        
+        const recentContainer = document.getElementById('staffRecentAssignments');
+        if (myAssignmentsCount > 0) {
+            recentContainer.innerHTML = recentAssignmentsHTML;
+            recentContainer.classList.remove('empty-state');
+        }
+        
+    } catch (err) {
+        console.error("Error loading staff dashboard", err);
+    }
+}
+window.loadStaffDashboard = loadStaffDashboard;
+
+async function loadUserAssignments() {
+    const container = document.getElementById('assignmentsList');
+    if (!container) return;
+    
+    try {
+        const snap = await db.collection('ot_schedules').orderBy('date', 'desc').get();
+        let html = '';
+        
+        snap.forEach(doc => {
+            const data = doc.data();
+            const staffNameLower = (currentUserData.fullName || '').toLowerCase();
+            const isInvolved = (data.surgeonId === currentUser.uid) || 
+                               (data.nurses && data.nurses.toLowerCase().includes(staffNameLower)) ||
+                               (data.anesthesiologist && data.anesthesiologist.toLowerCase().includes(staffNameLower));
+            
+            if (isInvolved) {
+                const statusColors = {
+                    scheduled: { bg: '#cce5ff', text: '#004085' },
+                    'in-progress': { bg: '#fff3cd', text: '#856404' },
+                    completed: { bg: '#d4edda', text: '#155724' },
+                    cancelled: { bg: '#f8d7da', text: '#721c24' }
+                };
+                const colors = statusColors[data.status] || { bg: '#e2e3e5', text: '#383d41' };
+                html += `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-title">${data.procedure}</div>
+                            <div class="item-subtitle">${data.date} | ${data.startTime} - ${data.endTime}</div>
+                        </div>
+                        <span style="padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; background: ${colors.bg}; color: ${colors.text};">${data.status.toUpperCase()}</span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                        <strong>OT Room:</strong> ${data.otRoomId} <br>
+                        <strong>Patient ID:</strong> ${data.patientId} <br>
+                        <strong>Notes:</strong> ${data.notes || 'None'}
+                    </div>
+                </div>`;
+            }
+        });
+        
+        if (html === '') {
+            container.innerHTML = '<div class="empty-state"><h3>No Assignments Found</h3><p>You have no current assignments.</p></div>';
+        } else {
+            container.innerHTML = html;
+        }
+    } catch(err) {
+        console.error("Error loading user assignments", err);
+        container.innerHTML = '<p style="color:red">Error loading assignments.</p>';
+    }
+}
+window.loadUserAssignments = loadUserAssignments;
 
 console.log('MediCore OT Scheduler loaded. Version 3.1 – stable.');
 

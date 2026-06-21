@@ -433,12 +433,69 @@
 <div class="user-features" id="userFeatures">
 <h3>User Features</h3>
 <ul class="feature-list">
-<li onclick="viewSchedule()">View Schedule</li>
 <li onclick="profileSettings()">Profile Settings</li>
 <li onclick="contactSupport()">Contact Support</li>
 <li onclick="viewAssignments()">View Assignments</li>
 <li onclick="updateAvailability()">Update Availability</li>
 </ul>
+</div>
+</div>
+<!-- Staff Dashboard Section -->
+<div class="content-section" id="section-staff-dashboard">
+<div class="section-card" style="margin-bottom: 1.5rem;">
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+<div>
+<h2 style="margin-bottom: 0.5rem; color: var(--text-primary);">Staff Dashboard</h2>
+<p style="color: var(--text-secondary); font-size: 0.95rem;">Manage your assignments and availability.</p>
+</div>
+<div style="text-align: right;">
+<div style="font-weight: 600; color: var(--primary-color);" id="staffWelcomeName">Loading...</div>
+<span class="badge" style="background: rgba(41,128,185,0.1); color: #2980b9; margin-top: 0.5rem; display: inline-block;">Hospital Staff</span>
+</div>
+</div>
+</div>
+
+<div class="cards-grid" style="margin-bottom: 1.5rem;">
+<div class="stat-card">
+<div class="stat-icon" style="background: rgba(41,128,185,0.1); color: #2980b9;"><i class="fas fa-tasks"></i></div>
+<div class="stat-info"><h3 id="staffAssignmentsCount">0</h3><p>My Assignments</p></div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background: rgba(39,174,96,0.1); color: #27ae60;"><i class="fas fa-calendar-day"></i></div>
+<div class="stat-info"><h3 id="staffTodayCases">0</h3><p>Today's Cases</p></div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background: rgba(243,156,18,0.1); color: #f39c12;"><i class="fas fa-clock"></i></div>
+<div class="stat-info"><h3 id="staffAvailabilityStatus">Set</h3><p>Availability Status</p></div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background: rgba(142,68,173,0.1); color: #8e44ad;"><i class="fas fa-check-circle"></i></div>
+<div class="stat-info"><h3 id="staffCompletedCases">0</h3><p>Completed Cases</p></div>
+</div>
+</div>
+
+<div class="section-card">
+<h2 class="section-title">Quick Actions</h2>
+<div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+<button class="btn btn-primary" onclick="showSection('assignments')">
+<i class="fas fa-tasks"></i> View Assignments
+</button>
+<button class="btn btn-success" onclick="showSection('availability')">
+<i class="fas fa-clock"></i> Update Availability
+</button>
+<button class="btn btn-warning" onclick="showSection('profile')">
+<i class="fas fa-user-cog"></i> Profile Settings
+</button>
+</div>
+</div>
+
+<div class="section-card" style="margin-top: 1.5rem;">
+<h2 class="section-title">My Recent Assignments</h2>
+<div id="staffRecentAssignments" class="empty-state">
+<i class="fas fa-tasks"></i>
+<h3>No recent assignments</h3>
+<p>Your recent assignments will appear here.</p>
+</div>
 </div>
 </div>
 <!-- Doctor Management Section -->
@@ -707,24 +764,7 @@
 <div class="section-card">
 <h2 class="section-title">Current Assignments</h2>
 <div class="cards-grid" id="assignmentsList">
-<div class="item-card">
-<div class="item-header">
-<div>
-<div class="item-title">Emergency Department Coverage</div>
-<div class="item-subtitle">Monday - Wednesday, 8:00 AM - 4:00 PM</div>
-</div>
-<span style="padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; background: #d4edda; color: #155724;">Active</span>
-</div>
-</div>
-<div class="item-card">
-<div class="item-header">
-<div>
-<div class="item-title">Patient Consultation - Cardiology</div>
-<div class="item-subtitle">Thursday - Friday, 10:00 AM - 6:00 PM</div>
-</div>
-<span style="padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; background: #f8d7da; color: #721c24;">Pending</span>
-</div>
-</div>
+<!-- Assignments populated by JavaScript -->
 </div>
 </div>
 </div>
@@ -816,6 +856,148 @@
 <p>Actions performed by administrators will appear here.</p>
 </div>
 </div>
+</div>
+</div>
+<!-- Patient Dashboard Section -->
+<div class="content-section" id="section-patient-dashboard">
+<div class="section-card" style="margin-bottom: 1.5rem;">
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+<div>
+<h2 style="margin-bottom: 0.5rem; color: var(--text-primary);">Welcome to your Patient Portal</h2>
+<p style="color: var(--text-secondary); font-size: 0.95rem;">Manage your health records, find doctors, and track appointments.</p>
+</div>
+<div style="text-align: right;">
+<div style="font-weight: 600; color: var(--primary-color);" id="patientWelcomeName">Loading...</div>
+<div style="font-size: 0.85rem; color: var(--text-secondary);" id="patientWelcomeEmail">Loading...</div>
+<span class="badge" style="background: rgba(39,174,96,0.1); color: #27ae60; margin-top: 0.5rem; display: inline-block;">Active Patient</span>
+</div>
+</div>
+</div>
+
+<div class="cards-grid" style="margin-bottom: 1.5rem;">
+<div class="stat-card">
+<div class="stat-icon" style="background: rgba(41,128,185,0.1); color: #2980b9;"><i class="fas fa-calendar-check"></i></div>
+<div class="stat-info"><h3 id="patientUpcomingAppointments">0</h3><p>Upcoming Appointments</p></div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background: rgba(39,174,96,0.1); color: #27ae60;"><i class="fas fa-history"></i></div>
+<div class="stat-info"><h3 id="patientCompletedAppointments">0</h3><p>Completed Appointments</p></div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+<div class="section-card">
+<h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Profile Summary</h3>
+<div style="display: flex; flex-direction: column; gap: 0.75rem;">
+<div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Name:</span> <strong id="patientSummaryName">Loading...</strong></div>
+<div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Phone:</span> <strong id="patientSummaryPhone">Loading...</strong></div>
+<div style="display: flex; justify-content: space-between;"><span style="color: var(--text-secondary);">Email:</span> <strong id="patientSummaryEmail">Loading...</strong></div>
+</div>
+<button class="btn btn-outline" style="width: 100%; margin-top: 1rem;" onclick="showSection('patient-profile')">Update Profile</button>
+</div>
+
+<div class="section-card">
+<h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Quick Actions</h3>
+<div style="display: flex; flex-direction: column; gap: 0.75rem;">
+<button class="btn btn-primary" onclick="showSection('find-doctors')" style="justify-content: flex-start;"><i class="fas fa-search" style="width: 24px;"></i> Find Doctors</button>
+<button class="btn btn-secondary" onclick="showSection('my-appointments')" style="justify-content: flex-start;"><i class="fas fa-calendar-alt" style="width: 24px;"></i> My Appointments</button>
+</div>
+</div>
+</div>
+
+<div class="section-card">
+<h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Recent Activity</h3>
+<div class="empty-state">
+<i class="fas fa-history"></i>
+<h3>No recent activity</h3>
+<p>Your recent appointments and updates will appear here.</p>
+</div>
+</div>
+</div>
+
+<!-- Patient Find Doctors Section -->
+<div class="content-section" id="section-find-doctors">
+<div class="section-card">
+<div class="section-header">
+<h2>Find Doctors</h2>
+</div>
+<div class="cards-grid" id="patientDoctorsList">
+<p style="padding:1rem;">Loading doctors...</p>
+</div>
+</div>
+</div>
+
+<!-- Patient Appointments Section -->
+<div class="content-section" id="section-my-appointments">
+<div class="section-card">
+<div class="section-header">
+<h2>My Appointments</h2>
+</div>
+<div class="empty-state">
+<i class="fas fa-calendar-times"></i>
+<h3>No appointments booked yet.</h3>
+<p>You have not booked any appointments with our hospital.</p>
+<button class="btn btn-primary" style="margin-top: 1rem;" onclick="showSection('find-doctors')">Browse Doctors</button>
+</div>
+</div>
+</div>
+
+<!-- Patient Profile Section -->
+<div class="content-section" id="section-patient-profile">
+<div class="section-card">
+<h2 class="section-title">My Profile</h2>
+<form id="patientProfileForm">
+<div class="form-grid">
+<div class="form-group">
+<label class="form-label" for="patProfileName">Full Name</label>
+<input class="form-input" id="patProfileName" type="text" required/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patProfileEmail">Email</label>
+<input class="form-input" id="patProfileEmail" readonly="" style="background: var(--bg-secondary);" type="email"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patProfilePhone">Phone Number</label>
+<input class="form-input" id="patProfilePhone" type="tel"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patProfileGender">Gender</label>
+<select class="form-input" id="patProfileGender">
+<option value="">Select Gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" for="patProfileAge">Age</label>
+<input class="form-input" id="patProfileAge" type="number" min="0" max="150"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patProfileBlood">Blood Group</label>
+<select class="form-input" id="patProfileBlood">
+<option value="">Select Blood Group</option>
+<option value="A+">A+</option><option value="A-">A-</option>
+<option value="B+">B+</option><option value="B-">B-</option>
+<option value="AB+">AB+</option><option value="AB-">AB-</option>
+<option value="O+">O+</option><option value="O-">O-</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" for="patProfileAddress">Address</label>
+<input class="form-input" id="patProfileAddress" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="patProfileEmergency">Emergency Contact</label>
+<input class="form-input" id="patProfileEmergency" placeholder="Name & Phone" type="text"/>
+</div>
+</div>
+<div class="form-group" style="margin-top: 1rem;">
+<label class="form-label" for="patProfileHistory">Medical History / Allergies</label>
+<textarea class="form-input" id="patProfileHistory" placeholder="List any known allergies or past medical conditions..." rows="4"></textarea>
+</div>
+<button class="btn btn-success" type="submit" style="margin-top: 1rem;">Update Profile</button>
+</form>
 </div>
 </div>
 </div><!-- /page-content -->

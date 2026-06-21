@@ -22,6 +22,12 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == uid;
     }
 
+    function isPatient() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'patient';
+    }
+
     // ── Users collection ────────────────────────────────────────────────────
     match /users/{userId} {
       allow read: if isOwnerUnverified(userId) || isAdmin();
@@ -32,14 +38,18 @@ service cloud.firestore {
                   ) &&
                   request.resource.data.uid == request.auth.uid)
               || isAdmin();
-      allow update: if isOwner(userId) && !('role' in request.resource.data.diff(resource.data).affectedKeys())
+      allow update: if isOwnerUnverified(userId) && 
+                       !('role' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                       !('isActive' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                       !('status' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                       !('uid' in request.resource.data.diff(resource.data).affectedKeys())
                     || isAdmin();
       allow delete: if isAdmin();
     }
 
     // ── Doctors collection ──────────────────────────────────────────────────
     match /doctors/{doctorId} {
-      allow read:   if isAuthenticated();
+      allow read:   if isAuthenticated() || isPatient();
       allow create,
             update,
             delete: if isAdmin();
@@ -47,10 +57,15 @@ service cloud.firestore {
 
     // ── Patients collection ─────────────────────────────────────────────────
     match /patients/{patientId} {
-      allow read:   if isAuthenticated();
-      allow create,
-            update,
-            delete: if isAdmin();
+      allow read:   if isOwnerUnverified(patientId) || (isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role != 'patient');
+      allow create: if isOwnerUnverified(patientId) || isAdmin();
+      allow update: if isOwnerUnverified(patientId) && 
+                       !('role' in request.resource.data.diff(resource.data).affectedKeys()) && 
+                       !('isActive' in request.resource.data.diff(resource.data).affectedKeys()) && 
+                       !('status' in request.resource.data.diff(resource.data).affectedKeys()) &&
+                       !('uid' in request.resource.data.diff(resource.data).affectedKeys())
+                    || isAdmin();
+      allow delete: if isAdmin();
     }
 
     // ── OT Rooms collection ─────────────────────────────────────────────────
