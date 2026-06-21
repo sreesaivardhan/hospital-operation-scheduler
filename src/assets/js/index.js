@@ -13,6 +13,7 @@ const db   = firebase.firestore();
 let currentUser     = null;
 let currentUserData = null;
 let isLoginMode     = true;
+let isRegistering   = false;
 let sessionStartTime = null;
 let sessionTimer    = null;
 let pendingAuthMessage = null;
@@ -51,40 +52,67 @@ const userNavigation = [
 document.addEventListener('DOMContentLoaded', function () {
 
     auth.onAuthStateChanged(async (user) => {
-        if (user && user.emailVerified) {
+        if (user) {
             try {
-                const userDoc = await db.collection('users').doc(user.uid).get();
+                let userDoc = await db.collection('users').doc(user.uid).get();
+                let retries = 0;
+                
+                const isGoogleUser = user.providerData && user.providerData.some(p => p.providerId === 'google.com');
+
+                // Race condition mitigation: Wait up to 3 seconds for handleAuth to write the document
+                // Skip waiting for Google users since we never auto-create documents for them
+                while (!userDoc.exists && retries < 6 && !isGoogleUser) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    userDoc = await db.collection('users').doc(user.uid).get();
+                    retries++;
+                }
+
                 let userData;
                 if (!userDoc.exists) {
-                    const isGoogle = user.providerData && user.providerData.some(p => p.providerId === 'google.com');
-                    if (isGoogle) {
-                        userData = {
-                            uid: user.uid,
-                            email: user.email,
-                            fullName: user.displayName || 'Google User',
-                            phone: user.phoneNumber || '',
-                            department: 'General',
-                            role: 'user',
-                            isActive: true,
-                            bio: '',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        };
-                        await db.collection('users').doc(user.uid).set(userData);
-                        await logAdminAction('google_sign_in_new', `New Google user: ${user.email}`, 'users', user.uid);
+                    if (isGoogleUser) {
+                        pendingAuthMessage = { type: 'error', text: 'Google Sign-In is restricted to existing users. Please use the registration form to create a new account.' };
+                        await user.delete();
+                        return;
                     } else {
-                        showAuthMessage('error', 'Your account is not set up in the system. Please contact an administrator.');
+                        console.log("TRACE REJECTION (Branch 1):", user.uid, userDoc.exists, userData, userData?.role, userData?.isActive);
+                        pendingAuthMessage = { type: 'error', text: 'Your account is not set up in the system. Please contact an administrator.' };
                         await auth.signOut();
                         return;
                     }
                 } else {
                     userData = userDoc.data();
                 }
-                if (userData.isActive === false) {
-                    pendingAuthMessage = { type: 'error', text: 'Your account has been deactivated. Please contact an administrator.' };
+
+                // Sync email verification status from Auth to Firestore
+                if (user.emailVerified === true && userData.emailVerified === false) {
+                    await db.collection('users').doc(user.uid).update({
+                        emailVerified: true,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    userData.emailVerified = true;
+                }
+
+                // Patients bypass email verification so they can login immediately
+                if (userData.role !== 'patient' && !user.emailVerified) {
+                    if (isRegistering) return; // Let handleAuth manage the UI and sign out cleanly
+                    
+                    pendingAuthMessage = { type: 'error', text: 'Please verify your email before accessing the dashboard.' };
                     await auth.signOut();
                     return;
                 }
+
+                if (userData.isActive === false) {
+                    if (isRegistering) return; // Let handleAuth manage the UI and sign out cleanly
+                    
+                    if (userData.role === 'user') {
+                        pendingAuthMessage = { type: 'info', text: 'Your account is pending administrator approval.' };
+                    } else {
+                        pendingAuthMessage = { type: 'error', text: 'Your account has been deactivated. Please contact an administrator.' };
+                    }
+                    await auth.signOut();
+                    return;
+                }
+
                 currentUser     = user;
                 currentUserData = userData;
                 showDashboard(userData);
@@ -95,14 +123,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error loading profile:', err);
                 await auth.signOut();
                 if (err.code === 'permission-denied' || err.message.includes('insufficient permissions')) {
+                    // Note: userDoc and userData are out of scope here in the catch block if get() failed,
+                    // but we log what we have to satisfy the debugging step.
+                    console.log("TRACE REJECTION (Branch 2 Catch):", user.uid, "userDoc exists?", false, "userData?", undefined);
                     showAuthMessage('error', 'Your account is not set up in the system. Please contact an administrator.');
                 } else {
                     showAuthMessage('error', 'A network or system error occurred while loading your profile.');
                 }
             }
-        } else if (user && !user.emailVerified) {
-            showAuthMessage('error', 'Please verify your email before accessing the dashboard.');
-            showAuth();
         } else {
             showAuth();
         }
@@ -209,20 +237,21 @@ function showSection(sectionName) {
 // ── Auth ──────────────────────────────────────────────────────
 async function handleAuth(e) {
     e.preventDefault();
-    const email    = document.getElementById('email').value.trim();
+    const email    = document.getElementById('email').value.trim().toLowerCase();
     const password = document.getElementById('password').value;
     if (!email || !password) { showAuthMessage('error', 'Please fill in all required fields'); return; }
     setAuthLoading(true);
     try {
         if (isLoginMode) {
             const cred = await auth.signInWithEmailAndPassword(email, password);
-            if (!cred.user.emailVerified) {
+            const userDoc = await db.collection('users').doc(cred.user.uid).get();
+            const userData = userDoc.exists ? userDoc.data() : null;
+            if (userData && userData.role !== 'patient' && !cred.user.emailVerified) {
                 showAuthMessage('error', 'Please verify your email before logging in.');
                 await auth.signOut();
                 return;
             }
-            const userDoc = await db.collection('users').doc(cred.user.uid).get();
-            if (!userDoc.exists || userDoc.data().isActive === false) {
+            if (!userDoc.exists || userData.isActive === false) {
                 // Let onAuthStateChanged handle the rejection/sign-out and messaging handoff
                 return;
             }
@@ -230,25 +259,47 @@ async function handleAuth(e) {
             showAuthMessage('success', 'Login successful!');
             sessionStartTime = new Date();
         } else {
+            const regTypeElement = document.querySelector('input[name="registrationType"]:checked');
+            const isPatient = regTypeElement && regTypeElement.value === 'patient';
+            
             const confirmPassword = document.getElementById('confirmPassword').value;
             const fullName   = document.getElementById('fullName').value.trim();
             const phone      = document.getElementById('phone').value.trim();
             const department = document.getElementById('department').value;
-            if (!fullName || !department) { showAuthMessage('error', 'Please fill in all required fields'); return; }
+            
+            if (!fullName || (!isPatient && !department)) { showAuthMessage('error', 'Please fill in all required fields'); return; }
             if (password !== confirmPassword) { showAuthMessage('error', 'Passwords do not match'); return; }
             if (password.length < 6) { showAuthMessage('error', 'Password must be at least 6 characters'); return; }
 
+            console.log("TRACE: Calling createUserWithEmailAndPassword with email:", email);
+            isRegistering = true;
             const cred = await auth.createUserWithEmailAndPassword(email, password);
+            console.log("TRACE: Auth user created successfully. UID:", cred.user.uid, "Email:", cred.user.email);
+            
             try {
-                await db.collection('users').doc(cred.user.uid).set({
-                    uid: cred.user.uid, email, fullName, phone: phone || '', department, role: 'user', bio: '',
-                    isActive: true,
+                const newRole = isPatient ? 'patient' : 'user';
+                const isActiveState = isPatient ? true : false;
+                
+                const payload = {
+                    uid: cred.user.uid, email, fullName, phone: phone || '', 
+                    department: isPatient ? '' : department, 
+                    role: newRole, bio: '',
+                    isActive: isActiveState,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     emailVerified: false, lastLogin: null, loginHistory: []
-                });
+                };
+                console.log("TRACE: Attempting Firestore write with payload:", payload);
+                await db.collection('users').doc(cred.user.uid).set(payload);
+                console.log("TRACE: Firestore write succeeded!");
                 await cred.user.sendEmailVerification();
-                showAuthMessage('success', 'Registration successful! Please verify your email.');
+                
+                if (!isActiveState) {
+                    await auth.signOut();
+                    showAuthMessage('success', 'Registration successful. Verify your email and wait for Admin approval.');
+                } else {
+                    showAuthMessage('success', 'Registration successful! Please verify your email.');
+                }
                 toggleAuthMode();
             } catch (fsErr) {
                 console.error('Firestore error:', fsErr);
@@ -270,6 +321,7 @@ async function handleAuth(e) {
         };
         showAuthMessage('error', msgs[err.code] || 'An error occurred. Please try again.');
     } finally {
+        isRegistering = false;
         setAuthLoading(false);
     }
 }
@@ -309,6 +361,7 @@ function toggleAuthMode(e) {
     const authBtnText    = document.getElementById('authButtonText');
     const toggleLink     = document.getElementById('toggleLink');
     const forgotPw       = document.getElementById('forgotPasswordContainer');
+    const googleBtn      = document.getElementById('googleSignInContainer');
 
     if (isLoginMode) {
         if (authTitle)   authTitle.textContent   = 'Welcome Back to MediCore';
@@ -316,12 +369,14 @@ function toggleAuthMode(e) {
         if (toggleLink)  toggleLink.textContent   = 'Need an account? Register here';
         if (registerFields) registerFields.style.display = 'none';
         if (forgotPw)    forgotPw.style.display   = 'block';
+        if (googleBtn)   googleBtn.style.display  = 'block';
     } else {
         if (authTitle)   authTitle.textContent   = 'Join MediCore Platform';
         if (authBtnText) authBtnText.textContent  = 'Create Account';
         if (toggleLink)  toggleLink.textContent   = 'Already have an account? Sign in here';
         if (registerFields) registerFields.style.display = 'block';
         if (forgotPw)    forgotPw.style.display   = 'none';
+        if (googleBtn)   googleBtn.style.display  = 'none';
     }
     hideAuthMessages();
     const f = document.getElementById('authForm');
@@ -334,6 +389,7 @@ function showAuth() {
     if (a) a.style.display = 'flex';
     if (d) d.style.display = 'none';
     hideAuthMessages();
+    setAuthLoading(false);
     
     if (pendingAuthMessage) {
         showAuthMessage(pendingAuthMessage.type, pendingAuthMessage.text);
@@ -473,7 +529,10 @@ function displayDoctors(doctors) {
         <div class="item-card">
           <div class="item-header">
             <div>
-              <div class="item-title">${d.name}</div>
+              <div class="item-title">
+                ${d.name}
+                <span class="status-badge status-${(d.status || 'active').toLowerCase()}" style="margin-left:10px; font-size:0.8rem; padding:2px 8px; border-radius:12px; background: ${d.status === 'inactive' ? '#fdecea' : '#e6f4ea'}; color: ${d.status === 'inactive' ? '#d32f2f' : '#1e8e3e'};">${capitalizeFirst(d.status || 'active')}</span>
+              </div>
               <div class="item-subtitle">${capitalizeFirst(d.specialty || d.specialization || 'Unknown')} • ${d.experience || 0} yrs</div>
               <div style="margin-top:.5rem;font-size:.9rem;color:var(--text-secondary);">
                 <span style="display:block;">${d.email}</span>
@@ -519,7 +578,8 @@ async function handleDoctorSubmit(e) {
             email:           document.getElementById('doctorEmail') ? document.getElementById('doctorEmail').value.trim().toLowerCase() : '',
             phone:           document.getElementById('doctorPhone') ? document.getElementById('doctorPhone').value.trim() : '',
             specialty:       document.getElementById('specialization') ? document.getElementById('specialization').value.trim() : '',
-            experience:      document.getElementById('doctorExperience') ? (parseInt(document.getElementById('doctorExperience').value) || 0) : 0
+            experience:      document.getElementById('doctorExperience') ? (parseInt(document.getElementById('doctorExperience').value) || 0) : 0,
+            status:          document.getElementById('doctorStatus') ? document.getElementById('doctorStatus').value : 'active'
         };
         if (isEditingDoctor && editingDoctorId) {
             await db.collection('doctors').doc(editingDoctorId).update({
@@ -2078,3 +2138,35 @@ async function logout() {
 window.logout = logout;
 
 console.log('MediCore OT Scheduler loaded. Version 3.1 – stable.');
+
+// ── Auth UI Helpers ──────────────────────────────────────────────────
+window.togglePasswordVisibility = function(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input && icon) {
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+};
+
+window.toggleDepartmentField = function() {
+    const regTypeElement = document.querySelector('input[name="registrationType"]:checked');
+    const container = document.getElementById('departmentContainer');
+    const deptSelect = document.getElementById('department');
+    if (regTypeElement && container && deptSelect) {
+        if (regTypeElement.value === 'staff') {
+            container.style.display = 'block';
+            deptSelect.setAttribute('required', 'true');
+        } else {
+            container.style.display = 'none';
+            deptSelect.removeAttribute('required');
+        }
+    }
+};
