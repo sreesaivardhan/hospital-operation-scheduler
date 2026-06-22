@@ -930,14 +930,35 @@
 <!-- Patient Appointments Section -->
 <div class="content-section" id="section-my-appointments">
 <div class="section-card">
-<div class="section-header">
+<div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
 <h2>My Appointments</h2>
+<button class="btn btn-primary" onclick="showSection('find-doctors')">Book New</button>
 </div>
-<div class="empty-state">
-<i class="fas fa-calendar-times"></i>
-<h3>No appointments booked yet.</h3>
-<p>You have not booked any appointments with our hospital.</p>
-<button class="btn btn-primary" style="margin-top: 1rem;" onclick="showSection('find-doctors')">Browse Doctors</button>
+<div id="patientAppointmentsContainer">
+    <p style="padding: 1rem;">Loading appointments...</p>
+</div>
+</div>
+</div>
+
+<!-- Admin Appointment Management Section -->
+<div class="content-section" id="section-appointment-management">
+<div class="section-card">
+<div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+<h2>Appointment Management</h2>
+</div>
+<div class="filters-bar" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; background: var(--bg-secondary); padding: 1rem; border-radius: var(--radius-md);">
+<label style="font-weight: 500; color: var(--text-secondary);">Status:</label>
+<select class="form-input" id="adminApptFilterStatus" onchange="loadAdminAppointments()" style="width: auto;">
+    <option value="">All Appointments</option>
+    <option value="pending">Pending</option>
+    <option value="confirmed">Confirmed</option>
+    <option value="completed">Completed</option>
+    <option value="cancelled">Cancelled</option>
+</select>
+<button class="btn" onclick="document.getElementById('adminApptFilterStatus').value=''; loadAdminAppointments();">Clear Filters</button>
+</div>
+<div id="adminAppointmentsContainer">
+    <p style="padding:1rem;">Loading appointments...</p>
 </div>
 </div>
 </div>
@@ -1282,6 +1303,41 @@
 </form>
 </div>
 </div>
+
+<!-- Book Appointment Modal -->
+<div class="modal" id="appointmentModal">
+<div class="modal-content">
+<div class="modal-header">
+<h2 class="modal-title">Book Appointment</h2>
+<button class="close" onclick="closeAppointmentModal()">×</button>
+</div>
+<form id="appointmentForm" onsubmit="handleAppointmentSubmit(event)">
+<input type="hidden" id="apptDoctorId" />
+<input type="hidden" id="apptDoctorEmail" />
+<input type="hidden" id="apptDoctorSpecialization" />
+<div class="form-grid">
+<div class="form-group">
+<label class="form-label" for="apptDoctorName">Doctor Name</label>
+<input class="form-input" id="apptDoctorName" type="text" readonly style="background-color: #f8f9fa; cursor: not-allowed;"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="apptDate">Appointment Date *</label>
+<input class="form-input" id="apptDate" required type="date"/>
+</div>
+<div class="form-group">
+<label class="form-label" for="apptTime">Appointment Time *</label>
+<input class="form-input" id="apptTime" required type="time"/>
+</div>
+<div class="form-group" style="grid-column: 1 / -1;">
+<label class="form-label" for="apptNotes">Notes (Optional)</label>
+<textarea class="form-input" id="apptNotes" rows="3" placeholder="Briefly describe your symptoms or reason for visit"></textarea>
+</div>
+</div>
+<button class="btn btn-success" type="submit" id="apptSubmitBtn">Book Appointment</button>
+<button class="btn btn-danger" onclick="closeAppointmentModal()" type="button">Cancel</button>
+</form>
+</div>
+</div>
 <script>
         // NOTE: Doctor/Patient/OT management is handled by index.js with Firestore.
         // This inline block only retains modal open/close helpers that index.js calls.
@@ -1316,33 +1372,6 @@
             const icon = document.getElementById('themeIcon');
             if (!icon) return;
             icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-        }
-
-        // Mobile nav behavior
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navOverlay = document.getElementById('navOverlay');
-        const navCloseBtn = document.getElementById('navCloseBtn');
-
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', () => {
-                document.body.classList.add('mobile-nav-open');
-                document.getElementById('dashboardNav').classList.add('open');
-                navOverlay.classList.add('open');
-            });
-        }
-
-        if (navOverlay) {
-            navOverlay.addEventListener('click', closeMobileNav);
-        }
-
-        if (navCloseBtn) {
-            navCloseBtn.addEventListener('click', closeMobileNav);
-        }
-
-        function closeMobileNav() {
-            document.body.classList.remove('mobile-nav-open');
-            document.getElementById('dashboardNav').classList.remove('open');
-            document.getElementById('navOverlay').classList.remove('open');
         }
     </script>
 <!-- Firebase SDKs -->

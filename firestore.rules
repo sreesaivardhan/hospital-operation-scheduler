@@ -28,6 +28,12 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'patient';
     }
 
+    function isStaffOrAdmin() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'user'];
+    }
+
     // ── Users collection ────────────────────────────────────────────────────
     match /users/{userId} {
       allow read: if isOwnerUnverified(userId) || isAdmin();
@@ -49,7 +55,7 @@ service cloud.firestore {
 
     // ── Doctors collection ──────────────────────────────────────────────────
     match /doctors/{doctorId} {
-      allow read:   if isAuthenticated() || isPatient();
+      allow read:   if request.auth != null;
       allow create,
             update,
             delete: if isAdmin();
@@ -57,8 +63,8 @@ service cloud.firestore {
 
     // ── Patients collection ─────────────────────────────────────────────────
     match /patients/{patientId} {
-      allow read:   if isOwnerUnverified(patientId) || (isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role != 'patient');
-      allow create: if isOwnerUnverified(patientId) || isAdmin();
+      allow read:   if (request.auth != null && request.auth.uid == patientId) || isStaffOrAdmin();
+      allow create: if (request.auth != null && request.auth.uid == patientId) || isAdmin();
       allow update: if isOwnerUnverified(patientId) && 
                        !('role' in request.resource.data.diff(resource.data).affectedKeys()) && 
                        !('isActive' in request.resource.data.diff(resource.data).affectedKeys()) && 
@@ -97,6 +103,18 @@ service cloud.firestore {
       allow create,
             update,
             delete: if isAdmin();
+    }
+
+    // ── Appointments collection ─────────────────────────────────────────────
+    match /appointments/{appointmentId} {
+      allow create: if request.auth != null &&
+                       request.resource.data.patientId == request.auth.uid &&
+                       request.resource.data.status == "pending";
+      allow read:   if (request.auth != null && resource.data.patientId == request.auth.uid) ||
+                       isAdmin() ||
+                       (request.auth != null && resource.data.doctorEmail == request.auth.token.email);
+      allow update: if isAdmin();
+      allow delete: if false;
     }
 
     // ── Admin Logs ──────────────────────────────────────────────────────────

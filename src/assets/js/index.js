@@ -34,6 +34,7 @@ const adminNavigation = [
     { id: 'patients',    icon: 'fas fa-procedures',      text: 'Patient Management' },
     { id: 'ot-rooms',    icon: 'fas fa-door-open',       text: 'OT Rooms' },
     { id: 'ot-schedule', icon: 'fas fa-calendar-alt',   text: 'OT Schedule' },
+    { id: 'appointment-management', icon: 'fas fa-calendar-check', text: 'Appointment Management' },
     { id: 'analytics',   icon: 'fas fa-chart-line',      text: 'Analytics Dashboard' },
     { id: 'operations',  icon: 'fas fa-cogs',            text: 'Operations Management' },
     { id: 'scheduling',  icon: 'fas fa-calendar-check',  text: 'Scheduling System' },
@@ -148,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 showDashboard(userData);
                 await loadInitialData();
                 startSessionManagement();
-                loadStaffData();
             } catch (err) {
                 console.error('Error loading profile:', err);
                 await auth.signOut();
@@ -224,14 +224,20 @@ function setupNavigation(items, userRole) {
     logoutA.innerHTML = '<i class="fas fa-sign-out-alt"></i> Secure Logout';
     logoutLi.appendChild(logoutA);
     navMenu.appendChild(logoutLi);
+    
+    // Bind universal mobile navigation events
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const navOverlay = document.getElementById('navOverlay');
+    const navCloseBtn = document.getElementById('navCloseBtn');
+    
+    if (mobileBtn) mobileBtn.onclick = toggleMobileSidebar;
+    if (navOverlay) navOverlay.onclick = closeMobileSidebar;
+    if (navCloseBtn) navCloseBtn.onclick = closeMobileSidebar;
 }
 
 function showSection(sectionName) {
-    // Close mobile sidebar
-    const nav = document.getElementById('dashboardNav');
-    if (nav) nav.classList.remove('open');
-    const overlay = document.getElementById('navOverlay');
-    if (overlay) overlay.classList.remove('open');
+    // Close mobile sidebar uniformly
+    closeMobileSidebar();
 
     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
     const target = document.getElementById(`section-${sectionName}`);
@@ -254,7 +260,8 @@ function showSection(sectionName) {
         'find-doctors': 'Find Doctors',
         'my-appointments': 'My Appointments',
         'patient-profile': 'My Profile',
-        'staff-dashboard': 'Staff Dashboard'
+        'staff-dashboard': 'Staff Dashboard',
+        'appointment-management': 'Appointment Management'
     };
     const el = document.getElementById('pageTitle');
     if (el) el.textContent = titles[sectionName] || 'Dashboard';
@@ -275,6 +282,8 @@ function showSection(sectionName) {
         case 'patient-profile': loadPatientProfile(); break;
         case 'staff-dashboard': loadStaffDashboard(); break;
         case 'assignments': loadUserAssignments(); break;
+        case 'appointment-management': loadAdminAppointments(); break;
+        case 'my-appointments': loadPatientAppointments(); break;
     }
 }
 
@@ -435,6 +444,13 @@ function toggleAuthMode(e) {
         if (registerFields) registerFields.style.display = 'none';
         if (forgotPw)    forgotPw.style.display   = 'block';
         if (googleBtn)   googleBtn.style.display  = 'block';
+        
+        // Remove required from department to prevent hidden validation blocking login
+        const deptSelect = document.getElementById('department');
+        if (deptSelect) {
+            deptSelect.removeAttribute('required');
+            deptSelect.removeAttribute('data-was-required');
+        }
     } else {
         if (authTitle)   authTitle.textContent   = 'Join MediCore Platform';
         if (authBtnText) authBtnText.textContent  = 'Create Account';
@@ -728,7 +744,7 @@ async function editDoctor(doctorId) {
 }
 
 async function deleteDoctor(doctorId, doctorName) {
-    const confirmed = await showConfirm(`Delete Dr. ${doctorName}?`, 'This action cannot be undone.');
+    const confirmed = await window.showConfirmation({ title: `Delete Dr. ${doctorName}?`, message: 'This action cannot be undone.', confirmText: 'Delete' });
     if (!confirmed) return;
     try {
         await db.collection('doctors').doc(doctorId).delete();
@@ -874,7 +890,7 @@ async function handleUserSubmit(e) {
 async function deactivateUser(userId, userName, deactivate) {
     if (!currentUserData || currentUserData.role !== 'admin') return;
     const actionText = deactivate ? 'deactivate' : 'reactivate';
-    const confirmed = await showConfirm(`Confirm ${capitalizeFirst(actionText)}`, `Are you sure you want to ${actionText} ${userName || 'this user'}?`);
+    const confirmed = await window.showConfirmation({ title: `Confirm ${capitalizeFirst(actionText)}`, message: `Are you sure you want to ${actionText} ${userName || 'this user'}?`, confirmText: capitalizeFirst(actionText) });
     if (!confirmed) return;
     
     try {
@@ -1069,7 +1085,7 @@ async function editPatient(patientId) {
 }
 
 async function deletePatient(patientId, patientName) {
-    const confirmed = await showConfirm(`Delete patient ${patientName}?`, 'This action cannot be undone.');
+    const confirmed = await window.showConfirmation({ title: `Delete patient ${patientName}?`, message: 'This action cannot be undone.', confirmText: 'Delete' });
     if (!confirmed) return;
     try {
         await db.collection('patients').doc(patientId).delete();
@@ -1230,7 +1246,7 @@ async function editOTRoom(roomId) {
 }
 
 async function deleteOTRoom(roomId, roomNumber) {
-    const confirmed = await showConfirm(`Delete OT Room ${roomNumber}?`, 'This action cannot be undone.');
+    const confirmed = await window.showConfirmation({ title: `Delete OT Room ${roomNumber}?`, message: 'This action cannot be undone.', confirmText: 'Delete' });
     if (!confirmed) return;
     try {
         await db.collection('ot_rooms').doc(roomId).delete();
@@ -1482,7 +1498,7 @@ async function updateOTStatus(scheduleId) {
 
 async function cancelOperation(scheduleId) {
     if (!currentUserData || currentUserData.role !== 'admin') return;
-    const confirmed = await showConfirm('Cancel this operation?', 'It will be marked as cancelled.');
+    const confirmed = await window.showConfirmation({ title: 'Cancel this operation?', message: 'It will be marked as cancelled.', confirmText: 'Cancel Operation' });
     if (!confirmed) return;
     try {
         await db.collection('ot_schedules').doc(scheduleId).update({
@@ -1668,6 +1684,9 @@ function showToast(type, message, duration) {
     }, duration);
 }
 
+// MediCore universal notification system
+window.showNotification = showToast;
+
 function showMessage(type, message) {
     showToast(type === 'success' ? 'success' : 'error', message);
 }
@@ -1678,7 +1697,8 @@ async function logAdminAction(action, details, entityType = null, entityId = nul
         const logData = {
             userId:    currentUser.uid,
             userEmail: currentUser.email,
-            action, details,
+            action,
+            details: details || '',
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         };
         if (entityType) logData.entityType = entityType;
@@ -1690,17 +1710,29 @@ async function logAdminAction(action, details, entityType = null, entityId = nul
     }
 }
 
-function showConfirm(title, message) {
+window.showConfirmation = function({ title, message, confirmText = 'Confirm', cancelText = 'Cancel', onConfirm, onCancel }) {
     return new Promise(resolve => {
         const modal = document.getElementById('confirmModal');
-        if (!modal) { resolve(window.confirm(title + '\n' + message)); return; }
+        if (!modal) {
+            const res = window.confirm(title + '\n' + message);
+            if (res && onConfirm) onConfirm();
+            if (!res && onCancel) onCancel();
+            resolve(res);
+            return;
+        }
         const t = document.getElementById('confirmTitle');
         const m = document.getElementById('confirmMessage');
-        if (t) t.textContent = title || 'Confirm';
+        const okBtn = document.getElementById('confirmOkBtn');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+        if (t) t.textContent = title || 'Confirm Action';
         if (m) m.textContent = message || '';
+        if (okBtn) okBtn.textContent = confirmText;
+        if (cancelBtn) cancelBtn.textContent = cancelText;
         modal.style.display = 'flex';
         window._confirmResolve = function (result) {
             modal.style.display = 'none';
+            if (result && onConfirm) onConfirm();
+            if (!result && onCancel) onCancel();
             resolve(result);
         };
     });
@@ -1749,8 +1781,7 @@ function toggleMobileSidebar() {
     if (!nav) return;
     const isOpen = nav.classList.toggle('open');
     if (overlay) overlay.classList.toggle('open', isOpen);
-    const closeBtn = document.getElementById('navCloseBtn');
-    if (closeBtn) closeBtn.style.display = isOpen ? 'flex' : 'none';
+    document.body.classList.toggle('mobile-nav-open', isOpen);
 }
 
 function closeMobileSidebar() {
@@ -1758,8 +1789,7 @@ function closeMobileSidebar() {
     const overlay = document.getElementById('navOverlay');
     if (nav) nav.classList.remove('open');
     if (overlay) overlay.classList.remove('open');
-    const closeBtn = document.getElementById('navCloseBtn');
-    if (closeBtn) closeBtn.style.display = 'none';
+    document.body.classList.remove('mobile-nav-open');
 }
 
 // Sidebar toggle button creation
@@ -1954,7 +1984,7 @@ function viewAnalytics()      { loadAnalytics(); showSection('analytics'); }
 
 async function deleteOperation(scheduleId) {
     if (!currentUserData || currentUserData.role !== 'admin') return;
-    const confirmed = await showConfirm('Delete Operation', 'This will permanently delete this operation. Are you sure?');
+    const confirmed = await window.showConfirmation({ title: 'Delete Operation', message: 'This will permanently delete this operation. Are you sure?', confirmText: 'Delete' });
     if (!confirmed) return;
     try {
         await db.collection('ot_schedules').doc(scheduleId).delete();
@@ -2068,14 +2098,14 @@ async function handleEmergencySubmit(e) {
         // Attempt room conflict validation
         const roomConflict = await checkOTConflict(scheduleData.otRoomId, scheduleData.date, scheduleData.startTime, scheduleData.endTime);
         if (roomConflict) { 
-            const confirmed = await showConfirm('Room Conflict Detected', 'The selected OT room is already booked. Proceed with emergency override?');
+            const confirmed = await window.showConfirmation({ title: 'Room Conflict Detected', message: 'The selected OT room is already booked. Proceed with emergency override?', confirmText: 'Override' });
             if (!confirmed) return;
         }
         
         if (scheduleData.surgeonId) {
             const docConflict = await checkDoctorConflict(scheduleData.surgeonId, scheduleData.date, scheduleData.startTime, scheduleData.endTime);
             if (docConflict) {
-                const confirmed = await showConfirm('Surgeon Conflict Detected', 'The selected surgeon is already booked. Proceed with emergency override?');
+                const confirmed = await window.showConfirmation({ title: 'Surgeon Conflict Detected', message: 'The selected surgeon is already booked. Proceed with emergency override?', confirmText: 'Override' });
                 if (!confirmed) return;
             }
         }
@@ -2103,21 +2133,7 @@ function profileSettings()    { showSection('profile'); }
 function viewAssignments()    { showSection('assignments'); }
 function updateAvailability() { showSection('availability'); }
 
-// ── Staff data ────────────────────────────────────────────────
-async function loadStaffData() {
-    try {
-        const [anesSnap, nurseSnap] = await Promise.all([
-            db.collection('anesthesiologists').get(),
-            db.collection('nurses').get()
-        ]);
-        // Populate any staff selects if they exist
-        const anesCount  = anesSnap.size;
-        const nurseCount = allNurses.length;
-    } catch (err) {
-        console.warn('loadStaffData skipped (collections may be empty or missing rules):', err.code);
-    }
-}
-
+// Removed legacy staff data function
 // ── Window onclick: close modals by clicking backdrop ─────────
 window.onclick = function (event) {
     document.querySelectorAll('.modal').forEach(modal => {
@@ -2142,7 +2158,7 @@ window.onclick = function (event) {
 window.capitalizeFirst    = capitalizeFirst;
 window.showToast          = showToast;
 window.showMessage        = showMessage;
-window.showConfirm        = showConfirm;
+window.showConfirm        = function(title, message) { return window.showConfirmation({ title, message }); };
 window.logAdminAction     = logAdminAction;
 window.openModal          = openModal;
 window.closeModal         = closeModal;
@@ -2313,6 +2329,7 @@ async function loadPatientDoctors() {
                         <span class="badge" style="background: rgba(39,174,96,0.1); color: #27ae60; display: inline-block;">${statusLabel}</span>
                     </div>
                 </div>
+                <button class="btn btn-primary btn-sm" onclick="openAppointmentModal('${doc.id}', '${(d.name||'').replace(/'/g, "\\'")}', '${d.email||''}', '${spec.replace(/'/g, "\\'")}')" style="margin-top: 15px; width: 100%;"><i class="fas fa-calendar-plus"></i> Book Appointment</button>
             </div>`;
         });
         container.innerHTML = html;
@@ -2331,48 +2348,58 @@ async function loadStaffDashboard() {
     try {
         const todayStr = new Date().toISOString().split('T')[0];
         
-        // Load assignments where staff is involved (either as surgeon or nurse/anesthesiologist by name)
-        // Since firestore doesn't natively support this complex OR without indexing, we fetch and filter
-        const snap = await db.collection('ot_schedules').orderBy('date', 'desc').get();
+        // Find if this staff member is linked to a doctor profile
+        const doctorSnap = await db.collection('doctors').where('email', '==', currentUser.email).limit(1).get();
+        if (doctorSnap.empty) {
+            document.getElementById('staffAssignmentsCount').textContent = "0";
+            document.getElementById('staffTodayCases').textContent = "0";
+            document.getElementById('staffCompletedCases').textContent = "0";
+            const recentContainer = document.getElementById('staffRecentAssignments');
+            recentContainer.innerHTML = '<div class="empty-state"><i class="fas fa-user-md"></i><h3>No Doctor Profile Linked</h3><p>Your account is not linked to any active doctor profile.</p></div>';
+            return;
+        }
+        
+        const snap = await db.collection('appointments').where('doctorEmail', '==', currentUser.email).get();
         let myAssignmentsCount = 0;
         let todayCasesCount = 0;
         let completedCasesCount = 0;
         let recentAssignmentsHTML = '';
         let counter = 0;
         
+        let appointments = [];
         snap.forEach(doc => {
             const data = doc.data();
-            const staffNameLower = (currentUserData.fullName || '').toLowerCase();
-            const isInvolved = (data.surgeonId === currentUser.uid) || 
-                               (data.nurses && data.nurses.toLowerCase().includes(staffNameLower)) ||
-                               (data.anesthesiologist && data.anesthesiologist.toLowerCase().includes(staffNameLower));
+            appointments.push({ id: doc.id, ...data });
+        });
+        
+        // sort descending by date
+        appointments.sort((a, b) => b.appointmentDate.localeCompare(a.appointmentDate));
+
+        appointments.forEach(data => {
+            myAssignmentsCount++;
+            if (data.appointmentDate === todayStr) todayCasesCount++;
+            if (data.status === 'completed') completedCasesCount++;
             
-            if (isInvolved) {
-                myAssignmentsCount++;
-                if (data.date === todayStr) todayCasesCount++;
-                if (data.status === 'completed') completedCasesCount++;
-                
-                // Add to recent assignments (limit 5)
-                if (counter < 5) {
-                    const statusColors = {
-                        scheduled: '#007bff',
-                        'in-progress': '#f39c12',
-                        completed: '#28a745',
-                        cancelled: '#dc3545'
-                    };
-                    const color = statusColors[data.status] || '#6c757d';
-                    recentAssignmentsHTML += `
-                    <div class="item-card" style="margin-bottom: 10px;">
-                        <div class="item-header">
-                            <div>
-                                <div class="item-title">${data.procedure}</div>
-                                <div class="item-subtitle">${data.date} | ${data.startTime} - ${data.endTime}</div>
-                            </div>
-                            <span class="badge" style="background: ${color}20; color: ${color};">${data.status.toUpperCase()}</span>
+            // Add to recent assignments (limit 5)
+            if (counter < 5) {
+                const statusColors = {
+                    pending: '#f39c12',
+                    confirmed: '#007bff',
+                    completed: '#28a745',
+                    cancelled: '#dc3545'
+                };
+                const color = statusColors[data.status] || '#6c757d';
+                recentAssignmentsHTML += `
+                <div class="item-card" style="margin-bottom: 10px;">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-title">Patient: ${data.patientName}</div>
+                            <div class="item-subtitle">${data.appointmentDate} | ${data.appointmentTime}</div>
                         </div>
-                    </div>`;
-                    counter++;
-                }
+                        <span class="badge" style="background: ${color}20; color: ${color};">${data.status.toUpperCase()}</span>
+                    </div>
+                </div>`;
+                counter++;
             }
         });
         
@@ -2384,6 +2411,9 @@ async function loadStaffDashboard() {
         if (myAssignmentsCount > 0) {
             recentContainer.innerHTML = recentAssignmentsHTML;
             recentContainer.classList.remove('empty-state');
+        } else {
+            recentContainer.innerHTML = '<div class="empty-state"><h3>No Appointments</h3><p>You have no recent appointments.</p></div>';
+            recentContainer.classList.add('empty-state');
         }
         
     } catch (err) {
@@ -2397,44 +2427,56 @@ async function loadUserAssignments() {
     if (!container) return;
     
     try {
-        const snap = await db.collection('ot_schedules').orderBy('date', 'desc').get();
+        const doctorSnap = await db.collection('doctors').where('email', '==', currentUser.email).limit(1).get();
+        if (doctorSnap.empty) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-user-md"></i><h3>No Doctor Profile Linked</h3><p>Your account is not linked to any active doctor profile.</p></div>';
+            return;
+        }
+
+        const snap = await db.collection('appointments').where('doctorEmail', '==', currentUser.email).get();
         let html = '';
         
+        let appointments = [];
         snap.forEach(doc => {
             const data = doc.data();
-            const staffNameLower = (currentUserData.fullName || '').toLowerCase();
-            const isInvolved = (data.surgeonId === currentUser.uid) || 
-                               (data.nurses && data.nurses.toLowerCase().includes(staffNameLower)) ||
-                               (data.anesthesiologist && data.anesthesiologist.toLowerCase().includes(staffNameLower));
-            
-            if (isInvolved) {
-                const statusColors = {
-                    scheduled: { bg: '#cce5ff', text: '#004085' },
-                    'in-progress': { bg: '#fff3cd', text: '#856404' },
-                    completed: { bg: '#d4edda', text: '#155724' },
-                    cancelled: { bg: '#f8d7da', text: '#721c24' }
-                };
-                const colors = statusColors[data.status] || { bg: '#e2e3e5', text: '#383d41' };
-                html += `
-                <div class="item-card">
-                    <div class="item-header">
-                        <div>
-                            <div class="item-title">${data.procedure}</div>
-                            <div class="item-subtitle">${data.date} | ${data.startTime} - ${data.endTime}</div>
-                        </div>
-                        <span style="padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; background: ${colors.bg}; color: ${colors.text};">${data.status.toUpperCase()}</span>
+            appointments.push({ id: doc.id, ...data });
+        });
+        
+        appointments.sort((a, b) => {
+            const dateA = a.appointmentDate || '';
+            const dateB = b.appointmentDate || '';
+            if (dateA !== dateB) return dateA.localeCompare(dateB);
+            const timeA = a.appointmentTime || '';
+            const timeB = b.appointmentTime || '';
+            return timeA.localeCompare(timeB);
+        });
+
+        appointments.forEach(data => {
+            const statusColors = {
+                pending: { bg: '#fff3cd', text: '#856404' },
+                confirmed: { bg: '#cce5ff', text: '#004085' },
+                completed: { bg: '#d4edda', text: '#155724' },
+                cancelled: { bg: '#f8d7da', text: '#721c24' }
+            };
+            const colors = statusColors[data.status] || { bg: '#e2e3e5', text: '#383d41' };
+            html += `
+            <div class="item-card">
+                <div class="item-header">
+                    <div>
+                        <div class="item-title">Patient: ${data.patientName}</div>
+                        <div class="item-subtitle">${data.appointmentDate} | ${data.appointmentTime}</div>
                     </div>
-                    <div style="margin-top: 10px; font-size: 0.9rem; color: #666;">
-                        <strong>OT Room:</strong> ${data.otRoomId} <br>
-                        <strong>Patient ID:</strong> ${data.patientId} <br>
-                        <strong>Notes:</strong> ${data.notes || 'None'}
-                    </div>
-                </div>`;
-            }
+                    <span style="padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500; background: ${colors.bg}; color: ${colors.text};">${data.status.toUpperCase()}</span>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                    <strong>Patient Email:</strong> ${data.patientEmail || 'N/A'} <br>
+                    <strong>Notes:</strong> ${data.notes || 'None'}
+                </div>
+            </div>`;
         });
         
         if (html === '') {
-            container.innerHTML = '<div class="empty-state"><h3>No Assignments Found</h3><p>You have no current assignments.</p></div>';
+            container.innerHTML = '<div class="empty-state"><h3>No Appointments Found</h3><p>You have no current appointments.</p></div>';
         } else {
             container.innerHTML = html;
         }
@@ -2478,3 +2520,373 @@ window.toggleDepartmentField = function() {
         }
     }
 };
+
+// ── Patient Appointments ──────────────────────────────────────────────
+window.openAppointmentModal = function(doctorId, doctorName, doctorEmail, doctorSpecialization) {
+    document.getElementById('apptDoctorId').value = doctorId;
+    document.getElementById('apptDoctorName').value = doctorName;
+    document.getElementById('apptDoctorEmail').value = doctorEmail;
+    document.getElementById('apptDoctorSpecialization').value = doctorSpecialization;
+    document.getElementById('apptDate').value = '';
+    document.getElementById('apptTime').value = '';
+    document.getElementById('apptNotes').value = '';
+    
+    const todayStr = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('apptDate');
+    const timeInput = document.getElementById('apptTime');
+    
+    if (dateInput) {
+        dateInput.min = todayStr;
+        if (!dateInput.value || dateInput.value < todayStr) {
+            dateInput.value = todayStr;
+        }
+    }
+    
+    // Add real-time time validation
+    if (dateInput && timeInput && !window._apptTimeValidationBound) {
+        window._apptTimeValidationBound = true;
+        const validateTime = () => {
+            if (!dateInput.value || !timeInput.value) return;
+            const now = new Date();
+            // Get local date accurately adjusting for timezone offset
+            const currentTodayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+            const currentTimeStr = now.toTimeString().slice(0, 5);
+            
+            if (dateInput.value === currentTodayStr && timeInput.value <= currentTimeStr) {
+                showNotification('warning', 'Please select a future time.');
+                timeInput.value = '';
+            }
+        };
+        dateInput.addEventListener('change', validateTime);
+        timeInput.addEventListener('change', validateTime);
+    }
+    
+    document.getElementById('appointmentModal').style.display = 'block';
+};
+
+window.closeAppointmentModal = function() {
+    document.getElementById('appointmentModal').style.display = 'none';
+};
+
+window.handleAppointmentSubmit = async function(e) {
+    e.preventDefault();
+    if(!currentUser || !currentUserData || currentUserData.role !== 'patient') return;
+    
+    const btn = document.getElementById('apptSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Booking...';
+    
+    const doctorId = document.getElementById('apptDoctorId').value;
+    const doctorName = document.getElementById('apptDoctorName').value;
+    const doctorEmail = document.getElementById('apptDoctorEmail').value;
+    const doctorSpecialization = document.getElementById('apptDoctorSpecialization').value;
+    const appointmentDate = document.getElementById('apptDate').value;
+    const appointmentTime = document.getElementById('apptTime').value;
+    const notes = document.getElementById('apptNotes').value.trim();
+    
+    const now = new Date();
+    // Get local date accurately adjusting for timezone offset
+    const todayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+    const currentTimeStr = now.toTimeString().slice(0, 5);
+    
+    if (appointmentDate < todayStr) {
+        showNotification('warning', 'Appointments must be booked for future dates.');
+        btn.disabled = false;
+        btn.textContent = 'Book Appointment';
+        return;
+    }
+    
+    if (appointmentDate === todayStr && appointmentTime <= currentTimeStr) {
+        showNotification('warning', 'Please select a future time.');
+        btn.disabled = false;
+        btn.textContent = 'Book Appointment';
+        return;
+    }
+    
+    try {
+        const appointmentId = `${doctorId}_${appointmentDate}_${appointmentTime.replace(':', '')}`;
+
+        // Proceed to create appointment
+        await db.collection('appointments').doc(appointmentId).set({
+            patientId: currentUser.uid,
+            patientName: currentUserData.fullName,
+            patientEmail: currentUserData.email || '',
+            doctorId: doctorId,
+            doctorName: doctorName,
+            doctorEmail: doctorEmail,
+            doctorSpecialization: doctorSpecialization,
+            appointmentDate: appointmentDate,
+            appointmentTime: appointmentTime,
+            status: 'pending',
+            notes: notes,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        showNotification('success', 'Appointment booked successfully!');
+        closeAppointmentModal();
+        if (window.loadPatientAppointments) {
+            showSection('my-appointments');
+        }
+    } catch (err) {
+        if (err.code === 'permission-denied') {
+            showNotification('error', 'This time slot is already booked. Please choose a different time.');
+        } else {
+            console.error("Error booking appointment", err);
+            showNotification('error', 'Failed to book appointment. Check console for details.');
+        }
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Book Appointment';
+    }
+};
+
+async function loadPatientAppointments() {
+    if(!currentUser || !currentUserData || currentUserData.role !== 'patient') return;
+    
+    const container = document.getElementById('patientAppointmentsContainer');
+    if (!container) return;
+    
+    try {
+        container.innerHTML = '<p style="padding:1rem;">Loading appointments...</p>';
+        const snap = await db.collection('appointments').where('patientId', '==', currentUser.uid).get();
+        
+        let appointments = [];
+        snap.forEach(doc => appointments.push({ id: doc.id, ...doc.data() }));
+        
+        if (appointments.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>No appointments booked yet.</h3>
+                    <p>You have not booked any appointments with our hospital.</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;" onclick="showSection('find-doctors')">Browse Doctors</button>
+                </div>
+            `;
+            return;
+        }
+        
+        appointments.sort((a, b) => {
+            const dateA = a.appointmentDate || '';
+            const dateB = b.appointmentDate || '';
+            if (dateA !== dateB) return dateA.localeCompare(dateB);
+            const timeA = a.appointmentTime || '';
+            const timeB = b.appointmentTime || '';
+            return timeA.localeCompare(timeB);
+        });
+        
+        let upcomingHtml = '';
+        let completedHtml = '';
+        let cancelledHtml = '';
+        
+        appointments.forEach(data => {
+            const statusColors = {
+                pending: { bg: '#fff3cd', text: '#856404' },
+                confirmed: { bg: '#cce5ff', text: '#004085' },
+                completed: { bg: '#d4edda', text: '#155724' },
+                cancelled: { bg: '#f8d7da', text: '#721c24' }
+            };
+            const colors = statusColors[data.status] || { bg: '#e2e3e5', text: '#383d41' };
+            const card = `
+                <div class="item-card" style="margin-bottom: 1rem;">
+                    <div class="item-header">
+                        <div>
+                            <div class="item-title">Dr. ${data.doctorName}</div>
+                            <div class="item-subtitle">${data.doctorSpecialization}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="badge" style="background: ${colors.bg}; color: ${colors.text}; display: inline-block;">${data.status.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.95rem;">
+                        <strong>Date:</strong> ${data.appointmentDate} <br>
+                        <strong>Time:</strong> ${data.appointmentTime} <br>
+                        <strong>Notes:</strong> ${data.notes || 'None'}
+                    </div>
+                </div>
+            `;
+            
+            if (data.status === 'pending' || data.status === 'confirmed') upcomingHtml += card;
+            else if (data.status === 'completed') completedHtml += card;
+            else if (data.status === 'cancelled') cancelledHtml += card;
+        });
+        
+        let finalHtml = '';
+        if (upcomingHtml) {
+            finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Upcoming</h3>' + upcomingHtml;
+        }
+        if (completedHtml) {
+            finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Completed</h3>' + completedHtml;
+        }
+        if (cancelledHtml) {
+            finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Cancelled</h3>' + cancelledHtml;
+        }
+        
+        container.innerHTML = finalHtml;
+        
+        // Update stats on dashboard if we are loading patient appointments
+        const dashUpcoming = document.getElementById('patientUpcomingAppointments');
+        const dashCompleted = document.getElementById('patientCompletedAppointments');
+        
+        if (dashUpcoming && dashCompleted) {
+            dashUpcoming.textContent = (upcomingHtml.match(/<div class="item-card"/g) || []).length;
+            dashCompleted.textContent = (completedHtml.match(/<div class="item-card"/g) || []).length;
+        }
+        
+    } catch(err) {
+        console.error("Error loading patient appointments", err);
+        container.innerHTML = '<p style="color:red">Error loading appointments.</p>';
+    }
+};
+
+// ── Admin Appointments ──────────────────────────────────────────────
+async function loadAdminAppointments() {
+    if(!currentUser || !currentUserData || currentUserData.role !== 'admin') return;
+    
+    const container = document.getElementById('adminAppointmentsContainer');
+    const statusFilter = document.getElementById('adminApptFilterStatus').value;
+    if (!container) return;
+    
+    try {
+        container.innerHTML = '<p style="padding:1rem;">Loading appointments...</p>';
+        
+        let query = db.collection('appointments');
+        if (statusFilter) {
+            query = query.where('status', '==', statusFilter);
+        }
+        
+        const snap = await query.get();
+        let appointments = [];
+        snap.forEach(doc => appointments.push({ id: doc.id, ...doc.data() }));
+        
+        appointments.sort((a, b) => {
+            const dateA = a.appointmentDate || '';
+            const dateB = b.appointmentDate || '';
+            if (dateA !== dateB) return dateA.localeCompare(dateB);
+            const timeA = a.appointmentTime || '';
+            const timeB = b.appointmentTime || '';
+            return timeA.localeCompare(timeB);
+        });
+        
+        if (appointments.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><h3>No Appointments Found</h3><p>There are no appointments matching your criteria.</p></div>';
+            return;
+        }
+        
+        let html = '';
+        appointments.forEach(data => {
+            const statusColors = {
+                pending: { bg: '#fff3cd', text: '#856404' },
+                confirmed: { bg: '#cce5ff', text: '#004085' },
+                completed: { bg: '#d4edda', text: '#155724' },
+                cancelled: { bg: '#f8d7da', text: '#721c24' }
+            };
+            const colors = statusColors[data.status] || { bg: '#e2e3e5', text: '#383d41' };
+            
+            // Generate valid actions based on current status
+            let actionsHtml = '';
+            if (data.status === 'pending') {
+                actionsHtml = `
+                    <button class="btn btn-sm btn-success" onclick="updateAppointmentStatus('${data.id}', 'confirmed')">Confirm</button>
+                    <button class="btn btn-sm btn-danger" onclick="updateAppointmentStatus('${data.id}', 'cancelled')">Cancel</button>
+                `;
+            } else if (data.status === 'confirmed') {
+                actionsHtml = `
+                    <button class="btn btn-sm btn-primary" onclick="updateAppointmentStatus('${data.id}', 'completed')">Mark Completed</button>
+                    <button class="btn btn-sm btn-danger" onclick="updateAppointmentStatus('${data.id}', 'cancelled')">Cancel</button>
+                `;
+            }
+
+            html += `
+            <div class="item-card" style="margin-bottom: 1rem;">
+                <div class="item-header">
+                    <div>
+                        <div class="item-title">Patient: ${data.patientName} | Dr. ${data.doctorName}</div>
+                        <div class="item-subtitle">${data.appointmentDate} | ${data.appointmentTime}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="badge" style="background: ${colors.bg}; color: ${colors.text}; display: inline-block;">${data.status.toUpperCase()}</span>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.95rem; display: flex; justify-content: space-between; align-items:flex-end; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <strong>Patient Email:</strong> ${data.patientEmail} <br>
+                        <strong>Doctor Email:</strong> ${data.doctorEmail} <br>
+                        <strong>Notes:</strong> ${data.notes || 'None'}
+                    </div>
+                    <div style="display:flex; gap:0.5rem;">
+                        ${actionsHtml}
+                    </div>
+                </div>
+            </div>`;
+        });
+        
+        container.innerHTML = html;
+        
+    } catch(err) {
+        console.error("Error loading admin appointments", err);
+        container.innerHTML = '<p style="color:red">Error loading appointments.</p>';
+    }
+};
+
+window.loadPatientAppointments = loadPatientAppointments;
+window.loadAdminAppointments = loadAdminAppointments;
+
+window.updateAppointmentStatus = async function(appointmentId, newStatus) {
+    if(!currentUser || !currentUserData || currentUserData.role !== 'admin') return;
+    const confirmed = await window.showConfirmation({ title: 'Confirm Status Change', message: `Are you sure you want to change the status to ${newStatus}?`, confirmText: 'Update' });
+    if (!confirmed) return;
+    
+    try {
+        await db.collection('appointments').doc(appointmentId).update({
+            status: newStatus,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        // Log action
+        if (window.logAdminAction) {
+            logAdminAction('appointment_status_updated', `Updated appointment ${appointmentId} status to ${newStatus}`, 'appointments', appointmentId);
+        }
+        loadAdminAppointments();
+    } catch(err) {
+        console.error("Error updating appointment status", err);
+        showNotification('error', 'Failed to update status. Check console for details.');
+    }
+};
+// ── Global Observer for Hidden Required Fields ─────────────────
+function initializeHiddenFieldsObserver() {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                const el = mutation.target;
+                const isHidden = window.getComputedStyle(el).display === 'none';
+                el.querySelectorAll('input, select, textarea').forEach(input => {
+                    if (isHidden) {
+                        if (input.hasAttribute('required')) {
+                            input.setAttribute('data-was-required', 'true');
+                            input.removeAttribute('required');
+                        }
+                    } else {
+                        if (input.hasAttribute('data-was-required')) {
+                            input.setAttribute('required', 'required');
+                            input.removeAttribute('data-was-required');
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    document.querySelectorAll('.modal, .content-section, #registerFields').forEach(el => {
+        observer.observe(el, { attributes: true, attributeFilter: ['style'] });
+        // Initial pass
+        if (window.getComputedStyle(el).display === 'none') {
+            el.querySelectorAll('input, select, textarea').forEach(input => {
+                if (input.hasAttribute('required')) {
+                    input.setAttribute('data-was-required', 'true');
+                    input.removeAttribute('required');
+                }
+            });
+        }
+    });
+}
+document.addEventListener('DOMContentLoaded', initializeHiddenFieldsObserver);
