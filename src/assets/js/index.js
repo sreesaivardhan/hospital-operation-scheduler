@@ -162,6 +162,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         } else {
+            if (window.patientAppointmentsUnsubscribe) {
+                window.patientAppointmentsUnsubscribe();
+                window.patientAppointmentsUnsubscribe = null;
+            }
             showAuth();
         }
     });
@@ -1198,22 +1202,37 @@ function openOTRoomModal() {
 
 function closeOTRoomModal() {
     const m = document.getElementById('otRoomModal');
-    if (m) m.style.display = 'none';
+    if (m) {
+        m.style.display = 'none';
+        delete m._editId;
+    }
 }
 
 async function handleOTRoomSubmit(e) {
     e.preventDefault();
     try {
+        const modal = document.getElementById('otRoomModal');
+        const editId = modal ? modal._editId : null;
+        
         const roomData = {
             roomNumber: document.getElementById('otRoomNumber').value.trim(),
             type:       document.getElementById('otRoomType').value,
             status:     document.getElementById('otRoomStatus').value,
             equipment:  document.getElementById('otRoomEquipment').value.trim(),
-            createdAt:  firebase.firestore.FieldValue.serverTimestamp()
+            updatedAt:  firebase.firestore.FieldValue.serverTimestamp()
         };
-        await db.collection('ot_rooms').add(roomData);
-        await logAdminAction('OT Room Added', `Added OT room: ${roomData.roomNumber}`);
-        showMessage('success', 'OT Room added successfully!');
+        
+        if (editId) {
+            await db.collection('ot_rooms').doc(editId).update(roomData);
+            await logAdminAction('OT Room Updated', `Updated OT room: ${roomData.roomNumber}`);
+            showMessage('success', 'OT Room updated successfully!');
+        } else {
+            roomData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('ot_rooms').add(roomData);
+            await logAdminAction('OT Room Added', `Added OT room: ${roomData.roomNumber}`);
+            showMessage('success', 'OT Room added successfully!');
+        }
+        
         closeOTRoomModal();
         await loadOTRooms();
     } catch (err) {
@@ -2642,18 +2661,23 @@ window.handleAppointmentSubmit = async function(e) {
     }
 };
 
+window.patientAppointmentsUnsubscribe = null;
+
 async function loadPatientAppointments() {
     if(!currentUser || !currentUserData || currentUserData.role !== 'patient') return;
     
     const container = document.getElementById('patientAppointmentsContainer');
     if (!container) return;
     
+    if (window.patientAppointmentsUnsubscribe) return;
+    container.innerHTML = '<p style="padding:1rem;">Loading appointments...</p>';
+    
     try {
-        container.innerHTML = '<p style="padding:1rem;">Loading appointments...</p>';
-        const snap = await db.collection('appointments').where('patientId', '==', currentUser.uid).get();
-        
-        let appointments = [];
-        snap.forEach(doc => appointments.push({ id: doc.id, ...doc.data() }));
+        window.patientAppointmentsUnsubscribe = db.collection('appointments')
+            .where('patientId', '==', currentUser.uid)
+            .onSnapshot(snap => {
+                let appointments = [];
+                snap.forEach(doc => appointments.push({ id: doc.id, ...doc.data() }));
         
         if (appointments.length === 0) {
             container.innerHTML = `
@@ -2734,9 +2758,12 @@ async function loadPatientAppointments() {
             dashCompleted.textContent = (completedHtml.match(/<div class="item-card"/g) || []).length;
         }
         
+            }, err => {
+                console.error("Error in appointments listener", err);
+                container.innerHTML = '<p style="color:red">Error loading appointments.</p>';
+            });
     } catch(err) {
-        console.error("Error loading patient appointments", err);
-        container.innerHTML = '<p style="color:red">Error loading appointments.</p>';
+        console.error("Error setting up patient appointments listener", err);
     }
 };
 
