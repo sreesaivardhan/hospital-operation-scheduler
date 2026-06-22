@@ -1691,7 +1691,7 @@ function showMessage(type, message) {
     showToast(type === 'success' ? 'success' : 'error', message);
 }
 
-async function logAdminAction(action, details, entityType = null, entityId = null) {
+async function logAdminAction(action, details, entityType = null, entityId = null, metadata = null) {
     try {
         if (!currentUser) return;
         const logData = {
@@ -1703,6 +1703,7 @@ async function logAdminAction(action, details, entityType = null, entityId = nul
         };
         if (entityType) logData.entityType = entityType;
         if (entityId) logData.entityId = entityId;
+        if (metadata) logData.metadata = metadata;
         
         await db.collection('adminLogs').add(logData);
     } catch (err) {
@@ -2838,13 +2839,50 @@ window.updateAppointmentStatus = async function(appointmentId, newStatus) {
     if (!confirmed) return;
     
     try {
+        // Fetch existing appointment data first to generate human-readable logs
+        const apptDoc = await db.collection('appointments').doc(appointmentId).get();
+        if (!apptDoc.exists) {
+            showNotification('error', 'Appointment not found.');
+            return;
+        }
+        const apptData = apptDoc.data();
+        const oldStatus = apptData.status;
+
         await db.collection('appointments').doc(appointmentId).update({
             status: newStatus,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        // Log action
+        
+        // Log action with structured metadata and human-readable string
         if (window.logAdminAction) {
-            logAdminAction('appointment_status_updated', `Updated appointment ${appointmentId} status to ${newStatus}`, 'appointments', appointmentId);
+            let actionTitle = 'Appointment Status Updated';
+            if (oldStatus === 'pending' && newStatus === 'confirmed') actionTitle = 'Appointment Confirmed';
+            else if (oldStatus === 'confirmed' && newStatus === 'completed') actionTitle = 'Appointment Completed';
+            else if (oldStatus === 'pending' && newStatus === 'cancelled') actionTitle = 'Appointment Cancelled';
+            
+            // Format date and time
+            const [yyyy, mm, dd] = apptData.appointmentDate.split('-');
+            const dateObj = new Date(yyyy, mm - 1, dd);
+            const dateStr = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, ' '); // 23 Jun 2026
+            
+            let [hour, min] = apptData.appointmentTime.split(':');
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = (hour % 12) || 12;
+            const timeStr = `${hour12.toString().padStart(2, '0')}:${min} ${ampm}`;
+
+            const detailsStr = `Patient: ${apptData.patientName}\nDoctor: ${apptData.doctorName}\nDate: ${dateStr}\nTime: ${timeStr}\n\nStatus:\n${capitalizeFirst(oldStatus)} → ${capitalizeFirst(newStatus)}`;
+
+            const metadata = {
+                actionType: "appointment_status_updated",
+                patientName: apptData.patientName,
+                doctorName: apptData.doctorName,
+                appointmentDate: apptData.appointmentDate,
+                appointmentTime: apptData.appointmentTime,
+                previousStatus: oldStatus,
+                newStatus: newStatus
+            };
+
+            logAdminAction(actionTitle, detailsStr, 'appointments', appointmentId, metadata);
         }
         loadAdminAppointments();
     } catch(err) {
