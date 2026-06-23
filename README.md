@@ -1,6 +1,6 @@
 # Hospital Operation Scheduler 🏥
 
-A comprehensive, role-based operation theater scheduling and hospital management system. Built with vanilla web technologies and Firebase, it seamlessly handles everything from patient appointment booking and doctor assignments to secure Razorpay payment processing and real-time dashboard analytics.
+A full-stack hospital operations management platform that streamlines operation theater scheduling, appointment booking, doctor management, patient workflows, and secure payment processing through a real-time Firebase-powered architecture.
 
 ## Features
 
@@ -38,27 +38,28 @@ A comprehensive, role-based operation theater scheduling and hospital management
 ## System Architecture
 
 ```text
-Patient / Admin / Doctor
-           ↓
-       Frontend
-           ↓
-     Firebase Auth
-           ↓
-       Firestore
-           ↓
-    Cloud Functions
-           ↓
-       Razorpay
+Patient Books Appointment
+          ↓
+Create Razorpay Order
+          ↓
+Razorpay Checkout
+          ↓
+Cloud Function Verification
+          ↓
+Firestore Update
+          ↓
+PDF Receipt Generation
 ```
 
 ## Key Highlights
 
-* Real-time appointment management
-* Conflict-free scheduling
-* Secure server-side payment verification
-* Firestore security rules
-* Responsive design
-* Multi-role dashboard architecture
+* Multi-role architecture (Admin, Doctor, Patient)
+* Real-time Firestore synchronization
+* Conflict-free appointment scheduling
+* Secure Razorpay payment verification using Firebase Cloud Functions
+* Automated PDF receipt generation
+* Mobile-responsive dashboard and management modules
+* Production-ready backend architecture with role-based security rules
 
 ## Payment Workflow
 
@@ -69,32 +70,32 @@ Appointment Booking → Razorpay Order Creation → Razorpay Checkout → Cloud 
 ## Screenshots
 
 ### Admin Dashboard
-![Admin Dashboard](#)
+![Admin Dashboard](screenshots/admin-dashboard.png)
 
 ### Doctor Dashboard
-![Doctor Dashboard](#)
+![Doctor Dashboard](screenshots/doctor-dashboard.png)
 
 ### Patient Dashboard
-![Patient Dashboard](#)
-
-### Appointment Booking
-![Appointment Booking](#)
+![Patient Dashboard](screenshots/patient-dashboard.png)
 
 ### Payment Gateway
-![Payment Gateway](#)
+![Payment Gateway](screenshots/payment-gateway.png)
 
 ### Receipt Generation
-![Receipt Generation](#)
+![Receipt Generation](screenshots/receipt-generation.png)
 
 ## Future Improvements
 
-* Full EHR (Electronic Health Record) Integration
-* Automated SMS/Email reminders for upcoming appointments
-* Comprehensive Ward and Bed Management System
-* Telemedicine video-conferencing capabilities
+* Live Razorpay production deployment
+* Email and SMS appointment notifications
+* Advanced analytics dashboard
+* Inventory and equipment tracking
+* Multi-hospital support
 
-## Author
+## Engineering Highlights
 
-**Name**
-[GitHub](https://github.com/)
-[LinkedIn](https://linkedin.com/in/)
+- Designed a role-based hospital management platform using Firebase Authentication and Firestore.
+- Implemented conflict-free appointment scheduling with real-time updates.
+- Integrated Razorpay payments with secure server-side verification using Firebase Cloud Functions.
+- Developed responsive dashboards for Admin, Doctor, and Patient workflows.
+- Built PDF receipt generation and payment tracking systems.
