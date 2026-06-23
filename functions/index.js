@@ -117,4 +117,114 @@ exports.createRazorpayOrder = onCall({
   }
 });
 
+const crypto = require("crypto");
+
+/**
+ * verifyRazorpayPayment
+ *
+ * Securely verifies a Razorpay Payment after successful checkout.
+ * Validates the user, appointment ownership, and authenticates
+ * the Razorpay signature to prevent spoofing. Updates Firestore
+ * on success.
+ */
+exports.verifyRazorpayPayment = onCall({
+  secrets: [razorpayKeySecret],
+  enforceAppCheck: false,
+}, async (request) => {
+  // 1. Validate Authentication
+  if (!request.auth) {
+    throw new HttpsError(
+        "unauthenticated",
+        "You must be logged in to verify a payment.",
+    );
+  }
+
+  const uid = request.auth.uid;
+  const {
+    appointmentId,
+    razorpay_payment_id: rzpPaymentId,
+    razorpay_order_id: rzpOrderId,
+    razorpay_signature: rzpSignature,
+  } = request.data;
+
+  if (!appointmentId || !rzpPaymentId || !rzpOrderId || !rzpSignature) {
+    throw new HttpsError(
+        "invalid-argument",
+        "Missing required payment parameters.",
+    );
+  }
+
+  try {
+    // 2. Fetch Appointment Document
+    const apptRef = admin.firestore().collection("appointments")
+        .doc(appointmentId);
+    const apptDoc = await apptRef.get();
+
+    if (!apptDoc.exists) {
+      throw new HttpsError("not-found", "Appointment not found.");
+    }
+
+    const appointment = apptDoc.data();
+
+    // 3. Verify appointment belongs to current patient
+    if (appointment.patientId !== uid) {
+      throw new HttpsError("permission-denied", "Unauthorized access.");
+    }
+
+    // 4. Verify Razorpay Signature
+    const secret = razorpayKeySecret.value();
+    const payload = `${rzpOrderId}|${rzpPaymentId}`;
+    const expectedSignature = crypto
+        .createHmac("sha256", secret)
+        .update(payload)
+        .digest("hex");
+
+    if (expectedSignature !== rzpSignature) {
+      throw new HttpsError(
+          "invalid-argument",
+          "Payment verification failed: Invalid signature.",
+      );
+    }
+
+    // 5. Firestore Updates
+    const db = admin.firestore();
+    const batch = db.batch();
+
+    // Update appointment document
+    batch.update(apptRef, {
+      paymentStatus: "paid",
+      paymentId: rzpPaymentId,
+      orderId: rzpOrderId,
+      paidAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Create payment document
+    const paymentRef = db.collection("payments").doc(rzpPaymentId);
+    batch.set(paymentRef, {
+      appointmentId,
+      patientId: uid,
+      paymentId: rzpPaymentId,
+      orderId: rzpOrderId,
+      amount: 500, // Fixed fee as per frontend
+      currency: "INR",
+      status: "paid",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
+
+    return {success: true};
+  } catch (error) {
+    console.error("Error verifying Razorpay payment:", error);
+
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+
+    throw new HttpsError(
+        "internal",
+        "An error occurred while verifying the payment.",
+    );
+  }
+});
 

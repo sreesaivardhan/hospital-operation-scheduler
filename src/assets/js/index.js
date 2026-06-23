@@ -2719,7 +2719,11 @@ async function loadPatientAppointments() {
                     };
                     const colors = statusColors[data.status] || { bg: '#e2e3e5', text: '#383d41' };
                     let payNowBtn = '';
-                    if (data.status === 'pending') {
+                    let paymentStatusBadge = '';
+                    
+                    if (data.paymentStatus === 'paid') {
+                        paymentStatusBadge = `<span class="badge" style="background: #d4edda; color: #155724; display: inline-block; margin-right: 5px;">PAID</span>`;
+                    } else if (data.status === 'pending') {
                         payNowBtn = `<button class="btn btn-sm btn-primary" style="margin-top: 10px;" onclick="window.initiateAppointmentPayment('${data.id}')">Pay Now (₹500)</button>`;
                     }
 
@@ -2731,7 +2735,7 @@ async function loadPatientAppointments() {
                             <div class="item-subtitle">${data.doctorSpecialization}</div>
                         </div>
                         <div style="text-align: right;">
-                            <span class="badge" style="background: ${colors.bg}; color: ${colors.text}; display: inline-block;">${data.status.toUpperCase()}</span>
+                            ${paymentStatusBadge}<span class="badge" style="background: ${colors.bg}; color: ${colors.text}; display: inline-block;">${data.status.toUpperCase()}</span>
                         </div>
                     </div>
                     <div style="margin-top: 10px; font-size: 0.95rem;">
@@ -2803,9 +2807,27 @@ window.initiateAppointmentPayment = async function (appointmentId) {
             name: "MediCore Hospital",
             description: "Appointment Booking Fee",
             order_id: data.orderId,
-            handler: function (response) {
-                console.log("Payment Success Response:", response);
-                showNotification("success", "Payment completed successfully.");
+            handler: async function (response) {
+                try {
+                    showNotification("info", "Verifying payment...");
+                    const verifyRazorpayPayment = firebase.functions().httpsCallable('verifyRazorpayPayment');
+                    const verifyResponse = await verifyRazorpayPayment({
+                        appointmentId: appointmentId,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
+                    });
+                    
+                    if (verifyResponse.data.success) {
+                        showNotification("success", "Payment verified successfully!");
+                        // Real-time listener will automatically refresh the appointments list
+                    } else {
+                        throw new Error("Verification failed on server.");
+                    }
+                } catch (err) {
+                    console.error("Payment Verification Error:", err);
+                    showNotification("error", "Payment verification failed.");
+                }
             },
             prefill: {
                 name: currentUserData.fullName || currentUser.email,
