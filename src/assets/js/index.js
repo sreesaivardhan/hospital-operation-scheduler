@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         await user.delete();
                         return;
                     } else {
-                        console.log("TRACE REJECTION (Branch 1):", user.uid, userDoc.exists, userData, userData?.role, userData?.isActive);
+                        // removed debug log
                         pendingAuthMessage = { type: 'error', text: 'Your account is not set up in the system. Please contact an administrator.' };
                         await auth.signOut();
                         return;
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         }, { merge: true });
-                        console.log("TRACE: Existing patient migrated to patients collection.");
+                        // existing patient migrated
                     }
                 }
 
@@ -149,13 +149,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 showDashboard(userData);
                 await loadInitialData();
                 startSessionManagement();
+                if (userData.role === 'patient') {
+                    window.loadPatientDashboardStats(user.uid);
+                }
             } catch (err) {
                 console.error('Error loading profile:', err);
                 await auth.signOut();
                 if (err.code === 'permission-denied' || err.message.includes('insufficient permissions')) {
                     // Note: userDoc and userData are out of scope here in the catch block if get() failed,
                     // but we log what we have to satisfy the debugging step.
-                    console.log("TRACE REJECTION (Branch 2 Catch):", user.uid, "userDoc exists?", false, "userData?", undefined);
+                    // removed debug log
                     showAuthMessage('error', 'Your account is not set up in the system. Please contact an administrator.');
                 } else {
                     showAuthMessage('error', 'A network or system error occurred while loading your profile.');
@@ -166,6 +169,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.patientAppointmentsUnsubscribe();
                 window.patientAppointmentsUnsubscribe = null;
             }
+            const dashUpcoming = document.getElementById('patientUpcomingAppointments');
+            const dashCompleted = document.getElementById('patientCompletedAppointments');
+            if (dashUpcoming) dashUpcoming.textContent = '0';
+            if (dashCompleted) dashCompleted.textContent = '0';
+            const apptContainer = document.getElementById('patientAppointmentsContainer');
+            if (apptContainer) apptContainer.innerHTML = '';
+            
+            // Clear auth fields
+            ['email', 'password', 'confirmPassword', 'fullName', 'phone', 'department'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            
             showAuth();
         }
     });
@@ -273,6 +289,11 @@ function showSection(sectionName) {
     if (crumb) crumb.textContent = `Home › ${titles[sectionName] || 'Dashboard'}`;
 
     switch (sectionName) {
+        case 'overview': 
+            if (currentUserData && currentUserData.role === 'patient') {
+                window.loadPatientDashboardStats(currentUser.uid);
+            }
+            break;
         case 'doctors': loadDoctors(); break;
         case 'users': loadUsers(); break;
         case 'patients': loadPatients(); break;
@@ -328,10 +349,10 @@ async function handleAuth(e) {
             if (password !== confirmPassword) { showAuthMessage('error', 'Passwords do not match'); return; }
             if (password.length < 6) { showAuthMessage('error', 'Password must be at least 6 characters'); return; }
 
-            console.log("TRACE: Calling createUserWithEmailAndPassword with email:", email);
+            // log removed
             isRegistering = true;
             const cred = await auth.createUserWithEmailAndPassword(email, password);
-            console.log("TRACE: Auth user created successfully. UID:", cred.user.uid, "Email:", cred.user.email);
+            // log removed
 
             try {
                 const newRole = isPatient ? 'patient' : 'user';
@@ -346,7 +367,7 @@ async function handleAuth(e) {
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     emailVerified: false, lastLogin: null, loginHistory: []
                 };
-                console.log("TRACE: Attempting Firestore write with payload:", payload);
+                // log removed
                 await db.collection('users').doc(cred.user.uid).set(payload);
 
                 if (isPatient) {
@@ -366,10 +387,10 @@ async function handleAuth(e) {
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     await db.collection('patients').doc(cred.user.uid).set(patientPayload, { merge: true });
-                    console.log("TRACE: Patient profile document created successfully!");
+                    // log removed
                 }
 
-                console.log("TRACE: Firestore write succeeded!");
+                // log removed
                 await cred.user.sendEmailVerification();
 
                 if (!isActiveState) {
@@ -1465,7 +1486,7 @@ function displayOTSchedule() {
                 ${capitalizeFirst(s.status)}</span></td>
             <td>
               <button class="btn btn-warning btn-sm" onclick="updateOTStatus('${s.id}')">Update</button>
-              <button class="btn btn-danger btn-sm" onclick="cancelOperation('${s.id}')">Cancel</button>
+              <button class="btn btn-secondary btn-sm" onclick="cancelOperation('${s.id}')">Cancel</button>
             </td>
           </tr>`;
     });
@@ -1956,7 +1977,7 @@ async function loadAdvancedSchedules() {
                     ${capitalizeFirst(s.status)}</span></td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editSchedule('${s.id}')">Edit</button>
-                    <button class="btn btn-danger btn-sm" onclick="cancelOperation('${s.id}')">Cancel</button>
+                    <button class="btn btn-secondary btn-sm" onclick="cancelOperation('${s.id}')">Cancel</button>
                 </td>
             </tr>`;
         });
@@ -2056,7 +2077,7 @@ async function loadOperationsManagement() {
                 <td><span style="padding:.25rem .75rem;border-radius:15px;font-size:.8rem;background:${getScheduleStatusColor(s.status)};">${capitalizeFirst(s.status)}</span></td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editSchedule('${s.id}')">Edit</button>
-                    <button class="btn btn-ghost btn-sm" onclick="cancelOperation('${s.id}')">Cancel</button>
+                    <button class="btn btn-secondary btn-sm" onclick="cancelOperation('${s.id}')">Cancel</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteOperation('${s.id}')">Delete</button>
                 </td>
             </tr>`;
@@ -2263,6 +2284,27 @@ async function logout() {
         sessionStartTime = null;
         currentUser = null;
         currentUserData = null;
+        
+        // Clear patient dashboard state
+        if (window.patientAppointmentsUnsubscribe) {
+            window.patientAppointmentsUnsubscribe();
+            window.patientAppointmentsUnsubscribe = null;
+        }
+        
+        const dashUpcoming = document.getElementById('patientUpcomingAppointments');
+        const dashCompleted = document.getElementById('patientCompletedAppointments');
+        if (dashUpcoming) dashUpcoming.textContent = '0';
+        if (dashCompleted) dashCompleted.textContent = '0';
+        
+        const apptContainer = document.getElementById('patientAppointmentsContainer');
+        if (apptContainer) apptContainer.innerHTML = '';
+
+        // Clear auth fields
+        ['email', 'password', 'confirmPassword', 'fullName', 'phone', 'department'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
         showMessage('success', 'Logged out successfully!');
     } catch (err) {
         console.error('Error logging out:', err);
@@ -2651,6 +2693,7 @@ window.handleAppointmentSubmit = async function (e) {
 
         showNotification('success', 'Appointment booked successfully!');
         closeAppointmentModal();
+        window.loadPatientDashboardStats(currentUser.uid);
         if (window.loadPatientAppointments) {
             showSection('my-appointments');
         }
@@ -2673,10 +2716,11 @@ async function loadPatientAppointments() {
     if (!currentUser || !currentUserData || currentUserData.role !== 'patient') return;
 
     const container = document.getElementById('patientAppointmentsContainer');
-    if (!container) return;
 
     if (window.patientAppointmentsUnsubscribe) return;
-    container.innerHTML = '<p style="padding:1rem;">Loading appointments...</p>';
+    if (container) {
+        container.innerHTML = '<p style="padding:1rem;">Loading appointments...</p>';
+    }
 
     try {
         window.patientAppointmentsUnsubscribe = db.collection('appointments')
@@ -2723,6 +2767,7 @@ async function loadPatientAppointments() {
                     
                     if (data.paymentStatus === 'paid') {
                         paymentStatusBadge = `<span class="badge" style="background: #d4edda; color: #155724; display: inline-block; margin-right: 5px;">PAID</span>`;
+                        payNowBtn = `<button class="btn btn-sm" style="margin-top: 10px; background-color: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="window.downloadReceipt('${data.id}')"><i class="fas fa-file-pdf"></i> Download Receipt</button>`;
                     } else if (data.status === 'pending') {
                         payNowBtn = `<button class="btn btn-sm btn-primary" style="margin-top: 10px;" onclick="window.initiateAppointmentPayment('${data.id}')">Pay Now (₹500)</button>`;
                     }
@@ -2763,23 +2808,62 @@ async function loadPatientAppointments() {
                     finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Cancelled</h3>' + cancelledHtml;
                 }
 
-                container.innerHTML = finalHtml;
-
-                // Update stats on dashboard if we are loading patient appointments
-                const dashUpcoming = document.getElementById('patientUpcomingAppointments');
-                const dashCompleted = document.getElementById('patientCompletedAppointments');
-
-                if (dashUpcoming && dashCompleted) {
-                    dashUpcoming.textContent = (upcomingHtml.match(/<div class="item-card"/g) || []).length;
-                    dashCompleted.textContent = (completedHtml.match(/<div class="item-card"/g) || []).length;
+                if (container) {
+                    container.innerHTML = finalHtml;
                 }
 
             }, err => {
                 console.error("Error in appointments listener", err);
-                container.innerHTML = '<p style="color:red">Error loading appointments.</p>';
+                if (container) {
+                    container.innerHTML = '<p style="color:red">Error loading appointments.</p>';
+                }
             });
     } catch (err) {
         console.error("Error setting up patient appointments listener", err);
+    }
+};
+
+window.downloadReceipt = async function(appointmentId) {
+    if (!currentUser) return;
+    try {
+        const apptDoc = await db.collection('appointments').doc(appointmentId).get();
+        if (!apptDoc.exists) throw new Error("Appointment not found");
+        const appt = apptDoc.data();
+        if (appt.paymentStatus !== 'paid' || !appt.paymentId) throw new Error("No payment record found");
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(20);
+        doc.text("MediCore Hospital", 105, 20, { align: "center" });
+        doc.setFontSize(14);
+        doc.text("Payment Receipt", 105, 30, { align: "center" });
+        
+        doc.setLineWidth(0.5);
+        doc.line(20, 35, 190, 35);
+        
+        doc.setFontSize(11);
+        doc.text(`Receipt ID: RCPT-${Date.now().toString().slice(-6)}`, 20, 45);
+        doc.text(`Payment ID: ${appt.paymentId}`, 20, 52);
+        doc.text(`Order ID: ${appt.orderId || 'N/A'}`, 20, 59);
+        doc.text(`Appointment ID: ${appointmentId}`, 20, 66);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 140, 45);
+        
+        doc.line(20, 75, 190, 75);
+        
+        doc.text(`Patient Name: ${appt.patientName}`, 20, 85);
+        doc.text(`Doctor Name: Dr. ${appt.doctorName}`, 20, 92);
+        doc.text(`Amount Paid: INR 500`, 20, 99);
+        
+        doc.setFontSize(14);
+        doc.setTextColor(21, 87, 36);
+        doc.text(`Status: PAID`, 20, 112);
+        
+        doc.save(`Receipt_${appointmentId}.pdf`);
+        showNotification("success", "Receipt downloaded successfully.");
+    } catch (err) {
+        console.error("Error generating receipt", err);
+        showNotification("error", "Could not generate receipt.");
     }
 };
 
@@ -2820,6 +2904,7 @@ window.initiateAppointmentPayment = async function (appointmentId) {
                     
                     if (verifyResponse.data.success) {
                         showNotification("success", "Payment verified successfully!");
+                        window.loadPatientDashboardStats(currentUser.uid);
                         // Real-time listener will automatically refresh the appointments list
                     } else {
                         throw new Error("Verification failed on server.");
@@ -2911,6 +2996,22 @@ async function loadAdminAppointments() {
                 `;
             }
 
+            // Payment info block
+            let paymentInfoHtml = '';
+            if (data.paymentStatus === 'paid') {
+                paymentInfoHtml = `
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; width: 100%;">
+                    <strong>Payment Status:</strong> <span class="badge" style="background:#d4edda; color:#155724; display:inline-block; font-size:0.8rem; margin-right:10px;">PAID</span>
+                    <strong>Payment ID:</strong> ${data.paymentId || 'N/A'} <span style="margin: 0 10px; color:#ccc;">|</span>
+                    <strong>Order ID:</strong> ${data.orderId || 'N/A'}
+                </div>`;
+            } else {
+                paymentInfoHtml = `
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; width: 100%;">
+                    <strong>Payment Status:</strong> <span class="badge" style="background:#f8d7da; color:#721c24; display:inline-block; font-size:0.8rem;">UNPAID</span>
+                </div>`;
+            }
+
             html += `
             <div class="item-card" style="margin-bottom: 1rem;">
                 <div class="item-header">
@@ -2932,6 +3033,7 @@ async function loadAdminAppointments() {
                         ${actionsHtml}
                     </div>
                 </div>
+                ${paymentInfoHtml}
             </div>`;
         });
 
@@ -2940,6 +3042,26 @@ async function loadAdminAppointments() {
     } catch (err) {
         console.error("Error loading admin appointments", err);
         container.innerHTML = '<p style="color:red">Error loading appointments.</p>';
+    }
+};
+
+window.loadPatientDashboardStats = async function(uid) {
+    if (!uid) return;
+    try {
+        const snap = await db.collection('appointments').where('patientId', '==', uid).get();
+        let upcoming = 0;
+        let completed = 0;
+        snap.forEach(doc => {
+            const data = doc.data();
+            if (data.status === 'pending' || data.status === 'confirmed') upcoming++;
+            else if (data.status === 'completed') completed++;
+        });
+        const dashUpcoming = document.getElementById('patientUpcomingAppointments');
+        const dashCompleted = document.getElementById('patientCompletedAppointments');
+        if (dashUpcoming) dashUpcoming.textContent = upcoming;
+        if (dashCompleted) dashCompleted.textContent = completed;
+    } catch (err) {
+        console.error("Error loading patient dashboard stats", err);
     }
 };
 

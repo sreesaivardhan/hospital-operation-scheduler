@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -315,9 +315,6 @@
 </div>
 <div class="header-right">
 <span class="session-badge" id="sessionStatus">Active Session</span>
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle theme">
-<i class="fas fa-moon" id="themeIcon"></i>
-</button>
 </div>
 </div>
 <!-- Page Content -->
@@ -1338,42 +1335,19 @@
 </form>
 </div>
 </div>
-<script>
+    <script>
         // NOTE: Doctor/Patient/OT management is handled by index.js with Firestore.
         // This inline block only retains modal open/close helpers that index.js calls.
-        // The in-memory duplicate listeners for otRoomForm and otScheduleForm have been
-        // removed to prevent double-writes. index.js owns those submit handlers.
-
-        // The in-memory duplicate listeners for otRoomForm and otScheduleForm have been
-        // removed to prevent double-writes. index.js owns those submit handlers.
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('authContainer').style.display = 'flex';
             document.getElementById('dashboardContainer').style.display = 'none';
             document.getElementById('sidebarToggleBtn').style.display = 'none';
-            // Restore theme preference
-            const savedTheme = sessionStorage.getItem('mc-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
         });
-
-        // Theme toggle
-        function toggleTheme() {
-            const html = document.documentElement;
-            const current = html.getAttribute('data-theme') || 'light';
-            const next = current === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', next);
-            sessionStorage.setItem('mc-theme', next);
-            updateThemeIcon(next);
-        }
-
-        function updateThemeIcon(theme) {
-            const icon = document.getElementById('themeIcon');
-            if (!icon) return;
-            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-        }
     </script>
+<!-- External Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>

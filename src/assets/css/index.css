@@ -72,37 +72,7 @@
   --accent-4: #b45309;
 }
 
-/* ── Dark Mode ────────────────────────────────────────────── */
-[data-theme="dark"] {
-  --surface-bg:           #111c1a;
-  --surface-card:         #182420;
-  --surface-sidebar:      #0d1614;
-  --surface-sidebar-hover:#1e302c;
-  --surface-header:       #182420;
-  --surface-input:        #1e302c;
 
-  --text-primary:         #d3f6d1;
-  --text-secondary:       #a7d7c5;
-  --text-muted:           #4e7d76;
-
-  --border-color:         #2a4540;
-
-  --brand-primary-light:  #162420;
-
-  --status-success-bg:    #0d2218;
-  --status-success-border:#1e4a2e;
-  --status-warning-bg:    #231a07;
-  --status-warning-border:#4a370d;
-  --status-danger-bg:     #230f0f;
-  --status-danger-border: #4a1a1a;
-  --status-info-bg:       #0d1e2e;
-  --status-info-border:   #17375e;
-
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md:  0 4px 8px rgba(0,0,0,0.25);
-  --shadow-lg:  0 10px 20px rgba(0,0,0,0.35);
-  --shadow-modal: 0 25px 50px rgba(0,0,0,0.5);
-}
 
 /* ── Reset ────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -161,6 +131,9 @@ a:hover { color: var(--brand-primary-hover); text-decoration: underline; }
 
 .btn-danger   { background: var(--status-danger);    color:#fff; border-color: var(--status-danger); }
 .btn-danger:hover   { background: #9b2020; border-color:#9b2020; color:#fff; }
+
+.btn-secondary { background: #6c757d; color: #fff; border: 1px solid #6c757d; }
+.btn-secondary:hover { background: #5a6268; border-color: #545b62; }
 
 .btn-warning  { background: var(--status-warning);   color:#fff; border-color: var(--status-warning); }
 .btn-warning:hover  { background: #8f4207; border-color:#8f4207; color:#fff; }
@@ -723,8 +696,62 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   .page-content  { padding: 1rem; }
   .auth-card     { padding: 2rem 1.375rem; }
   .section-header { flex-direction: column; align-items: flex-start; }
-  .filter-bar .form-input { max-width: 100%; }
   h1 { font-size: 1.375rem; }
+  
+  /* Mobile UI Optimization for Tables -> Cards */
+  .data-table-wrapper, .data-table-container, .table-container { overflow-x: hidden !important; border: none; background: transparent; padding: 0;}
+  .data-table, .data-table thead, .data-table tbody, .data-table th, .data-table td, .data-table tr { 
+    display: block; width: 100%;
+  }
+  .data-table thead tr { 
+    position: absolute; top: -9999px; left: -9999px; 
+  }
+  .data-table tr { 
+    border: 1px solid var(--border-color); 
+    border-radius: var(--radius-md); 
+    margin-bottom: 1rem; 
+    background: var(--surface-bg);
+  }
+  .data-table td { 
+    border: none; 
+    border-bottom: 1px dashed var(--border-color); 
+    position: relative; 
+    padding: 0.8rem 1rem 0.8rem 45% !important; 
+    text-align: right;
+    min-height: 40px;
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 0.5rem; flex-wrap: wrap;
+    word-break: break-word;
+  }
+  .data-table td:last-child { border-bottom: none; }
+  .data-table td::before { 
+    position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+    font-weight: 600; text-transform: uppercase; font-size: 0.75rem; 
+    color: var(--text-muted); text-align: left;
+  }
+  
+  /* Users */
+  #usersContainer .data-table td:nth-child(1)::before { content: "Name"; }
+  #usersContainer .data-table td:nth-child(2)::before { content: "Email"; }
+  #usersContainer .data-table td:nth-child(3)::before { content: "Department"; }
+  #usersContainer .data-table td:nth-child(4)::before { content: "Role"; }
+  #usersContainer .data-table td:nth-child(5)::before { content: "Status"; }
+  #usersContainer .data-table td:nth-child(6)::before { content: "Actions"; }
+  
+  /* OT Schedule */
+  #otScheduleContainer .data-table td:nth-child(1)::before { content: "Time"; }
+  #otScheduleContainer .data-table td:nth-child(2)::before { content: "OT Room"; }
+  #otScheduleContainer .data-table td:nth-child(3)::before { content: "Patient"; }
+  #otScheduleContainer .data-table td:nth-child(4)::before { content: "Surgeon"; }
+  #otScheduleContainer .data-table td:nth-child(5)::before { content: "Procedure"; }
+  #otScheduleContainer .data-table td:nth-child(6)::before { content: "Status"; }
+  #otScheduleContainer .data-table td:nth-child(7)::before { content: "Actions"; }
+  
+  /* Doctor Filters Stack */
+  .filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .filter-bar .form-input, .filter-bar .btn, .filter-bar input, .filter-bar select, .filter-bar button { 
+    max-width: 100% !important; width: 100%; 
+  }
 }
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr; }
