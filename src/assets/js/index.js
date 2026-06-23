@@ -7,53 +7,53 @@
 const firebaseConfig = window.firebaseConfig;
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db   = firebase.firestore();
+const db = firebase.firestore();
 
 // ── Global state ───────────────────────────────────────────────
-let currentUser     = null;
+let currentUser = null;
 let currentUserData = null;
-let isLoginMode     = true;
-let isRegistering   = false;
+let isLoginMode = true;
+let isRegistering = false;
 let sessionStartTime = null;
-let sessionTimer    = null;
+let sessionTimer = null;
 let pendingAuthMessage = null;
-let allDoctors      = [];
-let allPatients     = [];
-let allOTRooms      = [];
-let allOTSchedules  = [];
-let isEditingDoctor  = false;
-let editingDoctorId  = null;
+let allDoctors = [];
+let allPatients = [];
+let allOTRooms = [];
+let allOTSchedules = [];
+let isEditingDoctor = false;
+let editingDoctorId = null;
 let isEditingPatient = false;
 let editingPatientId = null;
 let _otStatusScheduleId = null;
 
 const adminNavigation = [
-    { id: 'overview',    icon: 'fas fa-chart-pie',       text: 'Dashboard Overview', active: true },
-    { id: 'doctors',     icon: 'fas fa-user-md',         text: 'Doctor Management' },
-    { id: 'users',       icon: 'fas fa-users',           text: 'User Management' },
-    { id: 'patients',    icon: 'fas fa-procedures',      text: 'Patient Management' },
-    { id: 'ot-rooms',    icon: 'fas fa-door-open',       text: 'OT Rooms' },
-    { id: 'ot-schedule', icon: 'fas fa-calendar-alt',   text: 'OT Schedule' },
+    { id: 'overview', icon: 'fas fa-chart-pie', text: 'Dashboard Overview', active: true },
+    { id: 'doctors', icon: 'fas fa-user-md', text: 'Doctor Management' },
+    { id: 'users', icon: 'fas fa-users', text: 'User Management' },
+    { id: 'patients', icon: 'fas fa-procedures', text: 'Patient Management' },
+    { id: 'ot-rooms', icon: 'fas fa-door-open', text: 'OT Rooms' },
+    { id: 'ot-schedule', icon: 'fas fa-calendar-alt', text: 'OT Schedule' },
     { id: 'appointment-management', icon: 'fas fa-calendar-check', text: 'Appointment Management' },
-    { id: 'analytics',   icon: 'fas fa-chart-line',      text: 'Analytics Dashboard' },
-    { id: 'operations',  icon: 'fas fa-cogs',            text: 'Operations Management' },
-    { id: 'scheduling',  icon: 'fas fa-calendar-check',  text: 'Scheduling System' },
-    { id: 'profile',     icon: 'fas fa-user-cog',        text: 'Profile Settings' },
-    { id: 'logs',        icon: 'fas fa-file-alt',        text: 'Audit Logs' }
+    { id: 'analytics', icon: 'fas fa-chart-line', text: 'Analytics Dashboard' },
+    { id: 'operations', icon: 'fas fa-cogs', text: 'Operations Management' },
+    { id: 'scheduling', icon: 'fas fa-calendar-check', text: 'Scheduling System' },
+    { id: 'profile', icon: 'fas fa-user-cog', text: 'Profile Settings' },
+    { id: 'logs', icon: 'fas fa-file-alt', text: 'Audit Logs' }
 ];
 
 const userNavigation = [
-    { id: 'staff-dashboard', icon: 'fas fa-chart-pie',     text: 'Staff Dashboard', active: true },
-    { id: 'profile',       icon: 'fas fa-user-cog',      text: 'Profile Settings' },
-    { id: 'assignments',   icon: 'fas fa-tasks',         text: 'View Assignments' },
-    { id: 'availability',  icon: 'fas fa-clock',         text: 'Update Availability' }
+    { id: 'staff-dashboard', icon: 'fas fa-chart-pie', text: 'Staff Dashboard', active: true },
+    { id: 'profile', icon: 'fas fa-user-cog', text: 'Profile Settings' },
+    { id: 'assignments', icon: 'fas fa-tasks', text: 'View Assignments' },
+    { id: 'availability', icon: 'fas fa-clock', text: 'Update Availability' }
 ];
 
 const patientNavigation = [
-    { id: 'patient-dashboard', icon: 'fas fa-heartbeat',     text: 'Dashboard', active: true },
-    { id: 'find-doctors',      icon: 'fas fa-search',        text: 'Find Doctors' },
-    { id: 'my-appointments',   icon: 'fas fa-calendar-check',text: 'My Appointments' },
-    { id: 'patient-profile',   icon: 'fas fa-user',          text: 'My Profile' }
+    { id: 'patient-dashboard', icon: 'fas fa-heartbeat', text: 'Dashboard', active: true },
+    { id: 'find-doctors', icon: 'fas fa-search', text: 'Find Doctors' },
+    { id: 'my-appointments', icon: 'fas fa-calendar-check', text: 'My Appointments' },
+    { id: 'patient-profile', icon: 'fas fa-user', text: 'My Profile' }
 ];
 
 // ── Bootstrap ──────────────────────────────────────────────────
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 let userDoc = await db.collection('users').doc(user.uid).get();
                 let retries = 0;
-                
+
                 const isGoogleUser = user.providerData && user.providerData.some(p => p.providerId === 'google.com');
 
                 // Race condition mitigation: Wait up to 3 seconds for handleAuth to write the document
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Patients bypass email verification so they can login immediately
                 if (userData.role !== 'patient' && !user.emailVerified) {
                     if (isRegistering) return; // Let handleAuth manage the UI and sign out cleanly
-                    
+
                     pendingAuthMessage = { type: 'error', text: 'Please verify your email before accessing the dashboard.' };
                     await auth.signOut();
                     return;
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (userData.isActive === false) {
                     if (isRegistering) return; // Let handleAuth manage the UI and sign out cleanly
-                    
+
                     if (userData.role === 'user') {
                         pendingAuthMessage = { type: 'info', text: 'Your account is pending administrator approval.' };
                     } else {
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
-                currentUser     = user;
+                currentUser = user;
                 currentUserData = userData;
                 showDashboard(userData);
                 await loadInitialData();
@@ -175,18 +175,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const el = document.getElementById(id);
         if (el) el.addEventListener(evt, fn);
     };
-    safe('authForm',         'submit', handleAuth);
-    safe('toggleLink',       'click',  toggleAuthMode);
-    safe('forgotPasswordLink','click', handleForgotPassword);
-    safe('doctorForm',       'submit', handleDoctorSubmit);
-    safe('profileForm',      'submit', handleProfileUpdate);
-    safe('patientProfileForm','submit', handlePatientProfileUpdate);
+    safe('authForm', 'submit', handleAuth);
+    safe('toggleLink', 'click', toggleAuthMode);
+    safe('forgotPasswordLink', 'click', handleForgotPassword);
+    safe('doctorForm', 'submit', handleDoctorSubmit);
+    safe('profileForm', 'submit', handleProfileUpdate);
+    safe('patientProfileForm', 'submit', handlePatientProfileUpdate);
     safe('availabilityForm', 'submit', handleAvailabilityUpdate);
-    safe('patientForm',      'submit', handlePatientSubmit);
-    safe('otRoomForm',       'submit', handleOTRoomSubmit);
-    safe('otScheduleForm',   'submit', handleOTScheduleSubmit);
-    safe('emergencyForm',    'submit', handleEmergencySubmit);
-    safe('userForm',         'submit', handleUserSubmit);
+    safe('patientForm', 'submit', handlePatientSubmit);
+    safe('otRoomForm', 'submit', handleOTRoomSubmit);
+    safe('otScheduleForm', 'submit', handleOTScheduleSubmit);
+    safe('emergencyForm', 'submit', handleEmergencySubmit);
+    safe('userForm', 'submit', handleUserSubmit);
 
     // OT schedule date default
     const otDateInput = document.getElementById('otScheduleDate');
@@ -228,12 +228,12 @@ function setupNavigation(items, userRole) {
     logoutA.innerHTML = '<i class="fas fa-sign-out-alt"></i> Secure Logout';
     logoutLi.appendChild(logoutA);
     navMenu.appendChild(logoutLi);
-    
+
     // Bind universal mobile navigation events
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const navOverlay = document.getElementById('navOverlay');
     const navCloseBtn = document.getElementById('navCloseBtn');
-    
+
     if (mobileBtn) mobileBtn.onclick = toggleMobileSidebar;
     if (navOverlay) navOverlay.onclick = closeMobileSidebar;
     if (navCloseBtn) navCloseBtn.onclick = closeMobileSidebar;
@@ -273,16 +273,16 @@ function showSection(sectionName) {
     if (crumb) crumb.textContent = `Home › ${titles[sectionName] || 'Dashboard'}`;
 
     switch (sectionName) {
-        case 'doctors':     loadDoctors();     break;
-        case 'users':       loadUsers();       break;
-        case 'patients':    loadPatients();    break;
-        case 'ot-rooms':    loadOTRooms();     break;
-        case 'ot-schedule': loadOTSchedule();  break;
-        case 'analytics':   loadAnalytics();   break;
-        case 'operations':  loadOperationsManagement(); break;
-        case 'scheduling':  loadAdvancedSchedules(); break;
-        case 'logs':        loadActivityLog(); break;
-        case 'find-doctors':loadPatientDoctors(); break;
+        case 'doctors': loadDoctors(); break;
+        case 'users': loadUsers(); break;
+        case 'patients': loadPatients(); break;
+        case 'ot-rooms': loadOTRooms(); break;
+        case 'ot-schedule': loadOTSchedule(); break;
+        case 'analytics': loadAnalytics(); break;
+        case 'operations': loadOperationsManagement(); break;
+        case 'scheduling': loadAdvancedSchedules(); break;
+        case 'logs': loadActivityLog(); break;
+        case 'find-doctors': loadPatientDoctors(); break;
         case 'patient-profile': loadPatientProfile(); break;
         case 'staff-dashboard': loadStaffDashboard(); break;
         case 'assignments': loadUserAssignments(); break;
@@ -294,7 +294,7 @@ function showSection(sectionName) {
 // ── Auth ──────────────────────────────────────────────────────
 async function handleAuth(e) {
     e.preventDefault();
-    const email    = document.getElementById('email').value.trim().toLowerCase();
+    const email = document.getElementById('email').value.trim().toLowerCase();
     const password = document.getElementById('password').value;
     if (!email || !password) { showAuthMessage('error', 'Please fill in all required fields'); return; }
     setAuthLoading(true);
@@ -318,12 +318,12 @@ async function handleAuth(e) {
         } else {
             const regTypeElement = document.querySelector('input[name="registrationType"]:checked');
             const isPatient = regTypeElement && regTypeElement.value === 'patient';
-            
+
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const fullName   = document.getElementById('fullName').value.trim();
-            const phone      = document.getElementById('phone').value.trim();
+            const fullName = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
             const department = document.getElementById('department').value;
-            
+
             if (!fullName || (!isPatient && !department)) { showAuthMessage('error', 'Please fill in all required fields'); return; }
             if (password !== confirmPassword) { showAuthMessage('error', 'Passwords do not match'); return; }
             if (password.length < 6) { showAuthMessage('error', 'Password must be at least 6 characters'); return; }
@@ -332,14 +332,14 @@ async function handleAuth(e) {
             isRegistering = true;
             const cred = await auth.createUserWithEmailAndPassword(email, password);
             console.log("TRACE: Auth user created successfully. UID:", cred.user.uid, "Email:", cred.user.email);
-            
+
             try {
                 const newRole = isPatient ? 'patient' : 'user';
                 const isActiveState = isPatient ? true : false;
-                
+
                 const payload = {
-                    uid: cred.user.uid, email, fullName, phone: phone || '', 
-                    department: isPatient ? '' : department, 
+                    uid: cred.user.uid, email, fullName, phone: phone || '',
+                    department: isPatient ? '' : department,
                     role: newRole, bio: '',
                     isActive: isActiveState,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -348,7 +348,7 @@ async function handleAuth(e) {
                 };
                 console.log("TRACE: Attempting Firestore write with payload:", payload);
                 await db.collection('users').doc(cred.user.uid).set(payload);
-                
+
                 if (isPatient) {
                     const patientPayload = {
                         uid: cred.user.uid,
@@ -368,10 +368,10 @@ async function handleAuth(e) {
                     await db.collection('patients').doc(cred.user.uid).set(patientPayload, { merge: true });
                     console.log("TRACE: Patient profile document created successfully!");
                 }
-                
+
                 console.log("TRACE: Firestore write succeeded!");
                 await cred.user.sendEmailVerification();
-                
+
                 if (!isActiveState) {
                     await auth.signOut();
                     showAuthMessage('success', 'Registration successful. Verify your email and wait for Admin approval.');
@@ -388,14 +388,14 @@ async function handleAuth(e) {
     } catch (err) {
         console.error('Auth error:', err);
         const msgs = {
-            'auth/email-already-in-use':      'Email already registered. Use login instead.',
+            'auth/email-already-in-use': 'Email already registered. Use login instead.',
             'auth/invalid-login-credentials': 'Invalid email or password.',
-            'auth/user-not-found':            'Invalid email or password.',
-            'auth/wrong-password':            'Invalid email or password.',
-            'auth/weak-password':             'Password too weak (min 6 characters).',
-            'auth/invalid-email':             'Invalid email address.',
-            'auth/too-many-requests':         'Too many attempts. Wait a few minutes.',
-            'auth/network-request-failed':    'Network error. Check your connection.'
+            'auth/user-not-found': 'Invalid email or password.',
+            'auth/wrong-password': 'Invalid email or password.',
+            'auth/weak-password': 'Password too weak (min 6 characters).',
+            'auth/invalid-email': 'Invalid email address.',
+            'auth/too-many-requests': 'Too many attempts. Wait a few minutes.',
+            'auth/network-request-failed': 'Network error. Check your connection.'
         };
         showAuthMessage('error', msgs[err.code] || 'An error occurred. Please try again.');
     } finally {
@@ -435,20 +435,20 @@ function toggleAuthMode(e) {
     if (e) e.preventDefault();
     isLoginMode = !isLoginMode;
     const registerFields = document.getElementById('registerFields');
-    const authTitle      = document.getElementById('authTitle');
-    const authBtnText    = document.getElementById('authButtonText');
-    const toggleLink     = document.getElementById('toggleLink');
-    const forgotPw       = document.getElementById('forgotPasswordContainer');
-    const googleBtn      = document.getElementById('googleSignInContainer');
+    const authTitle = document.getElementById('authTitle');
+    const authBtnText = document.getElementById('authButtonText');
+    const toggleLink = document.getElementById('toggleLink');
+    const forgotPw = document.getElementById('forgotPasswordContainer');
+    const googleBtn = document.getElementById('googleSignInContainer');
 
     if (isLoginMode) {
-        if (authTitle)   authTitle.textContent   = 'Welcome Back to MediCore';
-        if (authBtnText) authBtnText.textContent  = 'Sign In Securely';
-        if (toggleLink)  toggleLink.textContent   = 'Need an account? Register here';
+        if (authTitle) authTitle.textContent = 'Welcome Back to MediCore';
+        if (authBtnText) authBtnText.textContent = 'Sign In Securely';
+        if (toggleLink) toggleLink.textContent = 'Need an account? Register here';
         if (registerFields) registerFields.style.display = 'none';
-        if (forgotPw)    forgotPw.style.display   = 'block';
-        if (googleBtn)   googleBtn.style.display  = 'block';
-        
+        if (forgotPw) forgotPw.style.display = 'block';
+        if (googleBtn) googleBtn.style.display = 'block';
+
         // Remove required from department to prevent hidden validation blocking login
         const deptSelect = document.getElementById('department');
         if (deptSelect) {
@@ -456,12 +456,12 @@ function toggleAuthMode(e) {
             deptSelect.removeAttribute('data-was-required');
         }
     } else {
-        if (authTitle)   authTitle.textContent   = 'Join MediCore Platform';
-        if (authBtnText) authBtnText.textContent  = 'Create Account';
-        if (toggleLink)  toggleLink.textContent   = 'Already have an account? Sign in here';
+        if (authTitle) authTitle.textContent = 'Join MediCore Platform';
+        if (authBtnText) authBtnText.textContent = 'Create Account';
+        if (toggleLink) toggleLink.textContent = 'Already have an account? Sign in here';
         if (registerFields) registerFields.style.display = 'block';
-        if (forgotPw)    forgotPw.style.display   = 'none';
-        if (googleBtn)   googleBtn.style.display  = 'none';
+        if (forgotPw) forgotPw.style.display = 'none';
+        if (googleBtn) googleBtn.style.display = 'none';
     }
     hideAuthMessages();
     const f = document.getElementById('authForm');
@@ -475,7 +475,7 @@ function showAuth() {
     if (d) d.style.display = 'none';
     hideAuthMessages();
     setAuthLoading(false);
-    
+
     if (pendingAuthMessage) {
         showAuthMessage(pendingAuthMessage.type, pendingAuthMessage.text);
         pendingAuthMessage = null;
@@ -489,7 +489,7 @@ function showDashboard(userData) {
     if (d) d.style.display = 'block';
     const welcome = document.getElementById('userWelcome');
     if (welcome) welcome.textContent = `Welcome, ${userData.fullName || 'User'}`;
-    
+
     if (userData.role === 'admin') {
         setupNavigation(adminNavigation, 'admin');
         showSection('overview');
@@ -508,16 +508,16 @@ function showDashboard(userData) {
 async function loadProfileFields(userData) {
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
     const txt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || ''; };
-    txt('userName',       userData.fullName);
-    txt('userEmail',      userData.email || (currentUser && currentUser.email));
-    txt('userRole',       userData.role);
+    txt('userName', userData.fullName);
+    txt('userEmail', userData.email || (currentUser && currentUser.email));
+    txt('userRole', userData.role);
     txt('userDepartment', userData.department);
-    txt('userStatus',     currentUser && currentUser.emailVerified ? 'Verified' : 'Unverified');
-    set('editFullName',   userData.fullName);
-    set('editEmail',      userData.email || (currentUser && currentUser.email));
-    set('editPhone',      userData.phone);
+    txt('userStatus', currentUser && currentUser.emailVerified ? 'Verified' : 'Unverified');
+    set('editFullName', userData.fullName);
+    set('editEmail', userData.email || (currentUser && currentUser.email));
+    set('editPhone', userData.phone);
     set('editDepartment', userData.department);
-    set('bio',            userData.bio);
+    set('bio', userData.bio);
 
     if (userData.role === 'patient') {
         txt('patientWelcomeName', userData.fullName || 'Patient');
@@ -576,7 +576,7 @@ function updateSessionStatus() {
 }
 
 function extendSession() { showMessage('success', 'Session extended!'); }
-function endSession()    { logout(); }
+function endSession() { logout(); }
 
 // ── Initial data load ─────────────────────────────────────────
 async function loadInitialData() {
@@ -604,7 +604,7 @@ async function loadInitialData() {
 
             allOTRooms = [];
             otRoomsSnap.forEach(d => allOTRooms.push({ id: d.id, ...d.data() }));
-            
+
             allPatients = [];
             patSnap.forEach(d => allPatients.push({ id: d.id, ...d.data() }));
 
@@ -659,7 +659,7 @@ function displayDoctors(doctors) {
             </div>
             <div class="item-actions">
               <button class="btn btn-warning btn-sm" onclick="editDoctor('${d.id}')">Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteDoctor('${d.id}','${d.name.replace(/'/g,"\\'")}')">Delete</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteDoctor('${d.id}','${d.name.replace(/'/g, "\\'")}')">Delete</button>
             </div>
           </div>
         </div>`).join('');
@@ -669,10 +669,10 @@ function openDoctorModal() {
     isEditingDoctor = false;
     editingDoctorId = null;
     const title = document.getElementById('doctorModalTitle');
-    const form  = document.getElementById('doctorForm');
+    const form = document.getElementById('doctorForm');
     const modal = document.getElementById('doctorModal');
     if (title) title.textContent = 'Add New Doctor';
-    if (form)  form.reset();
+    if (form) form.reset();
     if (modal) modal.style.display = 'block';
 }
 
@@ -684,17 +684,17 @@ function closeDoctorModal() {
 async function handleDoctorSubmit(e) {
     e.preventDefault();
     const submitBtn = document.getElementById('doctorSubmitText');
-    const spinner   = document.getElementById('doctorSubmitSpinner');
+    const spinner = document.getElementById('doctorSubmitSpinner');
     if (submitBtn) submitBtn.style.display = 'none';
-    if (spinner)   spinner.style.display   = 'inline-block';
+    if (spinner) spinner.style.display = 'inline-block';
     try {
         const doctorData = {
-            name:            document.getElementById('doctorName') ? document.getElementById('doctorName').value.trim() : '',
-            email:           document.getElementById('doctorEmail') ? document.getElementById('doctorEmail').value.trim().toLowerCase() : '',
-            phone:           document.getElementById('doctorPhone') ? document.getElementById('doctorPhone').value.trim() : '',
-            specialty:       document.getElementById('specialization') ? document.getElementById('specialization').value.trim() : '',
-            experience:      document.getElementById('doctorExperience') ? (parseInt(document.getElementById('doctorExperience').value) || 0) : 0,
-            status:          document.getElementById('doctorStatus') ? document.getElementById('doctorStatus').value : 'active'
+            name: document.getElementById('doctorName') ? document.getElementById('doctorName').value.trim() : '',
+            email: document.getElementById('doctorEmail') ? document.getElementById('doctorEmail').value.trim().toLowerCase() : '',
+            phone: document.getElementById('doctorPhone') ? document.getElementById('doctorPhone').value.trim() : '',
+            specialty: document.getElementById('specialization') ? document.getElementById('specialization').value.trim() : '',
+            experience: document.getElementById('doctorExperience') ? (parseInt(document.getElementById('doctorExperience').value) || 0) : 0,
+            status: document.getElementById('doctorStatus') ? document.getElementById('doctorStatus').value : 'active'
         };
         if (isEditingDoctor && editingDoctorId) {
             await db.collection('doctors').doc(editingDoctorId).update({
@@ -719,7 +719,7 @@ async function handleDoctorSubmit(e) {
         showMessage('error', 'Error saving doctor. Please try again.');
     } finally {
         if (submitBtn) submitBtn.style.display = 'inline';
-        if (spinner)   spinner.style.display   = 'none';
+        if (spinner) spinner.style.display = 'none';
     }
 }
 
@@ -733,12 +733,12 @@ async function editDoctor(doctorId) {
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
         const title = document.getElementById('doctorModalTitle');
         if (title) title.textContent = 'Edit Doctor';
-        set('doctorName',           d.name);
-        set('doctorEmail',          d.email);
-        set('doctorPhone',          d.phone);
-        set('specialization',       d.specialty || d.specialization); // Matches actual DOM id 'specialization'
-        set('doctorExperience',     d.experience);
-        set('doctorStatus',         d.status || 'active');
+        set('doctorName', d.name);
+        set('doctorEmail', d.email);
+        set('doctorPhone', d.phone);
+        set('specialization', d.specialty || d.specialization); // Matches actual DOM id 'specialization'
+        set('doctorExperience', d.experience);
+        set('doctorStatus', d.status || 'active');
         const modal = document.getElementById('doctorModal');
         if (modal) modal.style.display = 'block';
     } catch (err) {
@@ -763,7 +763,7 @@ async function deleteDoctor(doctorId, doctorName) {
 }
 
 function searchDoctors() {
-    const q = (document.getElementById('doctorSearch') || {value:''}).value.toLowerCase();
+    const q = (document.getElementById('doctorSearch') || { value: '' }).value.toLowerCase();
     displayDoctors(allDoctors.filter(d =>
         d.name.toLowerCase().includes(q) ||
         d.email.toLowerCase().includes(q) ||
@@ -772,10 +772,10 @@ function searchDoctors() {
 }
 
 function filterDoctors() {
-    const spec   = (document.getElementById('specializationFilter') || {value:''}).value;
-    const status = (document.getElementById('statusFilter') || {value:''}).value;
+    const spec = (document.getElementById('specializationFilter') || { value: '' }).value;
+    const status = (document.getElementById('statusFilter') || { value: '' }).value;
     let list = allDoctors;
-    if (spec)   list = list.filter(d => d.specialization === spec);
+    if (spec) list = list.filter(d => d.specialization === spec);
     if (status) list = list.filter(d => d.status === status);
     displayDoctors(list);
 }
@@ -795,22 +795,22 @@ async function loadUsers() {
             </tr></thead>
             <tbody>
               ${users.map(u => {
-                const isDeactivated = u.isActive === false;
-                const statusBadge = isDeactivated 
-                  ? '<span class="badge" style="background:rgba(231,76,60,.1);color:#e74c3c;">Deactivated</span>'
-                  : (u.emailVerified 
-                      ? '<span class="badge" style="background:rgba(39,174,96,.1);color:#27ae60;">Verified</span>' 
-                      : '<span class="badge" style="background:rgba(255,193,7,.1);color:#b45309;">Unverified</span>');
-                
-                const isAdmin = currentUserData && currentUserData.role === 'admin';
-                const actions = isAdmin 
-                  ? `<button class="btn btn-warning btn-sm" onclick="editUser('${u.id}')">Edit</button>
-                     <button class="btn btn-danger btn-sm" onclick="deactivateUser('${u.id}','${(u.fullName || '').replace(/'/g,"\\\\'")}', ${!isDeactivated})">
+            const isDeactivated = u.isActive === false;
+            const statusBadge = isDeactivated
+                ? '<span class="badge" style="background:rgba(231,76,60,.1);color:#e74c3c;">Deactivated</span>'
+                : (u.emailVerified
+                    ? '<span class="badge" style="background:rgba(39,174,96,.1);color:#27ae60;">Verified</span>'
+                    : '<span class="badge" style="background:rgba(255,193,7,.1);color:#b45309;">Unverified</span>');
+
+            const isAdmin = currentUserData && currentUserData.role === 'admin';
+            const actions = isAdmin
+                ? `<button class="btn btn-warning btn-sm" onclick="editUser('${u.id}')">Edit</button>
+                     <button class="btn btn-danger btn-sm" onclick="deactivateUser('${u.id}','${(u.fullName || '').replace(/'/g, "\\\\'")}', ${!isDeactivated})">
                        ${isDeactivated ? 'Reactivate' : 'Deactivate'}
                      </button>`
-                  : `<button class="btn btn-ghost btn-sm" disabled title="Admin only">Read Only</button>`;
+                : `<button class="btn btn-ghost btn-sm" disabled title="Admin only">Read Only</button>`;
 
-                return `<tr>
+            return `<tr>
                  <td>${u.fullName || 'N/A'}</td>
                  <td>${u.email}</td>
                  <td>${capitalizeFirst(u.department || 'N/A')}</td>
@@ -818,7 +818,7 @@ async function loadUsers() {
                  <td>${statusBadge}</td>
                  <td>${actions}</td>
                 </tr>`;
-              }).join('')}
+        }).join('')}
             </tbody>
           </table>
         </div>
@@ -879,7 +879,7 @@ async function handleUserSubmit(e) {
         await logAdminAction('user_updated', `Admin updated user profile: ${updates.fullName}`, 'users', editingUserId);
         showToast('success', 'User updated successfully');
         closeUserModal();
-        
+
         if (currentUser && editingUserId === currentUser.uid) {
             currentUserData = { ...currentUserData, ...updates };
             showDashboard(currentUserData);
@@ -896,7 +896,7 @@ async function deactivateUser(userId, userName, deactivate) {
     const actionText = deactivate ? 'deactivate' : 'reactivate';
     const confirmed = await window.showConfirmation({ title: `Confirm ${capitalizeFirst(actionText)}`, message: `Are you sure you want to ${actionText} ${userName || 'this user'}?`, confirmText: capitalizeFirst(actionText) });
     if (!confirmed) return;
-    
+
     try {
         // Firebase Admin SDK/Cloud Functions note:
         // A true production app would call a Cloud Function here to disable the Auth user via admin.auth().updateUser(uid, { disabled: true })
@@ -953,7 +953,7 @@ function displayPatients(patients) {
             <div class="item-actions">
               <button class="btn btn-primary btn-sm" onclick="viewPatientDetails('${p.id}')">View</button>
               <button class="btn btn-warning btn-sm" onclick="editPatient('${p.id}')">Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="deletePatient('${p.id}','${p.name.replace(/'/g,"\\'")}')">Delete</button>
+              <button class="btn btn-danger btn-sm" onclick="deletePatient('${p.id}','${p.name.replace(/'/g, "\\'")}')">Delete</button>
             </div>
           </div>
         </div>`).join('');
@@ -975,7 +975,7 @@ function updatePatientStats() {
 }
 
 function searchPatients() {
-    const q = (document.getElementById('patientSearch') || {value:''}).value.toLowerCase();
+    const q = (document.getElementById('patientSearch') || { value: '' }).value.toLowerCase();
     displayPatients(allPatients.filter(p =>
         p.name.toLowerCase().includes(q) ||
         p.phone.includes(q) ||
@@ -984,14 +984,14 @@ function searchPatients() {
 }
 
 function filterPatients() {
-    const gender = (document.getElementById('genderFilter') || {value:''}).value;
-    const age    = (document.getElementById('ageFilter') || {value:''}).value;
+    const gender = (document.getElementById('genderFilter') || { value: '' }).value;
+    const age = (document.getElementById('ageFilter') || { value: '' }).value;
     let list = allPatients;
     if (gender) list = list.filter(p => p.gender === gender);
     if (age) list = list.filter(p => {
         switch (age) {
-            case 'child':  return p.age < 18;
-            case 'adult':  return p.age >= 18 && p.age < 60;
+            case 'child': return p.age < 18;
+            case 'adult': return p.age >= 18 && p.age < 60;
             case 'senior': return p.age >= 60;
             default: return true;
         }
@@ -1003,10 +1003,10 @@ function openPatientModal() {
     isEditingPatient = false;
     editingPatientId = null;
     const title = document.getElementById('patientModalTitle');
-    const form  = document.getElementById('patientForm');
+    const form = document.getElementById('patientForm');
     const modal = document.getElementById('patientModal');
     if (title) title.textContent = 'Add New Patient';
-    if (form)  form.reset();
+    if (form) form.reset();
     if (modal) modal.style.display = 'block';
 }
 
@@ -1018,21 +1018,21 @@ function closePatientModal() {
 async function handlePatientSubmit(e) {
     e.preventDefault();
     const submitBtn = document.getElementById('patientSubmitText');
-    const spinner   = document.getElementById('patientSubmitSpinner');
+    const spinner = document.getElementById('patientSubmitSpinner');
     if (submitBtn) submitBtn.style.display = 'none';
-    if (spinner)   spinner.style.display   = 'inline-block';
+    if (spinner) spinner.style.display = 'inline-block';
     try {
         const patientData = {
-            name:             document.getElementById('patientName').value.trim(),
-            age:              parseInt(document.getElementById('patientAge').value),
-            gender:           document.getElementById('patientGender').value,
-            phone:            document.getElementById('patientPhone').value.trim(),
-            email:            document.getElementById('patientEmail').value.trim(),
-            bloodGroup:       document.getElementById('patientBloodGroup').value,
+            name: document.getElementById('patientName').value.trim(),
+            age: parseInt(document.getElementById('patientAge').value),
+            gender: document.getElementById('patientGender').value,
+            phone: document.getElementById('patientPhone').value.trim(),
+            email: document.getElementById('patientEmail').value.trim(),
+            bloodGroup: document.getElementById('patientBloodGroup').value,
             emergencyContact: document.getElementById('emergencyContact').value.trim(),
-            status:           document.getElementById('patientStatus').value,
-            address:          document.getElementById('patientAddress').value.trim(),
-            medicalHistory:   document.getElementById('medicalHistory').value.trim()
+            status: document.getElementById('patientStatus').value,
+            address: document.getElementById('patientAddress').value.trim(),
+            medicalHistory: document.getElementById('medicalHistory').value.trim()
         };
         if (isEditingPatient && editingPatientId) {
             await db.collection('patients').doc(editingPatientId).update({
@@ -1056,7 +1056,7 @@ async function handlePatientSubmit(e) {
         showMessage('error', 'Error saving patient. Please try again.');
     } finally {
         if (submitBtn) submitBtn.style.display = 'inline';
-        if (spinner)   spinner.style.display   = 'none';
+        if (spinner) spinner.style.display = 'none';
     }
 }
 
@@ -1070,16 +1070,16 @@ async function editPatient(patientId) {
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
         const title = document.getElementById('patientModalTitle');
         if (title) title.textContent = 'Edit Patient';
-        set('patientName',      p.name);
-        set('patientAge',       p.age);
-        set('patientGender',    p.gender);
-        set('patientPhone',     p.phone);
-        set('patientEmail',     p.email);
-        set('patientBloodGroup',p.bloodGroup);
+        set('patientName', p.name);
+        set('patientAge', p.age);
+        set('patientGender', p.gender);
+        set('patientPhone', p.phone);
+        set('patientEmail', p.email);
+        set('patientBloodGroup', p.bloodGroup);
         set('emergencyContact', p.emergencyContact);
-        set('patientStatus',    p.status);
-        set('patientAddress',   p.address);
-        set('medicalHistory',   p.medicalHistory);
+        set('patientStatus', p.status);
+        set('patientAddress', p.address);
+        set('medicalHistory', p.medicalHistory);
         const modal = document.getElementById('patientModal');
         if (modal) modal.style.display = 'block';
     } catch (err) {
@@ -1106,17 +1106,17 @@ function viewPatientDetails(patientId) {
     const p = allPatients.find(x => x.id === patientId);
     if (!p) return;
     const modal = document.getElementById('patientDetailModal');
-    const body  = document.getElementById('patientDetailBody');
+    const body = document.getElementById('patientDetailBody');
     if (!modal || !body) { showToast('info', `${p.name} | ${p.age}y | ${capitalizeFirst(p.gender)}`); return; }
     body.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.875rem;"><tbody>
-      ${[['Name',p.name],['Age',p.age+' years'],['Gender',capitalizeFirst(p.gender)],
-         ['Phone',p.phone],['Email',p.email||'—'],['Blood Group',p.bloodGroup||'—'],
-         ['Status',capitalizeFirst(p.status||'outpatient')],
-         ['Emergency Contact',p.emergencyContact||'—'],['Address',p.address||'—']
-        ].map(([k,v])=>
-        `<tr><td style="padding:.45rem 0;font-weight:600;color:var(--text-secondary);width:42%;border-bottom:1px solid var(--border-color);">${k}</td>
+      ${[['Name', p.name], ['Age', p.age + ' years'], ['Gender', capitalizeFirst(p.gender)],
+        ['Phone', p.phone], ['Email', p.email || '—'], ['Blood Group', p.bloodGroup || '—'],
+        ['Status', capitalizeFirst(p.status || 'outpatient')],
+        ['Emergency Contact', p.emergencyContact || '—'], ['Address', p.address || '—']
+        ].map(([k, v]) =>
+            `<tr><td style="padding:.45rem 0;font-weight:600;color:var(--text-secondary);width:42%;border-bottom:1px solid var(--border-color);">${k}</td>
              <td style="padding:.45rem 0;border-bottom:1px solid var(--border-color);">${v}</td></tr>`
-      ).join('')}
+        ).join('')}
       ${p.medicalHistory ? `<tr><td colspan="2" style="padding:.5rem 0;"><strong>Medical History</strong><br>
         <span style="color:var(--text-secondary);">${p.medicalHistory}</span></td></tr>` : ''}
     </tbody></table>`;
@@ -1127,12 +1127,12 @@ async function exportPatients() {
     try {
         let csv = 'Name,Age,Gender,Phone,Email,Blood Group,Status,Emergency Contact,Address\n';
         allPatients.forEach(p => {
-            csv += [p.name,p.age,p.gender,p.phone,p.email||'',p.bloodGroup||'',p.status||'',
-                    p.emergencyContact||'', (p.address||'').replace(/"/g,'""')
-                   ].map(v=>`"${v}"`).join(',') + '\n';
+            csv += [p.name, p.age, p.gender, p.phone, p.email || '', p.bloodGroup || '', p.status || '',
+            p.emergencyContact || '', (p.address || '').replace(/"/g, '""')
+            ].map(v => `"${v}"`).join(',') + '\n';
         });
         const a = Object.assign(document.createElement('a'), {
-            href: URL.createObjectURL(new Blob([csv], {type:'text/csv'})),
+            href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })),
             download: `patients_${new Date().toISOString().split('T')[0]}.csv`
         });
         a.click();
@@ -1188,15 +1188,17 @@ function displayOTRooms(rooms) {
 }
 
 function getStatusColor(status) {
-    const m = {available:'rgba(39,174,96,.1);color:#27ae60',occupied:'rgba(231,76,60,.1);color:#e74c3c',
-                maintenance:'rgba(255,193,7,.1);color:#b45309',cleaning:'rgba(52,152,219,.1);color:#2980b9'};
+    const m = {
+        available: 'rgba(39,174,96,.1);color:#27ae60', occupied: 'rgba(231,76,60,.1);color:#e74c3c',
+        maintenance: 'rgba(255,193,7,.1);color:#b45309', cleaning: 'rgba(52,152,219,.1);color:#2980b9'
+    };
     return m[status] || 'rgba(149,165,166,.1);color:#7f8c8d';
 }
 
 function openOTRoomModal() {
-    const form  = document.getElementById('otRoomForm');
+    const form = document.getElementById('otRoomForm');
     const modal = document.getElementById('otRoomModal');
-    if (form)  form.reset();
+    if (form) form.reset();
     if (modal) modal.style.display = 'block';
 }
 
@@ -1213,15 +1215,15 @@ async function handleOTRoomSubmit(e) {
     try {
         const modal = document.getElementById('otRoomModal');
         const editId = modal ? modal._editId : null;
-        
+
         const roomData = {
             roomNumber: document.getElementById('otRoomNumber').value.trim(),
-            type:       document.getElementById('otRoomType').value,
-            status:     document.getElementById('otRoomStatus').value,
-            equipment:  document.getElementById('otRoomEquipment').value.trim(),
-            updatedAt:  firebase.firestore.FieldValue.serverTimestamp()
+            type: document.getElementById('otRoomType').value,
+            status: document.getElementById('otRoomStatus').value,
+            equipment: document.getElementById('otRoomEquipment').value.trim(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        
+
         if (editId) {
             await db.collection('ot_rooms').doc(editId).update(roomData);
             await logAdminAction('OT Room Updated', `Updated OT room: ${roomData.roomNumber}`);
@@ -1232,7 +1234,7 @@ async function handleOTRoomSubmit(e) {
             await logAdminAction('OT Room Added', `Added OT room: ${roomData.roomNumber}`);
             showMessage('success', 'OT Room added successfully!');
         }
-        
+
         closeOTRoomModal();
         await loadOTRooms();
     } catch (err) {
@@ -1247,9 +1249,9 @@ async function editOTRoom(roomId) {
         if (!doc.exists) { showMessage('error', 'OT Room not found'); return; }
         const r = doc.data();
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-        set('otRoomNumber',    r.roomNumber);
-        set('otRoomType',      r.type);
-        set('otRoomStatus',    r.status);
+        set('otRoomNumber', r.roomNumber);
+        set('otRoomType', r.type);
+        set('otRoomStatus', r.status);
         set('otRoomEquipment', r.equipment);
         // Repurpose the existing modal for edit (no separate edit modal needed)
         const modal = document.getElementById('otRoomModal');
@@ -1302,7 +1304,7 @@ function openOTScheduleModal() {
     }
     const title = document.getElementById('otScheduleModalTitle');
     if (title) title.textContent = 'Schedule Operation';
-    
+
     const dateEl = document.getElementById('scheduleDate');
     if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
     const modal = document.getElementById('otScheduleModal');
@@ -1351,24 +1353,24 @@ async function handleOTScheduleSubmit(e) {
     try {
         const form = document.getElementById('otScheduleForm');
         const editId = form.dataset.editId;
-        
+
         const scheduleData = {
-            otRoomId:  document.getElementById('scheduleOTRoom').value,
+            otRoomId: document.getElementById('scheduleOTRoom').value,
             patientId: document.getElementById('schedulePatient').value,
             surgeonId: document.getElementById('scheduleSurgeon').value,
-            date:      document.getElementById('scheduleDate').value,
+            date: document.getElementById('scheduleDate').value,
             startTime: document.getElementById('scheduleStartTime').value,
-            endTime:   document.getElementById('scheduleEndTime').value,
+            endTime: document.getElementById('scheduleEndTime').value,
             procedure: document.getElementById('scheduleProcedure').value.trim(),
-            notes:     document.getElementById('scheduleNotes').value.trim(),
+            notes: document.getElementById('scheduleNotes').value.trim(),
             anesthesiologist: document.getElementById('scheduleAnesthesiologist').value.trim(),
-            nurses:    document.getElementById('scheduleNurses').value.trim(),
-            priority:  document.getElementById('schedulePriority').value
+            nurses: document.getElementById('scheduleNurses').value.trim(),
+            priority: document.getElementById('schedulePriority').value
         };
-        
+
         const roomConflict = await checkOTConflict(scheduleData.otRoomId, scheduleData.date, scheduleData.startTime, scheduleData.endTime, editId);
         if (roomConflict) { showMessage('error', 'Time conflict! OT room already booked for this time.'); return; }
-        
+
         const doctorConflict = await checkDoctorConflict(scheduleData.surgeonId, scheduleData.date, scheduleData.startTime, scheduleData.endTime, editId);
         if (doctorConflict) { showMessage('error', 'Time conflict! Surgeon is already booked for this time.'); return; }
 
@@ -1402,7 +1404,7 @@ async function checkOTConflict(roomId, date, startTime, endTime, excludeId = nul
     try {
         const snap = await db.collection('ot_schedules')
             .where('otRoomId', '==', roomId).where('date', '==', date).get();
-        return snap.docs.map(d => ({id: d.id, ...d.data()}))
+        return snap.docs.map(d => ({ id: d.id, ...d.data() }))
             .filter(s => s.id !== excludeId && s.status !== 'cancelled')
             .some(s => startTime < s.endTime && endTime > s.startTime);
     } catch (err) { return false; }
@@ -1412,7 +1414,7 @@ async function checkDoctorConflict(surgeonId, date, startTime, endTime, excludeI
     try {
         const snap = await db.collection('ot_schedules')
             .where('surgeonId', '==', surgeonId).where('date', '==', date).get();
-        return snap.docs.map(d => ({id: d.id, ...d.data()}))
+        return snap.docs.map(d => ({ id: d.id, ...d.data() }))
             .filter(s => s.id !== excludeId && s.status !== 'cancelled')
             .some(s => startTime < s.endTime && endTime > s.startTime);
     } catch (err) { return false; }
@@ -1446,10 +1448,10 @@ function displayOTSchedule() {
         <thead><tr><th>Time</th><th>OT Room</th><th>Patient</th><th>Surgeon</th><th>Procedure</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>`;
     allOTSchedules.forEach(s => {
-        const room    = allOTRooms.find(r => r.id === s.otRoomId);
+        const room = allOTRooms.find(r => r.id === s.otRoomId);
         const patient = allPatients.find(p => p.id === s.patientId);
         const surgeon = allDoctors.find(d => d.id === s.surgeonId);
-        const roomName = room ? room.roomNumber : (s.otRoomId ? 'ID:'+s.otRoomId.slice(0,4) : 'Unknown');
+        const roomName = room ? room.roomNumber : (s.otRoomId ? 'ID:' + s.otRoomId.slice(0, 4) : 'Unknown');
         const patName = patient ? patient.name : 'Unknown Patient';
         const docName = surgeon ? surgeon.name : 'Unknown Surgeon';
         const emergencyMarker = s.priority === 'emergency' ? ' <span class="badge badge-danger">Emergency</span>' : '';
@@ -1472,8 +1474,10 @@ function displayOTSchedule() {
 }
 
 function getScheduleStatusColor(status) {
-    const m = {scheduled:'rgba(52,152,219,.1);color:#2980b9','in-progress':'rgba(255,193,7,.1);color:#b45309',
-                completed:'rgba(39,174,96,.1);color:#27ae60',cancelled:'rgba(231,76,60,.1);color:#e74c3c'};
+    const m = {
+        scheduled: 'rgba(52,152,219,.1);color:#2980b9', 'in-progress': 'rgba(255,193,7,.1);color:#b45309',
+        completed: 'rgba(39,174,96,.1);color:#27ae60', cancelled: 'rgba(231,76,60,.1);color:#e74c3c'
+    };
     return m[status] || 'rgba(149,165,166,.1);color:#7f8c8d';
 }
 
@@ -1546,11 +1550,11 @@ async function loadActivityLog() {
         let html = '';
         snap.forEach(doc => {
             const log = doc.data();
-            const ts  = log.timestamp ? log.timestamp.toDate().toLocaleString() : 'Unknown time';
+            const ts = log.timestamp ? log.timestamp.toDate().toLocaleString() : 'Unknown time';
             const actionStr = (log.action || 'Action').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             const userStr = log.userEmail ? `<span style="color:var(--text-secondary); margin-left:0.5rem;"><i class="fas fa-user" style="font-size:0.75rem;"></i> ${log.userEmail}</span>` : '';
             const targetAttr = (log.entityType && log.entityId) ? ` title="Target: ${log.entityType}:${log.entityId}" style="cursor:help;"` : '';
-            
+
             html += `<div class="audit-entry">
                 <div class="audit-time">${ts}${userStr}</div>
                 <div class="audit-action"><span${targetAttr}>${actionStr}</span></div>
@@ -1570,18 +1574,18 @@ async function handleProfileUpdate(e) {
     if (!currentUser) { showMessage('error', 'No user signed in'); return; }
     try {
         const data = {
-            fullName:   document.getElementById('editFullName').value.trim(),
-            phone:      document.getElementById('editPhone').value.trim(),
+            fullName: document.getElementById('editFullName').value.trim(),
+            phone: document.getElementById('editPhone').value.trim(),
             department: document.getElementById('editDepartment').value,
-            bio:        document.getElementById('bio').value.trim(),
-            updatedAt:  firebase.firestore.FieldValue.serverTimestamp()
+            bio: document.getElementById('bio').value.trim(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         await db.collection('users').doc(currentUser.uid).update(data);
         await logAdminAction('Profile Updated', 'User updated their profile');
-        currentUserData.fullName   = data.fullName;
-        currentUserData.phone      = data.phone;
+        currentUserData.fullName = data.fullName;
+        currentUserData.phone = data.phone;
         currentUserData.department = data.department;
-        currentUserData.bio        = data.bio;
+        currentUserData.bio = data.bio;
         const un = document.getElementById('userName');
         const ud = document.getElementById('userDepartment');
         const uw = document.getElementById('userWelcome');
@@ -1597,15 +1601,17 @@ async function handleProfileUpdate(e) {
 
 async function handleAvailabilityUpdate(e) {
     e.preventDefault();
-    const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
     const data = {};
     days.forEach(day => {
         const cb = document.getElementById(day);
-        const s  = document.getElementById(day + 'Start');
+        const s = document.getElementById(day + 'Start');
         const en = document.getElementById(day + 'End');
-        data[day] = { available: cb ? cb.checked : false,
-                      startTime: s ? s.value : '09:00',
-                      endTime:   en ? en.value : '17:00' };
+        data[day] = {
+            available: cb ? cb.checked : false,
+            startTime: s ? s.value : '09:00',
+            endTime: en ? en.value : '17:00'
+        };
     });
     try {
         await db.collection('users').doc(currentUser.uid).update({
@@ -1624,12 +1630,12 @@ async function exportDoctors() {
     try {
         let csv = 'Name,Email,Phone,Specialization,License,Experience,Fee,Status\n';
         allDoctors.forEach(d => {
-            csv += [d.name,d.email,d.phone,d.specialization,d.licenseNumber||'',
-                    d.experience||0,d.consultationFee||0,d.status||'active']
-                   .map(v=>`"${v}"`).join(',') + '\n';
+            csv += [d.name, d.email, d.phone, d.specialization, d.licenseNumber || '',
+            d.experience || 0, d.consultationFee || 0, d.status || 'active']
+                .map(v => `"${v}"`).join(',') + '\n';
         });
         const a = Object.assign(document.createElement('a'), {
-            href: URL.createObjectURL(new Blob([csv], {type:'text/csv'})),
+            href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })),
             download: `doctors_${new Date().toISOString().split('T')[0]}.csv`
         });
         a.click();
@@ -1643,12 +1649,12 @@ async function exportDoctors() {
 
 // ── Auth helpers ──────────────────────────────────────────────
 function setAuthLoading(loading) {
-    const btn  = document.getElementById('authButton');
-    const txt  = document.getElementById('authButtonText');
+    const btn = document.getElementById('authButton');
+    const txt = document.getElementById('authButtonText');
     const spin = document.getElementById('authSpinner');
     if (!btn) return;
     btn.disabled = loading;
-    if (txt)  txt.style.display  = loading ? 'none' : 'inline';
+    if (txt) txt.style.display = loading ? 'none' : 'inline';
     if (spin) spin.style.display = loading ? 'inline-block' : 'none';
 }
 
@@ -1656,8 +1662,8 @@ function showAuthMessage(type, message) {
     const err = document.getElementById('authErrorMessage');
     const suc = document.getElementById('authSuccessMessage');
     hideAuthMessages();
-    if (type === 'error')   { if (err) { err.textContent = message; err.style.display = 'block'; } }
-    else                    { if (suc) { suc.textContent = message; suc.style.display = 'block'; } }
+    if (type === 'error') { if (err) { err.textContent = message; err.style.display = 'block'; } }
+    else { if (suc) { suc.textContent = message; suc.style.display = 'block'; } }
     setTimeout(hideAuthMessages, 5000);
 }
 
@@ -1679,14 +1685,14 @@ function capitalizeFirst(str) {
 
 function showToast(type, message, duration) {
     duration = duration || 4000;
-    const icons = { success:'fa-check-circle', error:'fa-times-circle', info:'fa-info-circle', warning:'fa-exclamation-triangle' };
+    const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle' };
     const container = document.getElementById('toastContainer');
     if (!container) {
         // Fallback: floating div if toastContainer not in DOM
         const n = document.createElement('div');
         n.style.cssText = `position:fixed;top:20px;right:20px;padding:1rem 1.5rem;border-radius:12px;
             color:#fff;font-weight:500;z-index:20000;max-width:380px;
-            background:${type==='success'?'rgba(39,174,96,.95)':'rgba(231,76,60,.95)'};`;
+            background:${type === 'success' ? 'rgba(39,174,96,.95)' : 'rgba(231,76,60,.95)'};`;
         n.textContent = message;
         document.body.appendChild(n);
         setTimeout(() => n.remove(), duration);
@@ -1694,7 +1700,7 @@ function showToast(type, message, duration) {
     }
     const toast = document.createElement('div');
     toast.className = 'toast ' + type;
-    toast.innerHTML = `<i class="fas ${icons[type]||'fa-bell'}"></i><span>${message}</span>
+    toast.innerHTML = `<i class="fas ${icons[type] || 'fa-bell'}"></i><span>${message}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>`;
     container.appendChild(toast);
     setTimeout(() => {
@@ -1714,7 +1720,7 @@ async function logAdminAction(action, details, entityType = null, entityId = nul
     try {
         if (!currentUser) return;
         const logData = {
-            userId:    currentUser.uid,
+            userId: currentUser.uid,
             userEmail: currentUser.email,
             action,
             details: details || '',
@@ -1723,14 +1729,14 @@ async function logAdminAction(action, details, entityType = null, entityId = nul
         if (entityType) logData.entityType = entityType;
         if (entityId) logData.entityId = entityId;
         if (metadata) logData.metadata = metadata;
-        
+
         await db.collection('adminLogs').add(logData);
     } catch (err) {
         console.error('Error logging admin action:', err);
     }
 }
 
-window.showConfirmation = function({ title, message, confirmText = 'Confirm', cancelText = 'Cancel', onConfirm, onCancel }) {
+window.showConfirmation = function ({ title, message, confirmText = 'Confirm', cancelText = 'Cancel', onConfirm, onCancel }) {
     return new Promise(resolve => {
         const modal = document.getElementById('confirmModal');
         if (!modal) {
@@ -1766,7 +1772,7 @@ function openModal(modalId) {
     }
     const m = document.getElementById(modalId);
     if (m) m.style.display = 'block';
-    else    showToast('info', `${modalId} not available`);
+    else showToast('info', `${modalId} not available`);
 }
 
 function closeModal(modalId) {
@@ -1778,19 +1784,19 @@ function closeModal(modalId) {
 let sidebarOpen = true;
 
 function toggleSidebar() {
-    const nav  = document.getElementById('dashboardNav');
+    const nav = document.getElementById('dashboardNav');
     const main = document.querySelector('.main-content');
-    const btn  = document.getElementById('sidebarToggleBtn');
+    const btn = document.getElementById('sidebarToggleBtn');
     if (!nav) return;
     sidebarOpen = !sidebarOpen;
     if (sidebarOpen) {
         nav.classList.remove('closed');
         if (main) main.classList.remove('sidebar-closed');
-        if (btn)  { btn.classList.remove('closed'); btn.innerHTML = '‹'; btn.title = 'Close Sidebar'; }
+        if (btn) { btn.classList.remove('closed'); btn.innerHTML = '‹'; btn.title = 'Close Sidebar'; }
     } else {
         nav.classList.add('closed');
         if (main) main.classList.add('sidebar-closed');
-        if (btn)  { btn.classList.add('closed'); btn.innerHTML = '›'; btn.title = 'Open Sidebar'; }
+        if (btn) { btn.classList.add('closed'); btn.innerHTML = '›'; btn.title = 'Open Sidebar'; }
     }
 }
 
@@ -1829,7 +1835,7 @@ window.addEventListener('load', () => { if (!document.getElementById('sidebarTog
 document.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'b') { e.preventDefault(); toggleSidebar(); } });
 
 // ── Placeholder stubs ─────────────────────────────────────────
-function changePassword()    { showToast('info', 'Use "Reset Password" to receive a reset link by email.'); }
+function changePassword() { showToast('info', 'Use "Reset Password" to receive a reset link by email.'); }
 async function resetPassword() {
     if (!currentUser) return;
     try {
@@ -1844,10 +1850,10 @@ async function resendVerification() {
         showMessage('success', 'Verification email sent!');
     } catch (err) { showMessage('error', 'Error sending verification email'); }
 }
-function contactSupport()     { showToast('info', 'Support: support@hospital.com | +1 (555) 123-4567'); }
-function editProfile()        { showSection('profile'); }
-function viewAllUsers()       { showSection('users'); }
-function manageUsers()        { showSection('users'); }
+function contactSupport() { showToast('info', 'Support: support@hospital.com | +1 (555) 123-4567'); }
+function editProfile() { showSection('profile'); }
+function viewAllUsers() { showSection('users'); }
+function manageUsers() { showSection('users'); }
 async function loadAnalytics() {
     if (!currentUserData || currentUserData.role !== 'admin') return;
     try {
@@ -1858,7 +1864,7 @@ async function loadAnalytics() {
         const statusCount = {};
 
         const txt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-        
+
         const todayStr = new Date().toISOString().split('T')[0];
         let todayCount = 0;
         let upcomingCount = 0;
@@ -1868,7 +1874,7 @@ async function loadAnalytics() {
             totalScheds++;
             if (s.date === todayStr) todayCount++;
             if (s.date > todayStr) upcomingCount++;
-            
+
             const room = allOTRooms.find(r => r.id === s.otRoomId);
             const roomName = room ? 'OT ' + room.roomNumber : 'Unknown';
             roomCount[roomName] = (roomCount[roomName] || 0) + 1;
@@ -1883,7 +1889,7 @@ async function loadAnalytics() {
         txt('analyticsUpcomingSchedules', upcomingCount);
 
         let roomHtml = '<table class="data-table"><thead><tr><th>Room</th><th>Total Operations</th></tr></thead><tbody>';
-        Object.entries(roomCount).sort((a,b)=>b[1]-a[1]).forEach(([r, c]) => {
+        Object.entries(roomCount).sort((a, b) => b[1] - a[1]).forEach(([r, c]) => {
             roomHtml += `<tr><td>${r}</td><td>${c}</td></tr>`;
         });
         roomHtml += '</tbody></table>';
@@ -1895,7 +1901,7 @@ async function loadAnalytics() {
         });
         statusHtml += '</tbody></table>';
         document.getElementById('analyticsStatusStats').innerHTML = statusHtml;
-    } catch(err) {
+    } catch (err) {
         console.error('Error loading analytics:', err);
         showToast('error', 'Error loading analytics');
     }
@@ -1933,12 +1939,12 @@ async function loadAdvancedSchedules() {
             const room = allOTRooms.find(r => r.id === s.otRoomId);
             const patient = allPatients.find(p => p.id === s.patientId);
             const surgeon = allDoctors.find(d => d.id === s.surgeonId);
-            
-            const roomName = room ? room.roomNumber : (s.otRoomId ? 'ID:'+s.otRoomId.slice(0,4) : 'Unknown');
+
+            const roomName = room ? room.roomNumber : (s.otRoomId ? 'ID:' + s.otRoomId.slice(0, 4) : 'Unknown');
             const patName = patient ? patient.name : 'Unknown Patient';
             const docName = surgeon ? surgeon.name : 'Unknown Surgeon';
             const emergencyMarker = s.priority === 'emergency' ? ' <span class="badge badge-danger">Emergency</span>' : '';
-            
+
             html += `<tr>
                 <td>${s.date || 'No Date'}</td>
                 <td>${s.startTime || '?'} - ${s.endTime || '?'}</td>
@@ -1957,7 +1963,7 @@ async function loadAdvancedSchedules() {
         html += '</tbody></table></div>';
         const container = document.getElementById('advancedSchedulesContainer');
         if (container) container.innerHTML = html;
-    } catch(err) {
+    } catch (err) {
         console.error('Error loading schedules:', err);
         showToast('error', 'Error loading schedules');
     }
@@ -1988,19 +1994,19 @@ async function editSchedule(scheduleId) {
         document.getElementById('scheduleAnesthesiologist').value = s.anesthesiologist || '';
         document.getElementById('scheduleNurses').value = s.nurses || '';
         document.getElementById('schedulePriority').value = s.priority || 'normal';
-        
+
         document.getElementById('otScheduleForm').dataset.editId = scheduleId;
         document.getElementById('otScheduleModalTitle').textContent = 'Edit Operation';
-        
+
         const modal = document.getElementById('otScheduleModal');
         if (modal) modal.style.display = 'block';
-    } catch(err) {
+    } catch (err) {
         console.error('Error fetching schedule:', err);
         showToast('error', 'Error fetching schedule');
     }
 }
 
-function viewAnalytics()      { loadAnalytics(); showSection('analytics'); }
+function viewAnalytics() { loadAnalytics(); showSection('analytics'); }
 
 async function deleteOperation(scheduleId) {
     if (!currentUserData || currentUserData.role !== 'admin') return;
@@ -2014,7 +2020,7 @@ async function deleteOperation(scheduleId) {
         if (document.getElementById('section-scheduling').classList.contains('active')) loadAdvancedSchedules();
         loadOTSchedule();
         loadAnalytics();
-    } catch(err) {
+    } catch (err) {
         console.error('Error deleting operation:', err);
         showMessage('error', 'Error deleting operation.');
     }
@@ -2026,7 +2032,7 @@ async function loadOperationsManagement() {
         const snap = await db.collection('ot_schedules').orderBy('startTime').get();
         let schedules = [];
         snap.forEach(d => schedules.push({ id: d.id, ...d.data() }));
-        
+
         let html = `<div style="overflow-x:auto;"><table class="data-table">
             <thead><tr><th>Date & Time</th><th>Patient</th><th>Surgeon</th><th>Procedure</th><th>Anesthesia/Nurses</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody>`;
@@ -2035,10 +2041,10 @@ async function loadOperationsManagement() {
             const surgeon = allDoctors.find(d => d.id === s.surgeonId);
             const patName = patient ? patient.name : 'Unknown Patient';
             const docName = surgeon ? surgeon.name : 'Unknown Surgeon';
-            
+
             const staffStr = [s.anesthesiologist, s.nurses].filter(Boolean).join(' / ') || 'Unassigned';
-            const priorityBadge = s.priority === 'emergency' ? '<span class="badge badge-danger">Emergency</span>' : 
-                                  (s.priority === 'urgent' ? '<span class="badge badge-warning">Urgent</span>' : 'Normal');
+            const priorityBadge = s.priority === 'emergency' ? '<span class="badge badge-danger">Emergency</span>' :
+                (s.priority === 'urgent' ? '<span class="badge badge-warning">Urgent</span>' : 'Normal');
 
             html += `<tr>
                 <td>${s.date || 'No Date'}<br><small>${s.startTime || '?'} - ${s.endTime || '?'}</small></td>
@@ -2058,7 +2064,7 @@ async function loadOperationsManagement() {
         html += '</tbody></table></div>';
         const container = document.getElementById('operationsContainer');
         if (container) container.innerHTML = html;
-    } catch(err) {
+    } catch (err) {
         console.error('Error loading operations:', err);
         showToast('error', 'Error loading operations');
     }
@@ -2066,12 +2072,12 @@ async function loadOperationsManagement() {
 
 function openEmergencyModal() {
     if (!currentUserData || currentUserData.role !== 'admin') return;
-    
+
     // Populate dropdowns
     const patientSel = document.getElementById('emPatient');
     const surgeonSel = document.getElementById('emSurgeon');
     const roomSel = document.getElementById('emOTRoom');
-    
+
     if (patientSel) {
         patientSel.innerHTML = '<option value="">Select Patient</option>';
         allPatients.forEach(p => patientSel.innerHTML += `<option value="${p.id}">${p.name}</option>`);
@@ -2084,10 +2090,10 @@ function openEmergencyModal() {
         roomSel.innerHTML = '<option value="">Select OT Room</option>';
         allOTRooms.forEach(r => roomSel.innerHTML += `<option value="${r.id}">OT Room ${r.roomNumber}</option>`);
     }
-    
+
     const form = document.getElementById('emergencyForm');
     if (form) form.reset();
-    
+
     const modal = document.getElementById('emergencyModal');
     if (modal) modal.style.display = 'block';
 }
@@ -2102,26 +2108,26 @@ async function handleEmergencySubmit(e) {
     if (!currentUserData || currentUserData.role !== 'admin') return;
     try {
         const scheduleData = {
-            otRoomId:  document.getElementById('emOTRoom').value,
+            otRoomId: document.getElementById('emOTRoom').value,
             patientId: document.getElementById('emPatient').value,
             surgeonId: document.getElementById('emSurgeon').value || null,
-            date:      new Date().toISOString().split('T')[0],
+            date: new Date().toISOString().split('T')[0],
             startTime: new Date().toTimeString().split(' ')[0].slice(0, 5), // Current time HH:MM
-            endTime:   '23:59', // Block rest of day roughly
+            endTime: '23:59', // Block rest of day roughly
             procedure: document.getElementById('emProcedure').value.trim(),
-            notes:     document.getElementById('emNotes').value.trim(),
-            priority:  document.getElementById('emPriority').value,
-            status:    'scheduled',
+            notes: document.getElementById('emNotes').value.trim(),
+            priority: document.getElementById('emPriority').value,
+            status: 'scheduled',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        
+
         // Attempt room conflict validation
         const roomConflict = await checkOTConflict(scheduleData.otRoomId, scheduleData.date, scheduleData.startTime, scheduleData.endTime);
-        if (roomConflict) { 
+        if (roomConflict) {
             const confirmed = await window.showConfirmation({ title: 'Room Conflict Detected', message: 'The selected OT room is already booked. Proceed with emergency override?', confirmText: 'Override' });
             if (!confirmed) return;
         }
-        
+
         if (scheduleData.surgeonId) {
             const docConflict = await checkDoctorConflict(scheduleData.surgeonId, scheduleData.date, scheduleData.startTime, scheduleData.endTime);
             if (docConflict) {
@@ -2133,7 +2139,7 @@ async function handleEmergencySubmit(e) {
         const docRef = await db.collection('ot_schedules').add(scheduleData);
         await logAdminAction('emergency_case_created', `Emergency: ${scheduleData.procedure}`, 'ot_schedules', docRef.id);
         showMessage('success', 'Emergency case created successfully!');
-        
+
         closeEmergencyModal();
         if (document.getElementById('section-operations').classList.contains('active')) {
             loadOperationsManagement();
@@ -2148,9 +2154,9 @@ async function handleEmergencySubmit(e) {
 }
 
 function scheduleManagement() { loadAdvancedSchedules(); showSection('scheduling'); }
-function auditLogs()          { showSection('logs'); }
-function profileSettings()    { showSection('profile'); }
-function viewAssignments()    { showSection('assignments'); }
+function auditLogs() { showSection('logs'); }
+function profileSettings() { showSection('profile'); }
+function viewAssignments() { showSection('assignments'); }
 function updateAvailability() { showSection('availability'); }
 
 // Removed legacy staff data function
@@ -2175,78 +2181,78 @@ window.onclick = function (event) {
 
 // ── Explicit window exports (for onclick= in HTML) ───────────────
 // This guarantees they are accessible even if bundlers change scope.
-window.capitalizeFirst    = capitalizeFirst;
-window.showToast          = showToast;
-window.showMessage        = showMessage;
-window.showConfirm        = function(title, message) { return window.showConfirmation({ title, message }); };
-window.logAdminAction     = logAdminAction;
-window.openModal          = openModal;
-window.closeModal         = closeModal;
-window.showSection        = showSection;
-window.logout             = logout;
-window.toggleSidebar      = toggleSidebar;
-window.toggleMobileSidebar= toggleMobileSidebar;
+window.capitalizeFirst = capitalizeFirst;
+window.showToast = showToast;
+window.showMessage = showMessage;
+window.showConfirm = function (title, message) { return window.showConfirmation({ title, message }); };
+window.logAdminAction = logAdminAction;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.showSection = showSection;
+window.logout = logout;
+window.toggleSidebar = toggleSidebar;
+window.toggleMobileSidebar = toggleMobileSidebar;
 window.closeMobileSidebar = closeMobileSidebar;
-window.openDoctorModal    = openDoctorModal;
-window.closeDoctorModal   = closeDoctorModal;
-window.editDoctor         = editDoctor;
-window.deleteDoctor       = deleteDoctor;
-window.searchDoctors      = searchDoctors;
-window.filterDoctors      = filterDoctors;
-window.exportDoctors      = exportDoctors;
-window.openPatientModal   = openPatientModal;
-window.closePatientModal  = closePatientModal;
-window.editPatient        = editPatient;
-window.deletePatient      = deletePatient;
+window.openDoctorModal = openDoctorModal;
+window.closeDoctorModal = closeDoctorModal;
+window.editDoctor = editDoctor;
+window.deleteDoctor = deleteDoctor;
+window.searchDoctors = searchDoctors;
+window.filterDoctors = filterDoctors;
+window.exportDoctors = exportDoctors;
+window.openPatientModal = openPatientModal;
+window.closePatientModal = closePatientModal;
+window.editPatient = editPatient;
+window.deletePatient = deletePatient;
 window.viewPatientDetails = viewPatientDetails;
-window.searchPatients     = searchPatients;
-window.filterPatients     = filterPatients;
-window.exportPatients     = exportPatients;
-window.openOTRoomModal    = openOTRoomModal;
-window.closeOTRoomModal   = closeOTRoomModal;
-window.editOTRoom         = editOTRoom;
-window.deleteOTRoom       = deleteOTRoom;
-window.addSampleOTRoom    = addSampleOTRoom;
-window.openOTScheduleModal= openOTScheduleModal;
-window.closeOTScheduleModal=closeOTScheduleModal;
-window.updateOTStatus     = updateOTStatus;
-window.cancelOperation    = cancelOperation;
-window.changeOTDate       = changeOTDate;
-window.changePassword     = changePassword;
-window.resetPassword      = resetPassword;
+window.searchPatients = searchPatients;
+window.filterPatients = filterPatients;
+window.exportPatients = exportPatients;
+window.openOTRoomModal = openOTRoomModal;
+window.closeOTRoomModal = closeOTRoomModal;
+window.editOTRoom = editOTRoom;
+window.deleteOTRoom = deleteOTRoom;
+window.addSampleOTRoom = addSampleOTRoom;
+window.openOTScheduleModal = openOTScheduleModal;
+window.closeOTScheduleModal = closeOTScheduleModal;
+window.updateOTStatus = updateOTStatus;
+window.cancelOperation = cancelOperation;
+window.changeOTDate = changeOTDate;
+window.changePassword = changePassword;
+window.resetPassword = resetPassword;
 window.resendVerification = resendVerification;
-window.contactSupport     = contactSupport;
-window.editProfile        = editProfile;
-window.extendSession      = extendSession;
-window.endSession         = endSession;
-window.viewAllUsers       = viewAllUsers;
-window.manageUsers        = manageUsers;
-function manageOperations()   { showSection('operations'); }
+window.contactSupport = contactSupport;
+window.editProfile = editProfile;
+window.extendSession = extendSession;
+window.endSession = endSession;
+window.viewAllUsers = viewAllUsers;
+window.manageUsers = manageUsers;
+function manageOperations() { showSection('operations'); }
 
-window.viewAnalytics      = viewAnalytics;
-window.manageOperations   = manageOperations;
+window.viewAnalytics = viewAnalytics;
+window.manageOperations = manageOperations;
 window.scheduleManagement = scheduleManagement;
-window.auditLogs          = auditLogs;
-window.profileSettings    = profileSettings;
-window.viewAssignments    = viewAssignments;
+window.auditLogs = auditLogs;
+window.profileSettings = profileSettings;
+window.viewAssignments = viewAssignments;
 window.updateAvailability = updateAvailability;
-window.loadAnalytics          = loadAnalytics;
+window.loadAnalytics = loadAnalytics;
 window.loadOperationsManagement = loadOperationsManagement;
-window.loadAdvancedSchedules  = loadAdvancedSchedules;
-window.clearSchedFilters      = clearSchedFilters;
-window.editSchedule           = editSchedule;
+window.loadAdvancedSchedules = loadAdvancedSchedules;
+window.clearSchedFilters = clearSchedFilters;
+window.editSchedule = editSchedule;
 window.handleOTScheduleSubmit = handleOTScheduleSubmit;
-window.loadOTSchedule         = loadOTSchedule;
-window.openEmergencyModal     = openEmergencyModal;
-window.closeEmergencyModal    = closeEmergencyModal;
-window.handleEmergencySubmit  = handleEmergencySubmit;
-window.deleteOperation        = deleteOperation;
+window.loadOTSchedule = loadOTSchedule;
+window.openEmergencyModal = openEmergencyModal;
+window.closeEmergencyModal = closeEmergencyModal;
+window.handleEmergencySubmit = handleEmergencySubmit;
+window.deleteOperation = deleteOperation;
 
 // User Management
-window.editUser           = editUser;
-window.closeUserModal     = closeUserModal;
-window.deactivateUser     = deactivateUser;
-window.signInWithGoogle   = signInWithGoogle;
+window.editUser = editUser;
+window.closeUserModal = closeUserModal;
+window.deactivateUser = deactivateUser;
+window.signInWithGoogle = signInWithGoogle;
 
 // ── Logout ─────────────────────────────────────────────────────
 async function logout() {
@@ -2255,8 +2261,8 @@ async function logout() {
         await auth.signOut();
         clearInterval(sessionTimer);
         sessionStartTime = null;
-        currentUser      = null;
-        currentUserData  = null;
+        currentUser = null;
+        currentUserData = null;
         showMessage('success', 'Logged out successfully!');
     } catch (err) {
         console.error('Error logging out:', err);
@@ -2291,27 +2297,27 @@ async function handlePatientProfileUpdate(e) {
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         await db.collection('patients').doc(currentUser.uid).update(payload);
-        
+
         // Sync with users collection
         await db.collection('users').doc(currentUser.uid).update({
             fullName: updatedName,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
+
         // Update local session
         currentUserData.fullName = updatedName;
-        
+
         showMessage('success', 'Profile updated successfully!');
-        
+
         // Update dashboard snapshot UI
         const pDoc = await db.collection('patients').doc(currentUser.uid).get();
-        if(pDoc.exists) {
+        if (pDoc.exists) {
             const p = pDoc.data();
             document.getElementById('patientSummaryName').textContent = p.name || 'N/A';
             document.getElementById('patientSummaryPhone').textContent = p.phone || 'N/A';
             document.getElementById('patientWelcomeName').textContent = p.name || 'Patient';
         }
-    } catch(err) {
+    } catch (err) {
         console.error('Error updating patient profile:', err);
         showMessage('error', 'Failed to update profile.');
     } finally {
@@ -2332,7 +2338,7 @@ async function loadPatientDoctors() {
         let html = '';
         snap.forEach(doc => {
             const d = doc.data();
-            if(d.status === 'inactive') return; // Hide inactive doctors from patients
+            if (d.status === 'inactive') return; // Hide inactive doctors from patients
             const fee = d.consultationFee ? `₹${d.consultationFee}` : '₹500';
             const exp = d.experience ? `${d.experience} years exp.` : 'Experience not specified';
             const spec = d.specialty || d.specialization || 'General Medicine';
@@ -2349,11 +2355,11 @@ async function loadPatientDoctors() {
                         <span class="badge" style="background: rgba(39,174,96,0.1); color: #27ae60; display: inline-block;">${statusLabel}</span>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-sm" onclick="openAppointmentModal('${doc.id}', '${(d.name||'').replace(/'/g, "\\'")}', '${d.email||''}', '${spec.replace(/'/g, "\\'")}')" style="margin-top: 15px; width: 100%;"><i class="fas fa-calendar-plus"></i> Book Appointment</button>
+                <button class="btn btn-primary btn-sm" onclick="openAppointmentModal('${doc.id}', '${(d.name || '').replace(/'/g, "\\'")}', '${d.email || ''}', '${spec.replace(/'/g, "\\'")}')" style="margin-top: 15px; width: 100%;"><i class="fas fa-calendar-plus"></i> Book Appointment</button>
             </div>`;
         });
         container.innerHTML = html;
-    } catch(err) {
+    } catch (err) {
         console.error('Error loading patient doctors:', err);
         container.innerHTML = '<p style="padding:1rem;color:red;">Error loading doctors.</p>';
     }
@@ -2361,13 +2367,13 @@ async function loadPatientDoctors() {
 window.loadPatientDoctors = loadPatientDoctors;
 // ── Staff Portal Functions ──────────────────────────────────────────────
 async function loadStaffDashboard() {
-    if(!currentUser || !currentUserData || currentUserData.role !== 'user') return;
-    
+    if (!currentUser || !currentUserData || currentUserData.role !== 'user') return;
+
     document.getElementById('staffWelcomeName').textContent = currentUserData.fullName || 'Staff Member';
-    
+
     try {
         const todayStr = new Date().toISOString().split('T')[0];
-        
+
         // Find if this staff member is linked to a doctor profile
         const doctorSnap = await db.collection('doctors').where('email', '==', currentUser.email).limit(1).get();
         if (doctorSnap.empty) {
@@ -2378,20 +2384,20 @@ async function loadStaffDashboard() {
             recentContainer.innerHTML = '<div class="empty-state"><i class="fas fa-user-md"></i><h3>No Doctor Profile Linked</h3><p>Your account is not linked to any active doctor profile.</p></div>';
             return;
         }
-        
+
         const snap = await db.collection('appointments').where('doctorEmail', '==', currentUser.email).get();
         let myAssignmentsCount = 0;
         let todayCasesCount = 0;
         let completedCasesCount = 0;
         let recentAssignmentsHTML = '';
         let counter = 0;
-        
+
         let appointments = [];
         snap.forEach(doc => {
             const data = doc.data();
             appointments.push({ id: doc.id, ...data });
         });
-        
+
         // sort descending by date
         appointments.sort((a, b) => b.appointmentDate.localeCompare(a.appointmentDate));
 
@@ -2399,7 +2405,7 @@ async function loadStaffDashboard() {
             myAssignmentsCount++;
             if (data.appointmentDate === todayStr) todayCasesCount++;
             if (data.status === 'completed') completedCasesCount++;
-            
+
             // Add to recent assignments (limit 5)
             if (counter < 5) {
                 const statusColors = {
@@ -2422,11 +2428,11 @@ async function loadStaffDashboard() {
                 counter++;
             }
         });
-        
+
         document.getElementById('staffAssignmentsCount').textContent = myAssignmentsCount;
         document.getElementById('staffTodayCases').textContent = todayCasesCount;
         document.getElementById('staffCompletedCases').textContent = completedCasesCount;
-        
+
         const recentContainer = document.getElementById('staffRecentAssignments');
         if (myAssignmentsCount > 0) {
             recentContainer.innerHTML = recentAssignmentsHTML;
@@ -2435,7 +2441,7 @@ async function loadStaffDashboard() {
             recentContainer.innerHTML = '<div class="empty-state"><h3>No Appointments</h3><p>You have no recent appointments.</p></div>';
             recentContainer.classList.add('empty-state');
         }
-        
+
     } catch (err) {
         console.error("Error loading staff dashboard", err);
     }
@@ -2445,7 +2451,7 @@ window.loadStaffDashboard = loadStaffDashboard;
 async function loadUserAssignments() {
     const container = document.getElementById('assignmentsList');
     if (!container) return;
-    
+
     try {
         const doctorSnap = await db.collection('doctors').where('email', '==', currentUser.email).limit(1).get();
         if (doctorSnap.empty) {
@@ -2455,13 +2461,13 @@ async function loadUserAssignments() {
 
         const snap = await db.collection('appointments').where('doctorEmail', '==', currentUser.email).get();
         let html = '';
-        
+
         let appointments = [];
         snap.forEach(doc => {
             const data = doc.data();
             appointments.push({ id: doc.id, ...data });
         });
-        
+
         appointments.sort((a, b) => {
             const dateA = a.appointmentDate || '';
             const dateB = b.appointmentDate || '';
@@ -2494,13 +2500,13 @@ async function loadUserAssignments() {
                 </div>
             </div>`;
         });
-        
+
         if (html === '') {
             container.innerHTML = '<div class="empty-state"><h3>No Appointments Found</h3><p>You have no current appointments.</p></div>';
         } else {
             container.innerHTML = html;
         }
-    } catch(err) {
+    } catch (err) {
         console.error("Error loading user assignments", err);
         container.innerHTML = '<p style="color:red">Error loading assignments.</p>';
     }
@@ -2510,7 +2516,7 @@ window.loadUserAssignments = loadUserAssignments;
 console.log('MediCore OT Scheduler loaded. Version 3.1 – stable.');
 
 // ── Auth UI Helpers ──────────────────────────────────────────────────
-window.togglePasswordVisibility = function(inputId, iconId) {
+window.togglePasswordVisibility = function (inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
     if (input && icon) {
@@ -2526,7 +2532,7 @@ window.togglePasswordVisibility = function(inputId, iconId) {
     }
 };
 
-window.toggleDepartmentField = function() {
+window.toggleDepartmentField = function () {
     const regTypeElement = document.querySelector('input[name="registrationType"]:checked');
     const container = document.getElementById('departmentContainer');
     const deptSelect = document.getElementById('department');
@@ -2542,7 +2548,7 @@ window.toggleDepartmentField = function() {
 };
 
 // ── Patient Appointments ──────────────────────────────────────────────
-window.openAppointmentModal = function(doctorId, doctorName, doctorEmail, doctorSpecialization) {
+window.openAppointmentModal = function (doctorId, doctorName, doctorEmail, doctorSpecialization) {
     document.getElementById('apptDoctorId').value = doctorId;
     document.getElementById('apptDoctorName').value = doctorName;
     document.getElementById('apptDoctorEmail').value = doctorEmail;
@@ -2550,18 +2556,18 @@ window.openAppointmentModal = function(doctorId, doctorName, doctorEmail, doctor
     document.getElementById('apptDate').value = '';
     document.getElementById('apptTime').value = '';
     document.getElementById('apptNotes').value = '';
-    
+
     const todayStr = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('apptDate');
     const timeInput = document.getElementById('apptTime');
-    
+
     if (dateInput) {
         dateInput.min = todayStr;
         if (!dateInput.value || dateInput.value < todayStr) {
             dateInput.value = todayStr;
         }
     }
-    
+
     // Add real-time time validation
     if (dateInput && timeInput && !window._apptTimeValidationBound) {
         window._apptTimeValidationBound = true;
@@ -2571,7 +2577,7 @@ window.openAppointmentModal = function(doctorId, doctorName, doctorEmail, doctor
             // Get local date accurately adjusting for timezone offset
             const currentTodayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
             const currentTimeStr = now.toTimeString().slice(0, 5);
-            
+
             if (dateInput.value === currentTodayStr && timeInput.value <= currentTimeStr) {
                 showNotification('warning', 'Please select a future time.');
                 timeInput.value = '';
@@ -2580,22 +2586,22 @@ window.openAppointmentModal = function(doctorId, doctorName, doctorEmail, doctor
         dateInput.addEventListener('change', validateTime);
         timeInput.addEventListener('change', validateTime);
     }
-    
+
     document.getElementById('appointmentModal').style.display = 'block';
 };
 
-window.closeAppointmentModal = function() {
+window.closeAppointmentModal = function () {
     document.getElementById('appointmentModal').style.display = 'none';
 };
 
-window.handleAppointmentSubmit = async function(e) {
+window.handleAppointmentSubmit = async function (e) {
     e.preventDefault();
-    if(!currentUser || !currentUserData || currentUserData.role !== 'patient') return;
-    
+    if (!currentUser || !currentUserData || currentUserData.role !== 'patient') return;
+
     const btn = document.getElementById('apptSubmitBtn');
     btn.disabled = true;
     btn.textContent = 'Booking...';
-    
+
     const doctorId = document.getElementById('apptDoctorId').value;
     const doctorName = document.getElementById('apptDoctorName').value;
     const doctorEmail = document.getElementById('apptDoctorEmail').value;
@@ -2603,26 +2609,26 @@ window.handleAppointmentSubmit = async function(e) {
     const appointmentDate = document.getElementById('apptDate').value;
     const appointmentTime = document.getElementById('apptTime').value;
     const notes = document.getElementById('apptNotes').value.trim();
-    
+
     const now = new Date();
     // Get local date accurately adjusting for timezone offset
     const todayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
     const currentTimeStr = now.toTimeString().slice(0, 5);
-    
+
     if (appointmentDate < todayStr) {
         showNotification('warning', 'Appointments must be booked for future dates.');
         btn.disabled = false;
         btn.textContent = 'Book Appointment';
         return;
     }
-    
+
     if (appointmentDate === todayStr && appointmentTime <= currentTimeStr) {
         showNotification('warning', 'Please select a future time.');
         btn.disabled = false;
         btn.textContent = 'Book Appointment';
         return;
     }
-    
+
     try {
         const appointmentId = `${doctorId}_${appointmentDate}_${appointmentTime.replace(':', '')}`;
 
@@ -2642,7 +2648,7 @@ window.handleAppointmentSubmit = async function(e) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
+
         showNotification('success', 'Appointment booked successfully!');
         closeAppointmentModal();
         if (window.loadPatientAppointments) {
@@ -2664,23 +2670,23 @@ window.handleAppointmentSubmit = async function(e) {
 window.patientAppointmentsUnsubscribe = null;
 
 async function loadPatientAppointments() {
-    if(!currentUser || !currentUserData || currentUserData.role !== 'patient') return;
-    
+    if (!currentUser || !currentUserData || currentUserData.role !== 'patient') return;
+
     const container = document.getElementById('patientAppointmentsContainer');
     if (!container) return;
-    
+
     if (window.patientAppointmentsUnsubscribe) return;
     container.innerHTML = '<p style="padding:1rem;">Loading appointments...</p>';
-    
+
     try {
         window.patientAppointmentsUnsubscribe = db.collection('appointments')
             .where('patientId', '==', currentUser.uid)
             .onSnapshot(snap => {
                 let appointments = [];
                 snap.forEach(doc => appointments.push({ id: doc.id, ...doc.data() }));
-        
-        if (appointments.length === 0) {
-            container.innerHTML = `
+
+                if (appointments.length === 0) {
+                    container.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-calendar-times"></i>
                     <h3>No appointments booked yet.</h3>
@@ -2688,31 +2694,36 @@ async function loadPatientAppointments() {
                     <button class="btn btn-primary" style="margin-top: 1rem;" onclick="showSection('find-doctors')">Browse Doctors</button>
                 </div>
             `;
-            return;
-        }
-        
-        appointments.sort((a, b) => {
-            const dateA = a.appointmentDate || '';
-            const dateB = b.appointmentDate || '';
-            if (dateA !== dateB) return dateA.localeCompare(dateB);
-            const timeA = a.appointmentTime || '';
-            const timeB = b.appointmentTime || '';
-            return timeA.localeCompare(timeB);
-        });
-        
-        let upcomingHtml = '';
-        let completedHtml = '';
-        let cancelledHtml = '';
-        
-        appointments.forEach(data => {
-            const statusColors = {
-                pending: { bg: '#fff3cd', text: '#856404' },
-                confirmed: { bg: '#cce5ff', text: '#004085' },
-                completed: { bg: '#d4edda', text: '#155724' },
-                cancelled: { bg: '#f8d7da', text: '#721c24' }
-            };
-            const colors = statusColors[data.status] || { bg: '#e2e3e5', text: '#383d41' };
-            const card = `
+                    return;
+                }
+
+                appointments.sort((a, b) => {
+                    const dateA = a.appointmentDate || '';
+                    const dateB = b.appointmentDate || '';
+                    if (dateA !== dateB) return dateA.localeCompare(dateB);
+                    const timeA = a.appointmentTime || '';
+                    const timeB = b.appointmentTime || '';
+                    return timeA.localeCompare(timeB);
+                });
+
+                let upcomingHtml = '';
+                let completedHtml = '';
+                let cancelledHtml = '';
+
+                appointments.forEach(data => {
+                    const statusColors = {
+                        pending: { bg: '#fff3cd', text: '#856404' },
+                        confirmed: { bg: '#cce5ff', text: '#004085' },
+                        completed: { bg: '#d4edda', text: '#155724' },
+                        cancelled: { bg: '#f8d7da', text: '#721c24' }
+                    };
+                    const colors = statusColors[data.status] || { bg: '#e2e3e5', text: '#383d41' };
+                    let payNowBtn = '';
+                    if (data.status === 'pending') {
+                        payNowBtn = `<button class="btn btn-sm btn-primary" style="margin-top: 10px;" onclick="window.initiateAppointmentPayment('${data.id}')">Pay Now (₹500)</button>`;
+                    }
+
+                    const card = `
                 <div class="item-card" style="margin-bottom: 1rem;">
                     <div class="item-header">
                         <div>
@@ -2728,65 +2739,118 @@ async function loadPatientAppointments() {
                         <strong>Time:</strong> ${data.appointmentTime} <br>
                         <strong>Notes:</strong> ${data.notes || 'None'}
                     </div>
+                    ${payNowBtn}
                 </div>
             `;
-            
-            if (data.status === 'pending' || data.status === 'confirmed') upcomingHtml += card;
-            else if (data.status === 'completed') completedHtml += card;
-            else if (data.status === 'cancelled') cancelledHtml += card;
-        });
-        
-        let finalHtml = '';
-        if (upcomingHtml) {
-            finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Upcoming</h3>' + upcomingHtml;
-        }
-        if (completedHtml) {
-            finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Completed</h3>' + completedHtml;
-        }
-        if (cancelledHtml) {
-            finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Cancelled</h3>' + cancelledHtml;
-        }
-        
-        container.innerHTML = finalHtml;
-        
-        // Update stats on dashboard if we are loading patient appointments
-        const dashUpcoming = document.getElementById('patientUpcomingAppointments');
-        const dashCompleted = document.getElementById('patientCompletedAppointments');
-        
-        if (dashUpcoming && dashCompleted) {
-            dashUpcoming.textContent = (upcomingHtml.match(/<div class="item-card"/g) || []).length;
-            dashCompleted.textContent = (completedHtml.match(/<div class="item-card"/g) || []).length;
-        }
-        
+
+                    if (data.status === 'pending' || data.status === 'confirmed') upcomingHtml += card;
+                    else if (data.status === 'completed') completedHtml += card;
+                    else if (data.status === 'cancelled') cancelledHtml += card;
+                });
+
+                let finalHtml = '';
+                if (upcomingHtml) {
+                    finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Upcoming</h3>' + upcomingHtml;
+                }
+                if (completedHtml) {
+                    finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Completed</h3>' + completedHtml;
+                }
+                if (cancelledHtml) {
+                    finalHtml += '<h3 style="margin: 1.5rem 0 1rem 0;">Cancelled</h3>' + cancelledHtml;
+                }
+
+                container.innerHTML = finalHtml;
+
+                // Update stats on dashboard if we are loading patient appointments
+                const dashUpcoming = document.getElementById('patientUpcomingAppointments');
+                const dashCompleted = document.getElementById('patientCompletedAppointments');
+
+                if (dashUpcoming && dashCompleted) {
+                    dashUpcoming.textContent = (upcomingHtml.match(/<div class="item-card"/g) || []).length;
+                    dashCompleted.textContent = (completedHtml.match(/<div class="item-card"/g) || []).length;
+                }
+
             }, err => {
                 console.error("Error in appointments listener", err);
                 container.innerHTML = '<p style="color:red">Error loading appointments.</p>';
             });
-    } catch(err) {
+    } catch (err) {
         console.error("Error setting up patient appointments listener", err);
+    }
+};
+
+window.initiateAppointmentPayment = async function (appointmentId) {
+    try {
+        if (!currentUser) {
+            showNotification('error', 'Please login to make a payment.');
+            return;
+        }
+
+        showNotification('info', 'Initializing secure payment...');
+
+        const createRazorpayOrder = firebase.functions().httpsCallable('createRazorpayOrder');
+        const response = await createRazorpayOrder({ appointmentId });
+        const data = response.data;
+
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to create payment order.');
+        }
+
+        const options = {
+            key: "rzp_test_T4nIn7QJLlRMOb",
+            amount: data.amount,
+            currency: data.currency,
+            name: "MediCore Hospital",
+            description: "Appointment Booking Fee",
+            order_id: data.orderId,
+            handler: function (response) {
+                console.log("Payment Success Response:", response);
+                showNotification("success", "Payment completed successfully.");
+            },
+            prefill: {
+                name: currentUserData.fullName || currentUser.email,
+                email: currentUser.email
+            },
+            theme: {
+                color: "#1890ff"
+            }
+        };
+
+        const rzp = new window.Razorpay(options);
+
+        rzp.on('payment.failed', function (response) {
+            console.error("Payment Failed:", response.error);
+            showNotification("error", "Payment failed. Please try again.");
+        });
+
+        rzp.open();
+
+    } catch (err) {
+        console.error("Error initiating payment:", err);
+        showNotification('error', err.message || 'Error initiating payment.');
     }
 };
 
 // ── Admin Appointments ──────────────────────────────────────────────
 async function loadAdminAppointments() {
-    if(!currentUser || !currentUserData || currentUserData.role !== 'admin') return;
-    
+    if (!currentUser || !currentUserData || currentUserData.role !== 'admin') return;
+
     const container = document.getElementById('adminAppointmentsContainer');
     const statusFilter = document.getElementById('adminApptFilterStatus').value;
     if (!container) return;
-    
+
     try {
         container.innerHTML = '<p style="padding:1rem;">Loading appointments...</p>';
-        
+
         let query = db.collection('appointments');
         if (statusFilter) {
             query = query.where('status', '==', statusFilter);
         }
-        
+
         const snap = await query.get();
         let appointments = [];
         snap.forEach(doc => appointments.push({ id: doc.id, ...doc.data() }));
-        
+
         appointments.sort((a, b) => {
             const dateA = a.appointmentDate || '';
             const dateB = b.appointmentDate || '';
@@ -2795,12 +2859,12 @@ async function loadAdminAppointments() {
             const timeB = b.appointmentTime || '';
             return timeA.localeCompare(timeB);
         });
-        
+
         if (appointments.length === 0) {
             container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><h3>No Appointments Found</h3><p>There are no appointments matching your criteria.</p></div>';
             return;
         }
-        
+
         let html = '';
         appointments.forEach(data => {
             const statusColors = {
@@ -2810,7 +2874,7 @@ async function loadAdminAppointments() {
                 cancelled: { bg: '#f8d7da', text: '#721c24' }
             };
             const colors = statusColors[data.status] || { bg: '#e2e3e5', text: '#383d41' };
-            
+
             // Generate valid actions based on current status
             let actionsHtml = '';
             if (data.status === 'pending') {
@@ -2848,10 +2912,10 @@ async function loadAdminAppointments() {
                 </div>
             </div>`;
         });
-        
+
         container.innerHTML = html;
-        
-    } catch(err) {
+
+    } catch (err) {
         console.error("Error loading admin appointments", err);
         container.innerHTML = '<p style="color:red">Error loading appointments.</p>';
     }
@@ -2860,11 +2924,11 @@ async function loadAdminAppointments() {
 window.loadPatientAppointments = loadPatientAppointments;
 window.loadAdminAppointments = loadAdminAppointments;
 
-window.updateAppointmentStatus = async function(appointmentId, newStatus) {
-    if(!currentUser || !currentUserData || currentUserData.role !== 'admin') return;
+window.updateAppointmentStatus = async function (appointmentId, newStatus) {
+    if (!currentUser || !currentUserData || currentUserData.role !== 'admin') return;
     const confirmed = await window.showConfirmation({ title: 'Confirm Status Change', message: `Are you sure you want to change the status to ${newStatus}?`, confirmText: 'Update' });
     if (!confirmed) return;
-    
+
     try {
         // Fetch existing appointment data first to generate human-readable logs
         const apptDoc = await db.collection('appointments').doc(appointmentId).get();
@@ -2879,19 +2943,19 @@ window.updateAppointmentStatus = async function(appointmentId, newStatus) {
             status: newStatus,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
+
         // Log action with structured metadata and human-readable string
         if (window.logAdminAction) {
             let actionTitle = 'Appointment Status Updated';
             if (oldStatus === 'pending' && newStatus === 'confirmed') actionTitle = 'Appointment Confirmed';
             else if (oldStatus === 'confirmed' && newStatus === 'completed') actionTitle = 'Appointment Completed';
             else if (oldStatus === 'pending' && newStatus === 'cancelled') actionTitle = 'Appointment Cancelled';
-            
+
             // Format date and time
             const [yyyy, mm, dd] = apptData.appointmentDate.split('-');
             const dateObj = new Date(yyyy, mm - 1, dd);
             const dateStr = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, ' '); // 23 Jun 2026
-            
+
             let [hour, min] = apptData.appointmentTime.split(':');
             const ampm = hour >= 12 ? 'PM' : 'AM';
             const hour12 = (hour % 12) || 12;
@@ -2912,7 +2976,7 @@ window.updateAppointmentStatus = async function(appointmentId, newStatus) {
             logAdminAction(actionTitle, detailsStr, 'appointments', appointmentId, metadata);
         }
         loadAdminAppointments();
-    } catch(err) {
+    } catch (err) {
         console.error("Error updating appointment status", err);
         showNotification('error', 'Failed to update status. Check console for details.');
     }

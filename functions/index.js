@@ -88,7 +88,7 @@ exports.createRazorpayOrder = onCall({
     const options = {
       amount: amountInPaise,
       currency: "INR",
-      receipt: `appt_${appointmentId}`,
+      receipt: `appt_${Date.now()}`,
     };
 
     const order = await rzp.orders.create(options);
