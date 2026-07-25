@@ -272,6 +272,17 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .modal .close:hover { background: var(--status-danger-bg); color: var(--status-danger); border-color: var(--status-danger-border); }
 
+/* ── Modal scrollable body ────────────────────────────────── */
+.modal-body { max-height: calc(100vh - 200px); overflow-y: auto; padding-right: 2px; }
+
+/* ── Form actions (modal footer button row) ───────────────── */
+.form-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  margin-top: 1.75rem; padding-top: 1.125rem;
+  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
 /* ── Table ────────────────────────────────────────────────── */
 .data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .data-table thead th {
@@ -371,7 +382,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   list-style: none; padding: 0.625rem 0.5rem;
   overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;
 }
-.nav-item { margin-bottom: 1px; }
+.nav-item { margin-bottom: 3px; }
 .nav-link {
   display: flex; align-items: center; gap: 0.6rem;
   padding: 0.55rem 0.75rem;
@@ -695,8 +706,13 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   .modal-content { padding: 1.375rem; }
   .page-content  { padding: 1rem; }
   .auth-card     { padding: 2rem 1.375rem; }
+  .auth-card h1  { font-size: 1.25rem; }
   .section-header { flex-direction: column; align-items: flex-start; }
   h1 { font-size: 1.375rem; }
+  
+  /* Patient cards: wrap actions under info on small screens */
+  .item-header { flex-wrap: wrap; gap: 0.5rem; }
+  .item-actions { flex-wrap: wrap; }
   
   /* Mobile UI Optimization for Tables -> Cards */
   .data-table-wrapper, .data-table-container, .table-container { overflow-x: hidden !important; border: none; background: transparent; padding: 0;}

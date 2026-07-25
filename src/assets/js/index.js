@@ -959,17 +959,9 @@ function displayPatients(patients) {
     c.innerHTML = patients.map(p => `
         <div class="item-card">
           <div class="item-header">
-            <div>
+            <div style="min-width:0;flex:1;">
               <div class="item-title">${p.name}</div>
-              <div class="item-subtitle">${p.age} yrs • ${capitalizeFirst(p.gender)}</div>
-              <div style="margin-top:.5rem;font-size:.9rem;color:var(--text-secondary);">
-                <span style="display:block;">${p.phone}</span>
-                ${p.email ? `<span style="display:block;">${p.email}</span>` : ''}
-                <span style="display:block;">Blood: ${p.bloodGroup || 'Unknown'}</span>
-                <span style="display:block;">${capitalizeFirst(p.status || 'outpatient')}</span>
-              </div>
-              ${p.medicalHistory ? `<div style="margin-top:.5rem;font-style:italic;color:var(--text-secondary);">
-                Medical: ${p.medicalHistory.substring(0, 100)}${p.medicalHistory.length > 100 ? '...' : ''}</div>` : ''}
+              <div class="item-subtitle">${p.age ?? '?'} yrs &bull; ${capitalizeFirst(p.gender || 'Unknown')}</div>
             </div>
             <div class="item-actions">
               <button class="btn btn-primary btn-sm" onclick="viewPatientDetails('${p.id}')">View</button>
@@ -977,6 +969,13 @@ function displayPatients(patients) {
               <button class="btn btn-danger btn-sm" onclick="deletePatient('${p.id}','${p.name.replace(/'/g, "\\'")}')">Delete</button>
             </div>
           </div>
+          <div style="margin-top:.625rem;font-size:.875rem;color:var(--text-secondary);display:grid;gap:.15rem;">
+            <span><i class="fas fa-phone" style="width:14px;opacity:.6;margin-right:.3rem;"></i>${p.phone || '—'}</span>
+            ${p.email ? `<span><i class="fas fa-envelope" style="width:14px;opacity:.6;margin-right:.3rem;"></i>${p.email}</span>` : ''}
+            <span><i class="fas fa-tint" style="width:14px;opacity:.6;margin-right:.3rem;"></i>Blood: ${p.bloodGroup || 'Unknown'}</span>
+            <span><i class="fas fa-circle" style="width:14px;opacity:.6;margin-right:.3rem;"></i>${capitalizeFirst(p.status || 'outpatient')}</span>
+          </div>
+          ${p.medicalHistory ? `<div style="margin-top:.5rem;font-size:.8125rem;color:var(--text-muted);font-style:italic;border-top:1px dashed var(--border-color);padding-top:.4rem;">${p.medicalHistory.substring(0, 100)}${p.medicalHistory.length > 100 ? '...' : ''}</div>` : ''}
         </div>`).join('');
 }
 

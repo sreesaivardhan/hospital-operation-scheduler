@@ -7,6 +7,8 @@ serviceAccountKey.json
 
 # ─── Firebase ─────────────────────────────────────────────────────────────
 firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
 .firebase/
 
 # ─── Dependencies ─────────────────────────────────────────────────────────
@@ -29,3 +31,9 @@ build/
 
 # ─── Logs ─────────────────────────────────────────────────────────────────
 *.log
+
+# ─── Scratch / temp files ─────────────────────────────────────────────────
+test-registration.js
+test-rules.js
+src/folder_structure.txt
+dataconnect/
